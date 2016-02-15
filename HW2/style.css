@@ -1,0 +1,65 @@
+/*CS5410 Assignment1, Fabio Gottlicher A01647928*/
+body
+{
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #444444
+}
+#all
+{
+    width: 50%;
+    float: center;
+    box-shadow: 1px 1px 5px #888888;
+    border-radius: 5px
+}
+#top
+{
+    background-color: #AFAFFF;
+    width: 100%;
+    text-align: center;
+    border-radius: 5px 5px 0px 0px
+}
+
+#title
+{
+}
+
+#left
+{
+    float:left;
+    width: calc(50% - 2px);
+    border: 1px solid #666666;
+    height: 200px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+
+#right
+{
+    float: right;
+    width: calc(50% - 2px);
+    border: 1px solid #666666;
+    height: 200px
+}
+
+.label
+{
+    width: 100px;
+    display: inline-block;
+    text-align: right;
+}
+input
+{
+    margin-left: 5px
+}
+
+#submit_cont
+{
+    margin: 0 auto;
+}
+#bottom
+{
+    clear: both;
+    background-color: #AFAFFF;  
+    text-align: center;  
+    border-radius: 0px 0px 5px 5px
+}
