@@ -21,10 +21,9 @@ MazeGame.mazeArray = (function () {
         END: 7
     }
 
-    function init(size) {
-        console.log('start1');
+    function init(sizeM) {
         
-        size = size;
+        size = sizeM;
         mazeArray = new Array(size)
         for (var i = 0; i < size; i++) {
             mazeArray[i] = new Array(size);
@@ -32,29 +31,31 @@ MazeGame.mazeArray = (function () {
                 mazeArray[i][j] = CellType.EMPTY;
             }
         }
-        console.log('start2');
 
-        recursiveDivider(0, 0, size, size);
+       recursiveDivider(0, 0, size, size);
 
     }
 
     function recursiveDivider(startX, startY, width, height) {
-        if (width == 2 && height == 2) return;
+        console.log('w ', width, ' h ', height);
+        if (width <= 2 || height <= 2) return;
         console.log('start3');
         //add vertical
-        var verticalDivide = randomBetween(startX + 1, startX + width)
+        var verticalDivide = randomBetween(startX + 1, startX + width -1)
         for(var  j = startY; j < startY + height;j++){
-            console.log(j);
             mazeArray[verticalDivide][j] = CellType.WALL;
         }
         //add hole to vertical
+        if(height == 3){
+            verticalHole = startY; //edge case
+        } else {
         var verticalHole = randomBetween(startY,startY+height);
         mazeArray[verticalDivide][verticalHole] = CellType.EMPTY;
-        
+        }
         //add horizontal
         var horizontalDivide = 0;
         do{
-            horizontalDivide = randomBetween(startY, startY + height);
+            horizontalDivide = randomBetween(startY + 1, startY + height - 1);
         }while(horizontalDivide == verticalHole)
         
         for(var i = startX; i < startX + height;i++)
@@ -63,27 +64,36 @@ MazeGame.mazeArray = (function () {
         }
         
         //add hole to horizontal
-        var horizontalHole = randomBetween(startX, startX + width);
-        mazeArray[horizontalHole][horizontalDivide] = CellType.EMPTY;
+        var horizontalHole1 = randomBetween(startX, verticalDivide);
+        mazeArray[horizontalHole1][horizontalDivide] = CellType.EMPTY;
         
+        var horizontalHole2 = randomBetween(verticalDivide + 1, startX + width);
+        mazeArray[horizontalHole2][horizontalDivide] = CellType.EMPTY;
         logMaze();
         //topleft
-        recursiveDivider(startX, startY, verticalDivide - startX, horizontalDivide - startY);
+        recursiveDivider(startX, startY, verticalDivide - startX - 1, horizontalDivide - startY - 1);
         //topright
-        recursiveDivider(verticalDivide, startY, startX + width - verticalDivide, horizontalDivide - startY);
+        recursiveDivider(verticalDivide + 1, startY, startX + width - verticalDivide, horizontalDivide - startY );
         //bottomleft
-        recursiveDivider(startX, horizontalDivide, verticalDivide - startX, startY + height - horizontalDivide);
+        //recursiveDivider(startX, horizontalDivide, verticalDivide - startX, startY + height - horizontalDivide);
         //bottomright
-        recursiveDivider(verticalDivide, horizontalDivide, startX + width - verticalDivide, startY + height - horizontalDivide);
+        //recursiveDivider(verticalDivide, horizontalDivide, startX + width - verticalDivide, startY + height - horizontalDivide);
     }
     
     function logMaze(){
         var a = '';
         for(var j = 0; j < size;j++){
             for(var i = 0; i < size; i++){
-                a += mazeArray[i][j];
+                if(mazeArray[i][j] == CellType.EMPTY)
+                {
+                    a += " ";
+                }
+                else
+                {
+                    a += "*";
+                }
             }
-            a += '\\r\\n';
+            a += '\r\n';
         }
         console.log(a);
     }
@@ -118,7 +128,8 @@ function startGame() {
 
 
 function randomBetween(min, max) {
-    return Math.floor((Math.random() * max) + min);
+    return Math.floor(Math.random() * (max - min)) + min;
 }
 
-MazeGame.mazeArray.init(10);
+console.log('test')
+MazeGame.mazeArray.init(20);
