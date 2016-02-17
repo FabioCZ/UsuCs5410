@@ -44,11 +44,11 @@ MazeGame.Game = (function () {
     var printBreadCrumbs = false;
 
     function gameLoop(time) {
-        console.log('loopin\'');
         elapsedTime = time - startTime;
-        //collect input and update maze
         MazeGame.Graphics.drawMaze();
-        //window.requestAnimationFrame(gameLoop);
+        if(!CheckWin()){
+            window.requestAnimationFrame(gameLoop);
+        }
     }
 
     function startGame(size) {
@@ -70,7 +70,15 @@ MazeGame.Game = (function () {
         else if (e.keyCode === MazeGame.KeyCode.P) { } //TODO print path to finish
         else if (e.keyCode === MazeGame.KeyCode.Y) { } //TODO print score
         
-        gameLoop(performance.now());
+        //gameLoop(performance.now());
+    }
+    
+    function CheckWin(){
+        if(MazeGame.mazeArray.hasWon()){
+            alert('win. Time: ' + MazeGame.Game.elapsedTime());
+            return true;            
+        }
+        return false;
     }
 
     return {
@@ -146,9 +154,10 @@ MazeGame.mazeArray = (function () {
     var size = -1;
     var lastPlayerX;
     var lastPlayerY;
+    var hasWon;
 
     function init(sizeM) {
-
+        hasWon = false;
         size = sizeM + 2;
         mazeArray = new Array(size)
         for (var i = 0; i < size; i++) {
@@ -243,10 +252,9 @@ MazeGame.mazeArray = (function () {
             mazeArray[lastPlayerX][lastPlayerY] = MazeGame.CellType.PLAYER;
         }
 
+
         //check win
-        if(lastPlayerX === size - 2 && lastPlayerY === size - 2){
-            alert('win. Time: ' + MazeGame.mazeArray.elapsedTime());
-        }
+        hasWon = (lastPlayerX === size - 2 && lastPlayerY === size - 2);
     }
 
     function isValidMove(newX, newY) {
@@ -279,6 +287,7 @@ MazeGame.mazeArray = (function () {
         logMaze: logMaze,
         getCell: getCell,
         size: function () { return size; },
+        hasWon : function () {return hasWon; },
         updatePlayer: updatePlayer
     }
 } ());
