@@ -4,11 +4,22 @@
     <head>
         <meta charset="UTF-8">
         <link rel = "stylesheet" type = "text/css" href = "style.css">
-        <script src = "maze.js"></script>
+
         <title>Assignment 2 - CS5410</title>
     </head>
     <body>
+        <div id="sizes">
+            <button onclick="MazeGame.Game.startGame(5)">5x5</button>
+            <button onclick="MazeGame.Game.startGame(10)">10x10</button>
+            <button onclick="MazeGame.Game.startGame(15)">15x15</button>
+            <button onclick="MazeGame.Game.startGame(20)">20x20</button>
+        </div>
+        <div id="gameBoard">
+            <canvas id="canvas-main" width = "500" height = "500" style = "width: 100%;"></canvas>
+        </div>
+            
     </body>
+    <script src = "maze.js"></script>
 </html>
                 
                 

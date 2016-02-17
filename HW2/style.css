@@ -1,8 +1,14 @@
 /*CS5410 Assignment1, Fabio Gottlicher A01647928*/
+
+html{
+    height: 100%;    
+}
 body
 {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: #444444
+    color: #444444;
+    height: 100%;
+    overflow: hidden;
 }
 #all
 {
