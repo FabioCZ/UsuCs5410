@@ -43,22 +43,25 @@ MazeGame.Game = (function () {
     var startTime;
 
     var printHint = false;
-    var printBreadCrumbs = false;
+    var printBreadCrumbs = true;
     var printFinishPath = false;
-    var printScore = false;
+    var printScore = true;
+    var winDialogShown;
 
     function gameLoop(time) {
-        elapsedTime = time - startTime;
+        if (!winDialogShown)
+            elapsedTime = time - startTime;
         MazeGame.Graphics.drawMaze();
         updateHtml();
-        if(!CheckWin()){
-            window.requestAnimationFrame(gameLoop);
-        }
+        CheckWin();
+        window.requestAnimationFrame(gameLoop);
     }
 
     function startGame(size) {
+        winDialogShown = false;
         console.log('starting game of size ', size);
         MazeGame.mazeArray.init(size);
+        MazeGame.Graphics.init();
         startTime = performance.now();
         document.addEventListener('keydown', onKeyDown);
         gameLoop(performance.now());
@@ -77,32 +80,33 @@ MazeGame.Game = (function () {
         
         //gameLoop(performance.now());
     }
-    
-    function CheckWin(){
-        if(MazeGame.mazeArray.hasWon()){
+
+    function CheckWin() {
+        if (MazeGame.mazeArray.hasWon() && !winDialogShown) {
+            console.log('win');
             alert('win. Time: ' + millisToTimeString(MazeGame.Game.elapsedTime()));
-            return true;            
+            winDialogShown = true;
         }
-        return false;
     }
 
-    function updateHtml(){
+    function updateHtml() {
         var hint = document.getElementById('hint');
         var breadCrumbs = document.getElementById('breadCrumbs');
         var finishPath = document.getElementById('finishPath');
         var score = document.getElementById('score');
         var time = document.getElementById('time');
 
-        hint.innerHTML = "Print Hint (H): " + (printHint ? "ON" : "OFF"); 
-        breadCrumbs.innerHTML = "Print Breadcrumbs (B): " + (printBreadCrumbs ? "ON" : "OFF"); 
-        finishPath.innerHTML = "Print Path to Finish (P): " + (printFinishPath ? "ON" : "OFF"); 
-        score.innerHTML = "Print Score (Y): " + (printScore ? ("ON, Score: " + 1) : "OFF") ; 
+        hint.innerHTML = "Print Hint (H): " + (printHint ? "ON" : "OFF");
+        breadCrumbs.innerHTML = "Print Breadcrumbs (B): " + (printBreadCrumbs ? "ON" : "OFF");
+        finishPath.innerHTML = "Print Path to Finish (P): " + (printFinishPath ? "ON" : "OFF");
+        score.innerHTML = "Print Score (Y): " + (printScore ? ("ON, Score: " + 1) : "OFF");
         time.innerHTML = "Elapsed time: " + millisToTimeString(MazeGame.Game.elapsedTime());
     }
 
     return {
         startGame: startGame,
-        elapsedTime: function(){ return elapsedTime;},
+        updateHtml: updateHtml,
+        elapsedTime: function () { return elapsedTime; },
         printHint: function () { return printHint; },
         printBreadCrumbs: function () { return printBreadCrumbs; },
         printFinishPath: function () { return printFinishPath; }
@@ -115,13 +119,13 @@ MazeGame.Graphics = (function () {
 
     var canvas = document.getElementById('canvas-main');
     var context = canvas.getContext('2d');
+
+    var cellSize;
     
     //------------------------------------------------------------------
-    //
     // Place a 'clear' function on the Canvas prototype, this makes it a part
     // of the canvas, rather than making a function that calls and does it.
-    // This is taken from Dean Mathias's 
-    //
+    // This is taken from Dean Mathias's sample code
     //------------------------------------------------------------------
     CanvasRenderingContext2D.prototype.clear = function () {
         this.save();
@@ -129,13 +133,20 @@ MazeGame.Graphics = (function () {
         this.clearRect(0, 0, canvas.width, canvas.height);
         this.restore();
     };
-	
+
     function clear() {
         context.clear();
     }
 
+    function init() {
+        var gameBoardDummy = document.getElementById('gameBoardDummy');
+        var canvasSize = gameBoardDummy.clientWidth;
+        cellSize = canvasSize / MazeGame.mazeArray.size();
+        fitToContainer();
+    }
+
     function drawMaze() {
-        console.log('draw, size: ', MazeGame.mazeArray.size());
+        //console.log('draw, size: ', MazeGame.mazeArray.size());
         context.clear();
         for (var j = 0; j < MazeGame.mazeArray.size(); j++) {
             for (var i = 0; i < MazeGame.mazeArray.size(); i++) {
@@ -143,9 +154,9 @@ MazeGame.Graphics = (function () {
 
                 if (currCell === MazeGame.CellType.PLAYER) {
                     context.fillStyle = "#FF00FF";
-                } else if(i == 1 && j == 1){
+                } else if (i == 1 && j == 1) {
                     context.fillStyle = "#00FF00";  //start
-                } else if (i == MazeGame.mazeArray.size() - 2 && j == MazeGame.mazeArray.size() - 2){
+                } else if (i == MazeGame.mazeArray.size() - 2 && j == MazeGame.mazeArray.size() - 2) {
                     context.fillStyle = "#FF0000";
                 } else if (currCell === MazeGame.CellType.EMPTY) {
                     context.fillStyle = "#EEEEEE";
@@ -153,15 +164,27 @@ MazeGame.Graphics = (function () {
                     context.fillStyle = "#000000";
                 } else if (currCell === MazeGame.CellType.VISITED) {
                     context.fillStyle = MazeGame.Game.printBreadCrumbs() ? "#FFFF00" : "#EEEEEE";
-                } 
-                context.fillRect(i * 10, j * 10, 10, 10);
+                }
+                context.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
             }
         }
 
     }
+
+    //from http://stackoverflow.com/questions/10214873/make-canvas-as-wide-and-as-high-as-parent
+    function fitToContainer() {
+        // Make it visually fill the positioned parent
+        canvas.style.width = '100%';
+        canvas.style.height = '100%';
+        // ...then set the internal size to match
+        canvas.width = canvas.offsetWidth;
+        canvas.height = canvas.offsetHeight;
+    }
+
     return {
         drawMaze: drawMaze,
-        clear: clear
+        clear: clear,
+        init: init
     }
 } ());
 
@@ -181,10 +204,10 @@ MazeGame.mazeArray = (function () {
         for (var i = 0; i < size; i++) {
             mazeArray[i] = new Array(size);
             for (var j = 0; j < size; j++) {
-                    mazeArray[i][j] = MazeGame.CellType.EMPTY;
+                mazeArray[i][j] = MazeGame.CellType.EMPTY;
             }
         }
-        
+
         logMaze();
         recursiveDivider(true, 1, 1, size - 2, size - 2);
 
@@ -196,7 +219,7 @@ MazeGame.mazeArray = (function () {
         }
 
         mazeArray[1][1] = MazeGame.CellType.EMPTY;
-        mazeArray[size-2][size-2] = MazeGame.CellType.EMPTY;
+        mazeArray[size - 2][size - 2] = MazeGame.CellType.EMPTY;
         lastPlayerX = 1;
         lastPlayerY = 1;
         mazeArray[lastPlayerX][lastPlayerY] = MazeGame.CellType.PLAYER;
@@ -252,7 +275,7 @@ MazeGame.mazeArray = (function () {
     }
 
     function updatePlayer(direction) {
-        if(hasWon) return;
+        if (hasWon) return;
         var newX = lastPlayerX;
         var newY = lastPlayerY;
         if (direction == MazeGame.Direction.UP) {
@@ -306,7 +329,7 @@ MazeGame.mazeArray = (function () {
         logMaze: logMaze,
         getCell: getCell,
         size: function () { return size; },
-        hasWon : function () {return hasWon; },
+        hasWon: function () { return hasWon; },
         updatePlayer: updatePlayer
     }
 } ());
@@ -315,12 +338,12 @@ function randomBetween(min, max) {
     return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
-function millisToTimeString(millis)
-{
+function millisToTimeString(millis) {
+    if (typeof millis === 'undefined') return "0:00";
     var totalSec = Math.floor(millis / 1000);
     var sec = totalSec % 60;
     var min = Math.floor(totalSec / 60);
-    return min + ":" + (sec < 10 ? ("0"+sec) : sec);
+    return min + ":" + (sec < 10 ? ("0" + sec) : sec);
 }
 
-//MazeGame.mazeArray.init(10);
+MazeGame.Game.updateHtml();     //set on first load

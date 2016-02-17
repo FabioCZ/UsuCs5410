@@ -10,62 +10,40 @@ body
     height: 100%;
     overflow: hidden;
 }
+
 #all
 {
-    width: 50%;
-    float: center;
-    box-shadow: 1px 1px 5px #888888;
-    border-radius: 5px
-}
-#top
-{
-    background-color: #AFAFFF;
-    width: 100%;
-    text-align: center;
-    border-radius: 5px 5px 0px 0px
+    width : 60%;
 }
 
-#title
+#controls
 {
-}
-
-#left
-{
-    float:left;
-    width: calc(50% - 2px);
-    border: 1px solid #666666;
-    height: 200px;
-    overflow-y: scroll;
-    overflow-x: hidden;
-}
-
-#right
-{
+    margin-left: 10px;
+    width: calc(25%);   
     float: right;
-    width: calc(50% - 2px);
-    border: 1px solid #666666;
-    height: 200px
 }
 
-.label
+#gameBoard 
 {
-    width: 100px;
-    display: inline-block;
-    text-align: right;
-}
-input
-{
-    margin-left: 5px
+    float: left;
+    position: relative;
+    width:    calc(75% - 10px); /* desired width */
 }
 
-#submit_cont
+#gameBoard:before 
 {
-    margin: 0 auto;
+    content:     "";
+    display:     block;
+    padding-top: 100%; /* initial ratio of 1:1*/
 }
-#bottom
+
+#gameBoardDummy
 {
-    clear: both;
-    background-color: #AFAFFF;  
-    text-align: center;  
-    border-radius: 0px 0px 5px 5px
+    position: absolute;
+    top:      0;
+    left:     0;
+    bottom:   0;
+    right:    0;
 }
+
+

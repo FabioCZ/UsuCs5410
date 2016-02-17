@@ -1,33 +1,41 @@
 <!--CS5410 Assignment1, Fabio Gottlicher A01647928-->
 <!DOCTYPE HTML>
 <html lang="en-US">
-    <head>
-        <meta charset="UTF-8">
-        <link rel = "stylesheet" type = "text/css" href = "style.css">
 
-        <title>Assignment 2 - CS5410</title>
-    </head>
-    <body>
-        <div id="sizes">
-            <button onclick="MazeGame.Game.startGame(5)">5x5</button>
-            <button onclick="MazeGame.Game.startGame(10)">10x10</button>
-            <button onclick="MazeGame.Game.startGame(15)">15x15</button>
-            <button onclick="MazeGame.Game.startGame(20)">20x20</button>
-        </div>
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="style.css">
+
+    <title>Assignment 2 - CS5410</title>
+</head>
+
+<body>
+    <h1>Assignment 2 - Maze Game</h2>
+    <div id="all">
         <div id="controls">
-            <div id="hint">...</div>
-            <div id="breadCrumbs">...</div>
-            <div id="finishPath">...</div>
-            <div id="score">...</div>
-            <div id="time">...</div>
+            <div id="sizes">
+                <div id ="newGameHeader">Please select a maze size to start a new game</div>
+                <button onclick="MazeGame.Game.startGame(5)">5x5</button>
+                <button onclick="MazeGame.Game.startGame(10)">10x10</button>
+                <button onclick="MazeGame.Game.startGame(15)">15x15</button>
+                <button onclick="MazeGame.Game.startGame(20)">20x20</button>
+            </div>
+            <div id="stats">
+                <div id="hint">...</div>
+                <div id="breadCrumbs">...</div>
+                <div id="finishPath">...</div>
+                <div id="score">...</div>
+                <div id="time">...</div>
+            </div>
+            <div id="author">Developed by Fabio Gottlicher, A01647928</div>
         </div>
         <div id="gameBoard">
-            <canvas id="canvas-main" width = "500" height = "500" style = "width: 100%;"></canvas>
+            <div  id="gameBoardDummy">
+            <canvas id="canvas-main"></canvas>
+            </div>
         </div>
-            
-    </body>
-    <script src = "maze.js"></script>
+    </div>
+    
+</body>
+<script src = "maze.js"></script>
 </html>
-                
-                
-        
