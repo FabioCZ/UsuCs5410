@@ -2,14 +2,13 @@
 
 
 var MazeGame = {};
+
 MazeGame.CellType = {
     EMPTY: 1,
     WALL: 2,
     PLAYER: 3,
     VISITED: 4,
     HINT: 5,
-    START: 6,
-    END: 7
 }
 
 MazeGame.Direction = {
@@ -76,7 +75,7 @@ MazeGame.Game = (function () {
 
     return {
         startGame: startGame,
-        elapsedTime: elapsedTime,
+        elapsedTime: function(){ return elapsedTime;},
         printBreadCrumbs: function () { return printBreadCrumbs; }
     }
 } ());
@@ -111,18 +110,24 @@ MazeGame.Graphics = (function () {
 
     function drawMaze() {
         console.log('draw, size: ', MazeGame.mazeArray.size());
+        context.clear();
         for (var j = 0; j < MazeGame.mazeArray.size(); j++) {
             for (var i = 0; i < MazeGame.mazeArray.size(); i++) {
                 var currCell = MazeGame.mazeArray.getCell(i, j);
-                if (currCell === MazeGame.CellType.EMPTY) {
+
+                if (currCell === MazeGame.CellType.PLAYER) {
+                    context.fillStyle = "#FF00FF";
+                } else if(i == 1 && j == 1){
+                    context.fillStyle = "#00FF00";  //start
+                } else if (i == MazeGame.mazeArray.size() - 2 && j == MazeGame.mazeArray.size() - 2){
+                    context.fillStyle = "#FF0000";
+                } else if (currCell === MazeGame.CellType.EMPTY) {
                     context.fillStyle = "#EEEEEE";
                 } else if (currCell === MazeGame.CellType.WALL) {
                     context.fillStyle = "#000000";
-                } else if (currCell === MazeGame.CellType.PLAYER) {
-                    context.fillStyle = "#FF00FF";
                 } else if (currCell === MazeGame.CellType.VISITED) {
-                    context.fillStyle = MazeGame.Game.printBreadCrumbs() ? "#FF0000" : "#EEEEEE";
-                }
+                    context.fillStyle = MazeGame.Game.printBreadCrumbs() ? "#FFFF00" : "#EEEEEE";
+                } 
                 context.fillRect(i * 10, j * 10, 10, 10);
             }
         }
@@ -163,6 +168,8 @@ MazeGame.mazeArray = (function () {
             }
         }
 
+        mazeArray[1][1] = MazeGame.CellType.EMPTY;
+        mazeArray[size-2][size-2] = MazeGame.CellType.EMPTY;
         lastPlayerX = 1;
         lastPlayerY = 1;
         mazeArray[lastPlayerX][lastPlayerY] = MazeGame.CellType.PLAYER;
@@ -234,6 +241,11 @@ MazeGame.mazeArray = (function () {
             lastPlayerX = newX;
             lastPlayerY = newY;
             mazeArray[lastPlayerX][lastPlayerY] = MazeGame.CellType.PLAYER;
+        }
+
+        //check win
+        if(lastPlayerX === size - 2 && lastPlayerY === size - 2){
+            alert('win. Time: ' + MazeGame.mazeArray.elapsedTime());
         }
     }
 
