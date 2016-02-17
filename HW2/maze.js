@@ -41,11 +41,16 @@ MazeGame.Game = (function () {
 
     var elapsedTime;
     var startTime;
+
+    var printHint = false;
     var printBreadCrumbs = false;
+    var printFinishPath = false;
+    var printScore = false;
 
     function gameLoop(time) {
         elapsedTime = time - startTime;
         MazeGame.Graphics.drawMaze();
+        updateHtml();
         if(!CheckWin()){
             window.requestAnimationFrame(gameLoop);
         }
@@ -65,26 +70,43 @@ MazeGame.Game = (function () {
         else if (e.keyCode === MazeGame.KeyCode.RIGHT || e.keyCode === MazeGame.KeyCode.D || e.keyCode === MazeGame.KeyCode.L) MazeGame.mazeArray.updatePlayer(MazeGame.Direction.RIGHT);
         else if (e.keyCode === MazeGame.KeyCode.DOWN || e.keyCode === MazeGame.KeyCode.S || e.keyCode === MazeGame.KeyCode.K) MazeGame.mazeArray.updatePlayer(MazeGame.Direction.DOWN);
         else if (e.keyCode === MazeGame.KeyCode.LEFT || e.keyCode === MazeGame.KeyCode.A || e.keyCode === MazeGame.KeyCode.J) MazeGame.mazeArray.updatePlayer(MazeGame.Direction.LEFT);
-        else if (e.keyCode === MazeGame.KeyCode.H) { } //TODO print hint
+        else if (e.keyCode === MazeGame.KeyCode.H) printHint = !printHint;
         else if (e.keyCode === MazeGame.KeyCode.B) printBreadCrumbs = !printBreadCrumbs;
-        else if (e.keyCode === MazeGame.KeyCode.P) { } //TODO print path to finish
-        else if (e.keyCode === MazeGame.KeyCode.Y) { } //TODO print score
+        else if (e.keyCode === MazeGame.KeyCode.P) printFinishPath = !printFinishPath;
+        else if (e.keyCode === MazeGame.KeyCode.Y) printScore = !printScore;
         
         //gameLoop(performance.now());
     }
     
     function CheckWin(){
         if(MazeGame.mazeArray.hasWon()){
-            alert('win. Time: ' + MazeGame.Game.elapsedTime());
+            alert('win. Time: ' + millisToTimeString(MazeGame.Game.elapsedTime()));
             return true;            
         }
         return false;
     }
 
+    function updateHtml(){
+        var hint = document.getElementById('hint');
+        var breadCrumbs = document.getElementById('breadCrumbs');
+        var finishPath = document.getElementById('finishPath');
+        var score = document.getElementById('score');
+        var time = document.getElementById('time');
+
+        hint.innerHTML = "Print Hint (H): " + (printHint ? "ON" : "OFF"); 
+        breadCrumbs.innerHTML = "Print Breadcrumbs (B): " + (printBreadCrumbs ? "ON" : "OFF"); 
+        finishPath.innerHTML = "Print Path to Finish (P): " + (printFinishPath ? "ON" : "OFF"); 
+        score.innerHTML = "Print Score (Y): " + (printScore ? ("ON, Score: " + 1) : "OFF") ; 
+        time.innerHTML = "Elapsed time: " + millisToTimeString(MazeGame.Game.elapsedTime());
+    }
+
     return {
         startGame: startGame,
         elapsedTime: function(){ return elapsedTime;},
-        printBreadCrumbs: function () { return printBreadCrumbs; }
+        printHint: function () { return printHint; },
+        printBreadCrumbs: function () { return printBreadCrumbs; },
+        printFinishPath: function () { return printFinishPath; }
+        //printScore: function () { return printScore; }
     }
 } ());
 
@@ -98,6 +120,7 @@ MazeGame.Graphics = (function () {
     //
     // Place a 'clear' function on the Canvas prototype, this makes it a part
     // of the canvas, rather than making a function that calls and does it.
+    // This is taken from Dean Mathias's 
     //
     //------------------------------------------------------------------
     CanvasRenderingContext2D.prototype.clear = function () {
@@ -107,11 +130,6 @@ MazeGame.Graphics = (function () {
         this.restore();
     };
 	
-    //------------------------------------------------------------------
-    //
-    // Public function that allows the client code to clear the canvas.
-    //
-    //------------------------------------------------------------------
     function clear() {
         context.clear();
     }
@@ -234,6 +252,7 @@ MazeGame.mazeArray = (function () {
     }
 
     function updatePlayer(direction) {
+        if(hasWon) return;
         var newX = lastPlayerX;
         var newY = lastPlayerY;
         if (direction == MazeGame.Direction.UP) {
@@ -294,6 +313,14 @@ MazeGame.mazeArray = (function () {
 
 function randomBetween(min, max) {
     return Math.floor(Math.random() * (max - min + 1) + min);
+}
+
+function millisToTimeString(millis)
+{
+    var totalSec = Math.floor(millis / 1000);
+    var sec = totalSec % 60;
+    var min = Math.floor(totalSec / 60);
+    return min + ":" + (sec < 10 ? ("0"+sec) : sec);
 }
 
 //MazeGame.mazeArray.init(10);
