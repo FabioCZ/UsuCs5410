@@ -9,6 +9,7 @@ MazeGame.CellType = {
     PLAYER: 3,
     VISITED: 4,
     HINT: 5,
+    PATHFULL : 6
 }
 
 MazeGame.Direction = {
@@ -47,6 +48,7 @@ MazeGame.Game = (function () {
     var printFinishPath = false;
     var printScore = true;
     var winDialogShown;
+    var highscores = [];
 
     function gameLoop(time) {
         if (!winDialogShown)
@@ -61,10 +63,14 @@ MazeGame.Game = (function () {
         winDialogShown = false;
         console.log('starting game of size ', size);
         MazeGame.mazeArray.init(size);
-        MazeGame.Graphics.init();
         startTime = performance.now();
-        document.addEventListener('keydown', onKeyDown);
         gameLoop(performance.now());
+    }
+
+    function onLoad() {
+        MazeGame.Graphics.init();
+        document.addEventListener('keydown', onKeyDown);
+        updateHtml();
     }
 
     function onKeyDown(e) {
@@ -77,14 +83,16 @@ MazeGame.Game = (function () {
         else if (e.keyCode === MazeGame.KeyCode.B) printBreadCrumbs = !printBreadCrumbs;
         else if (e.keyCode === MazeGame.KeyCode.P) printFinishPath = !printFinishPath;
         else if (e.keyCode === MazeGame.KeyCode.Y) printScore = !printScore;
-        
-        //gameLoop(performance.now());
     }
 
     function CheckWin() {
         if (MazeGame.mazeArray.hasWon() && !winDialogShown) {
             console.log('win');
-            alert('win. Time: ' + millisToTimeString(MazeGame.Game.elapsedTime()));
+            alert('Congratulation. You have solved the maze.\nTime: '
+                + millisToTimeString(MazeGame.Game.elapsedTime()) +
+                '\nYour score: ' + MazeGame.mazeArray.score());
+            highscores.push(MazeGame.mazeArray.score());
+            console.log(highscores);
             winDialogShown = true;
         }
     }
@@ -95,12 +103,41 @@ MazeGame.Game = (function () {
         var finishPath = document.getElementById('finishPath');
         var score = document.getElementById('score');
         var time = document.getElementById('time');
-
+        var highScoresTable = document.getElementById('highscorestable');
+        
         hint.innerHTML = "Print Hint (H): " + (printHint ? "ON" : "OFF");
         breadCrumbs.innerHTML = "Print Breadcrumbs (B): " + (printBreadCrumbs ? "ON" : "OFF");
         finishPath.innerHTML = "Print Path to Finish (P): " + (printFinishPath ? "ON" : "OFF");
-        score.innerHTML = "Print Score (Y): " + (printScore ? ("ON, Score: " + 1) : "OFF");
+        score.innerHTML = "Print Score (Y): " + (printScore ? ("ON, Score: " + MazeGame.mazeArray.score()) : "OFF");
         time.innerHTML = "Elapsed time: " + millisToTimeString(MazeGame.Game.elapsedTime());
+        
+        //TODO print highscores
+        if(highscores.length > 0){
+            highscores.sort(function(a,b){return b-a;});
+            var tbl = document.createElement('table');
+            tbl.style.border = '1px solid black';
+            tbl.style.borderCollapse = 'collapse';
+            var scoreCt = (highscores.length > 5) ? 5 : highscores.length;
+            console.log('score Ct to print', scoreCt);
+            for(var i = 0; i < scoreCt;i++){
+                var tr = tbl.insertRow();
+                var td1 = tr.insertCell();
+                td1.appendChild(document.createTextNode('Highscore no.' + (i+1).toString()));
+                td1.style.border = '1px solid black';
+                td1.style.padding = '0px 5px';
+                
+                var td2 = tr.insertCell();
+                td2.appendChild(document.createTextNode((highscores[i]).toString()));
+                td2.style.border = '1px solid black';
+                td2.style.padding = '0px 5px';
+                td2.style.textAlign = 'right';
+                
+            }
+            highScoresTable.removeChild(highScoresTable.firstChild);
+            highScoresTable.appendChild(tbl);
+        } else {
+            highScoresTable.innerHTML = "None available"
+        }
     }
 
     return {
@@ -109,8 +146,8 @@ MazeGame.Game = (function () {
         elapsedTime: function () { return elapsedTime; },
         printHint: function () { return printHint; },
         printBreadCrumbs: function () { return printBreadCrumbs; },
-        printFinishPath: function () { return printFinishPath; }
-        //printScore: function () { return printScore; }
+        printFinishPath: function () { return printFinishPath; },
+        onLoad: onLoad
     }
 } ());
 
@@ -121,6 +158,8 @@ MazeGame.Graphics = (function () {
     var context = canvas.getContext('2d');
 
     var cellSize;
+    var gameBoardDummy;
+    var canvasSize;
     
     //------------------------------------------------------------------
     // Place a 'clear' function on the Canvas prototype, this makes it a part
@@ -139,26 +178,36 @@ MazeGame.Graphics = (function () {
     }
 
     function init() {
-        var gameBoardDummy = document.getElementById('gameBoardDummy');
-        var canvasSize = gameBoardDummy.clientWidth;
-        cellSize = canvasSize / MazeGame.mazeArray.size();
-        fitToContainer();
+        setSize();
+        context.fillStyle = "#EEEEEE";
+        context.fillRect(0, 0, canvasSize, canvasSize);
+        context.fillStyle = "#000000";
+        var fontSize = canvasSize / 15;
+        context.font = fontSize + "px Segoe UI";
+        context.fillText("Welcome to the Maze Game", canvasSize * 0.15, canvasSize / 2 - fontSize / 2, canvasSize * 0.7);
+        context.fillText("Select a maze size to start", canvasSize * 0.15, (canvasSize / 2) + fontSize / 2, canvasSize * 0.7);
+
     }
 
     function drawMaze() {
         //console.log('draw, size: ', MazeGame.mazeArray.size());
         context.clear();
+        setSize();
+        cellSize = canvasSize / MazeGame.mazeArray.size();
         for (var j = 0; j < MazeGame.mazeArray.size(); j++) {
             for (var i = 0; i < MazeGame.mazeArray.size(); i++) {
                 var currCell = MazeGame.mazeArray.getCell(i, j);
-
                 if (currCell === MazeGame.CellType.PLAYER) {
                     context.fillStyle = "#FF00FF";
                 } else if (i == 1 && j == 1) {
                     context.fillStyle = "#00FF00";  //start
                 } else if (i == MazeGame.mazeArray.size() - 2 && j == MazeGame.mazeArray.size() - 2) {
-                    context.fillStyle = "#FF0000";
-                } else if (currCell === MazeGame.CellType.EMPTY) {
+                    context.fillStyle = "#FF0000";  //goal
+                } else if (currCell === MazeGame.CellType.HINT) {
+                    context.fillStyle = (MazeGame.Game.printFinishPath() || MazeGame.Game.printHint()) ? "#FF9900" : "#EEEEEE";
+                } else if (currCell === MazeGame.CellType.PATHFULL) {
+                    context.fillStyle = MazeGame.Game.printFinishPath() ? "#FF9900" : "#EEEEEE";
+                } else if (currCell === MazeGame.CellType.EMPTY || currCell === MazeGame.CellType.EMPTYVISITED) {
                     context.fillStyle = "#EEEEEE";
                 } else if (currCell === MazeGame.CellType.WALL) {
                     context.fillStyle = "#000000";
@@ -168,11 +217,12 @@ MazeGame.Graphics = (function () {
                 context.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
             }
         }
-
     }
-
+    
     //from http://stackoverflow.com/questions/10214873/make-canvas-as-wide-and-as-high-as-parent
-    function fitToContainer() {
+    function setSize() {
+        gameBoardDummy = document.getElementById('gameBoardDummy');
+        canvasSize = gameBoardDummy.clientWidth;
         // Make it visually fill the positioned parent
         canvas.style.width = '100%';
         canvas.style.height = '100%';
@@ -196,6 +246,7 @@ MazeGame.mazeArray = (function () {
     var lastPlayerX;
     var lastPlayerY;
     var hasWon;
+    var score;
 
     function init(sizeM) {
         hasWon = false;
@@ -223,6 +274,8 @@ MazeGame.mazeArray = (function () {
         lastPlayerX = 1;
         lastPlayerY = 1;
         mazeArray[lastPlayerX][lastPlayerY] = MazeGame.CellType.PLAYER;
+        score = 0;
+        setHintPath();
     }
 
     function recursiveDivider(horizontal, startX, startY, endX, endY) {
@@ -234,11 +287,11 @@ MazeGame.mazeArray = (function () {
                 var horizontalDivideY = Math.floor(randomBetween(startY, endY) / 2) * 2;
             } while (horizontalDivideY == startY - 1 || horizontalDivideY == endY + 1);
             for (var i = startX; i < endX; i++) {
-                setMazeField(i, horizontalDivideY, MazeGame.CellType.WALL);
+                setCell(i, horizontalDivideY, MazeGame.CellType.WALL);
             }
 
             var hHoleX = Math.floor(randomBetween(startX, endX) / 2) * 2 + 1;
-            setMazeField(hHoleX, horizontalDivideY, MazeGame.CellType.EMPTY);
+            setCell(hHoleX, horizontalDivideY, MazeGame.CellType.EMPTY);
 
             logMaze();
             recursiveDivider(!horizontal, startX, startY, endX, horizontalDivideY - 1);
@@ -250,11 +303,11 @@ MazeGame.mazeArray = (function () {
                 var verticalDivideX = Math.floor(randomBetween(startX, endX) / 2) * 2;
             } while (verticalDivideX == startX - 1 || verticalDivideX == endX + 1)
             for (var i = startY; i < endY; i++) {
-                setMazeField(verticalDivideX, i, MazeGame.CellType.WALL);
+                setCell(verticalDivideX, i, MazeGame.CellType.WALL);
             }
 
             var vHoleY = Math.floor(randomBetween(startY, endY) / 2) * 2 + 1;
-            setMazeField(verticalDivideX, vHoleY, MazeGame.CellType.EMPTY);
+            setCell(verticalDivideX, vHoleY, MazeGame.CellType.EMPTY);
 
             logMaze();
             recursiveDivider(!horizontal, startX, startY, verticalDivideX - 1, endY);
@@ -262,14 +315,13 @@ MazeGame.mazeArray = (function () {
         }
     }
 
-    function setMazeField(x, y, type) {
-
+    function setCell(x, y, type) {
         if (typeof mazeArray[x] === 'undefined' || typeof mazeArray[x][y] === 'undefined') {
             console.log('Attempting to set coord (', x, ',', y, ') to ', type, ' ,which is not defined.');
             console.trace('stacktrace:');
             throw 'Bad Maze array access'
         } else {
-            console.log(type, ' to (', x, ',', y, ')');
+            //console.log(type, ' to (', x, ',', y, ')');
             mazeArray[x][y] = type;
         }
     }
@@ -287,22 +339,107 @@ MazeGame.mazeArray = (function () {
         } else if (direction == MazeGame.Direction.LEFT) {
             newX--;
         }
+        
         if (isValidMove(newX, newY)) {
             mazeArray[lastPlayerX][lastPlayerY] = MazeGame.CellType.VISITED;
+            //adjust score, does it just like the assignment description
+            var hintCell = getHintCell();
+            var diffFromHint = Math.abs(newX - hintCell.x) + Math.abs(newY - hintCell.y);
+            if(diffFromHint == 0){
+                score +=5;
+            } else if (diffFromHint == 1){
+                score -=1;
+            } else if(diffFromHint > 1) {
+                score -=2;
+            }
+            
             lastPlayerX = newX;
             lastPlayerY = newY;
             mazeArray[lastPlayerX][lastPlayerY] = MazeGame.CellType.PLAYER;
         }
-
-
         //check win
         hasWon = (lastPlayerX === size - 2 && lastPlayerY === size - 2);
+        setHintPath();
     }
 
     function isValidMove(newX, newY) {
         if (newX >= size || newY >= size || newX < 0 || newY < 0) return false;
         if (mazeArray[newX][newY] == MazeGame.CellType.WALL) return false;
         return true;
+    }
+    
+    function getHintCell(){
+        for(var i = 0; i < size;i++)
+        {
+            for(var j = 0; j < size;j++){
+                if(mazeArray[i][j] == MazeGame.CellType.HINT)
+                {
+                    return {x : i, y : j};
+                }
+            }
+        }
+    }
+
+    function setHintPath() {
+        //resets hint path from previous
+        for (var j = 0; j < size; j++) {
+            for (var i = 0; i < size; i++) {
+                if (mazeArray[i][j] === MazeGame.CellType.EMPTYVISITED || mazeArray[i][j] === MazeGame.CellType.HINT)
+                    setCell(i, j, MazeGame.CellType.EMPTY);
+            }
+        }
+
+        var mazeVisited = new Array(size);
+        for(var i = 0; i < size;i++){
+            mazeVisited[i] = new Array(size);
+            for(var j = 0; j < size; j++){
+                mazeVisited[i][j] = false;
+            }
+        }
+        
+        var queue = new Array();
+        queue.push({ x: lastPlayerX, y: lastPlayerY, path : new Array() });
+        
+        while(queue.length > 0){
+            var c = queue.shift();
+            console.log('c is', c);
+            if(c.x == size - 2 && c.y == size - 2){
+                for(var i = 0; i < c.path.length;i++){
+                    if(i == 0){
+                        setCell(c.path[i].x, c.path[i].y, MazeGame.CellType.HINT);
+                    }else{                    
+                        setCell(c.path[i].x, c.path[i].y, MazeGame.CellType.PATHFULL);
+                    }
+                }
+                logMaze();
+                return;
+            }
+            if(mazeVisited[c.x][c.y] == true){
+                continue;
+            }
+            mazeVisited[c.x][c.y] = true;
+            var validMoves = getValidMoves(c.x,c.y);
+            for(var i = 0; i < validMoves.length;i++){
+                var newPath = c.path.slice();
+                newPath.push({x : validMoves[i].x, y : validMoves[i].y});
+                queue.push({x : validMoves[i].x, y : validMoves[i].y, path : newPath});
+            }
+        }
+
+
+    }
+
+    function getValidMoves(x, y) {
+        var validMoves = [];
+        if (isValidMove(x, y - 1))
+            validMoves.push({ x: x, y: y - 1 });
+        if (isValidMove(x, y + 1))
+            validMoves.push({ x: x, y: y + 1 });
+        if (isValidMove(x - 1, y))
+            validMoves.push({ x: x - 1, y: y });
+        if (isValidMove(x + 1, y))
+            validMoves.push({ x: x + 1, y: y });
+        return validMoves;
     }
 
     function logMaze() {
@@ -311,8 +448,10 @@ MazeGame.mazeArray = (function () {
             for (var i = 0; i < size; i++) {
                 if (mazeArray[i][j] == MazeGame.CellType.EMPTY) {
                     a += " ";
+                } else if(mazeArray[i][j] == MazeGame.CellType.HINT) {
+                    a += "h";
                 } else {
-                    a += "*";
+                    a+= "*";
                 }
             }
             a += '\r\n';
@@ -330,7 +469,8 @@ MazeGame.mazeArray = (function () {
         getCell: getCell,
         size: function () { return size; },
         hasWon: function () { return hasWon; },
-        updatePlayer: updatePlayer
+        updatePlayer: updatePlayer,
+        score: function () { return score; }
     }
 } ());
 
@@ -345,5 +485,3 @@ function millisToTimeString(millis) {
     var min = Math.floor(totalSec / 60);
     return min + ":" + (sec < 10 ? ("0" + sec) : sec);
 }
-
-MazeGame.Game.updateHtml();     //set on first load

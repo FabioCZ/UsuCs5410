@@ -1,4 +1,4 @@
-<!--CS5410 Assignment1, Fabio Gottlicher A01647928-->
+<!--CS5410 Assignment2, Fabio Gottlicher A01647928-->
 <!DOCTYPE HTML>
 <html lang="en-US">
 
@@ -9,15 +9,15 @@
     <title>Assignment 2 - CS5410</title>
 </head>
 
-<body>
-    <h1>Assignment 2 - Maze Game</h2>
+<body onload="MazeGame.Game.onLoad()">
+    <h1>Assignment 2 - Maze Game by Fabio Gottlicher</h2>
     <div id="all">
         <div id="controls">
             <div id="sizes">
-                <div id ="newGameHeader">Please select a maze size to start a new game</div>
-                <button onclick="MazeGame.Game.startGame(5)">5x5</button>
-                <button onclick="MazeGame.Game.startGame(10)">10x10</button>
-                <button onclick="MazeGame.Game.startGame(15)">15x15</button>
+                <div id ="newGameHeader">Please select a maze size to start a new game:</div>
+                <button onclick="MazeGame.Game.startGame(5)">05x05</button><br/>
+                <button onclick="MazeGame.Game.startGame(10)">10x10</button><br/>
+                <button onclick="MazeGame.Game.startGame(15)">15x15</button><br/>
                 <button onclick="MazeGame.Game.startGame(20)">20x20</button>
             </div>
             <div id="stats">
@@ -27,7 +27,11 @@
                 <div id="score">...</div>
                 <div id="time">...</div>
             </div>
-            <div id="author">Developed by Fabio Gottlicher, A01647928</div>
+            <div id="highscores">
+                <span>High scores:</span>
+                <div id="highscorestable"></div>
+            </div>
+            <!--<div id="author">Developed by Fabio Gottlicher, A01647928</div>-->
         </div>
         <div id="gameBoard">
             <div  id="gameBoardDummy">
