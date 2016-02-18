@@ -246,7 +246,7 @@ MazeGame.mazeArray = (function () {
     var lastPlayerX;
     var lastPlayerY;
     var hasWon;
-    var score;
+    var score = 0;
 
     function init(sizeM) {
         hasWon = false;
