@@ -1,9 +1,9 @@
 //CS5410 Assignment 3, Fabio Gottlicher A01647928
 
 
-var Game = {};
+var Breakout = {};
 
-Game.Color = {
+Breakout.Color = {
     YELLOW: 'rgba(255, 255, 0, 1)',
     ORANGE: 'rgba(255, 153, 0, 1)',
     BLUE: 'rgba(0, 51, 204, 1)',
@@ -11,7 +11,7 @@ Game.Color = {
 
 }
 
-Game.Game = (function() {
+Breakout.Game = (function() {
 
     var elapsedTime;
     var startTime;
@@ -32,7 +32,7 @@ Game.Game = (function() {
         elapsedTime = time - startTime - pausedTime;
 
         update(elapsedTime - lastUpdate);
-        Game.Graphics.drawAll(); //render
+        Breakout.Graphics.drawAll(); //render
         lastUpdate = elapsedTime;
         if (!paused && lives > 0)
             requestAnimationFrame(loop);
@@ -50,9 +50,9 @@ Game.Game = (function() {
     function startGame() {
         document.addEventListener('keydown', onKeyDown);
         startTime = performance.now();
-        Game.Graphics.setSize();
-        Game.Paddle.init();
-        Game.Bricks.init();
+        Breakout.Graphics.setSize();
+        Breakout.Paddle.init();
+        Breakout.Bricks.init();
         bricksRemoved = 0;
         score = 0
         elapsedTime = 0;
@@ -62,18 +62,18 @@ Game.Game = (function() {
         paused = false;
         explosions = Explosions();
         balls.splice(0);
-        latestSpeed = Game.Graphics.getCanvasSize() / 2500;
+        latestSpeed = Breakout.Graphics.getCanvasSize() / 2500;
         balls.push(makeBall(true,latestSpeed));
         loop(performance.now()); //needs to be last
     }
 
     function onKeyDown(e) {
         if (e.keyCode == KeyCode.LEFT) {
-            Game.Paddle.move(e.keyCode);
+            Breakout.Paddle.move(e.keyCode);
             moveThisFrame = -1;
         }
         else if (e.keyCode == KeyCode.RIGHT) {
-            Game.Paddle.move(e.keyCode);
+           Breakout.Paddle.move(e.keyCode);
             moveThisFrame = 1;
         }
         else if (e.keyCode == KeyCode.SPACE) balls[0].release(elapsedTime);
@@ -81,12 +81,12 @@ Game.Game = (function() {
             document.removeEventListener('keydown', onKeyDown);
             Menu.Main.init();
         }
-        else if (e.keyCode == KeyCode.ESCAPE && !paused) Game.Game.pause();
+        else if (e.keyCode == KeyCode.ESCAPE && !paused)Breakout.Game.pause();
         else if (e.keyCode == KeyCode.ESCAPE && paused) {
             document.removeEventListener('keydown', onKeyDown);
             Menu.Main.init();
         }
-        else if (paused && e.keyCode == KeyCode.RETURN) Game.Game.pause();
+        else if (paused && e.keyCode == KeyCode.RETURN)Breakout.Game.pause();
 
     }
 
@@ -105,13 +105,13 @@ Game.Game = (function() {
             return;
         }
         var bb = ball.getBounds();
-        var cS = Game.Graphics.getCanvasSize();
-        var w = Game.Graphics.getCellWidth();
-        var h = Game.Graphics.getCellHeight();
+        var cS =Breakout.Graphics.getCanvasSize();
+        var w =Breakout.Graphics.getCellWidth();
+        var h =Breakout.Graphics.getCellHeight();
 
         var row = -1;
         for (var i = 0; i < 8; i++) {
-            var br = Game.Bricks.getBrick(i, 0);
+            var br =Breakout.Bricks.getBrick(i, 0);
             if (bb.yB >= (br.y) && bb.yT <= (br.y + h)) {
                 row = i;
                 break;
@@ -120,7 +120,7 @@ Game.Game = (function() {
         //console.log('candidate row is ', row);
         if (row != -1) {
             for (var i = 0; i < 14; i++) {
-                var br = Game.Bricks.getBrick(row, i);
+                var br =Breakout.Bricks.getBrick(row, i);
                 if (br.hp == 0) continue;
                 var collisionW = -1;
                 var collisionH = -1;
@@ -142,7 +142,7 @@ Game.Game = (function() {
                 }
 
                 if (collisionH != -1 && collisionW != -1) {
-                    Game.Bricks.hitBrick(row, i,elapsedTime);
+                   Breakout.Bricks.hitBrick(row, i,elapsedTime);
 
                     if (collisionH > collisionW) {
                         ball.bounce(false);
@@ -163,7 +163,7 @@ Game.Game = (function() {
             ball.bounce(true);
         } else if (bb.xL <= 0 || bb.xR >= cS) {   //bounce of sidewalls
             ball.bounce(false);
-        } else if (bb.yB >= Game.Paddle.getY() && bb.yB <= (Game.Paddle.getY() + Game.Graphics.getCanvasSize() / 75) && bb.xL >= (Game.Paddle.getCurrPositionX() - Game.Paddle.getWidth()/5) && bb.xR <= (Game.Paddle.getCurrPositionX() + Game.Paddle.getWidth() * 1.2)) {
+        } else if (bb.yB >=Breakout.Paddle.getY() && bb.yB <= (Breakout.Paddle.getY() +Breakout.Graphics.getCanvasSize() / 75) && bb.xL >= (Breakout.Paddle.getCurrPositionX() -Breakout.Paddle.getWidth()/5) && bb.xR <= (Breakout.Paddle.getCurrPositionX() +Breakout.Paddle.getWidth() * 1.2)) {
             ball.bounce(true,moveThisFrame);
         }
         moveCt++;
@@ -256,7 +256,7 @@ Game.Game = (function() {
     }
 } ());
 
-Game.Bricks = (function() {
+Breakout.Bricks = (function() {
     var bricks = [];
     var numBricks = 14;
     var removedCt;
@@ -270,22 +270,22 @@ Game.Bricks = (function() {
                 switch (i) {
                     case 0:
                     case 1:
-                        color = Game.Color.GREEN;
+                        color =Breakout.Color.GREEN;
                         pts = 5;
                         break;
                     case 2:
                     case 3:
-                        color = Game.Color.BLUE;
+                        color =Breakout.Color.BLUE;
                         pts = 3;
                         break;
                     case 4:
                     case 5:
-                        color = Game.Color.ORANGE;
+                        color =Breakout.Color.ORANGE;
                         pts = 2;
                         break;
                     case 6:
                     case 7:
-                        color = Game.Color.YELLOW;
+                        color =Breakout.Color.YELLOW;
                         pts = 1;
                         break;
                     default:
@@ -298,8 +298,8 @@ Game.Bricks = (function() {
     }
 
     function makeBrick(color, row, column, hp, pts) {
-        var y = (Game.Graphics.getCanvasSize() / 6) + Game.Graphics.getCellSpacing() + row * (Game.Graphics.getCellSpacing() + Game.Graphics.getCellHeight());
-        var x = Game.Graphics.getCellSpacing() + column * (Game.Graphics.getCellSpacing() + Game.Graphics.getCellWidth());
+        var y = (Breakout.Graphics.getCanvasSize() / 6) +Breakout.Graphics.getCellSpacing() + row * (Breakout.Graphics.getCellSpacing() +Breakout.Graphics.getCellHeight());
+        var x =Breakout.Graphics.getCellSpacing() + column * (Breakout.Graphics.getCellSpacing() +Breakout.Graphics.getCellWidth());
         return {
             color: color,
             hp: hp,
@@ -320,31 +320,31 @@ Game.Bricks = (function() {
         if (bricks[r][c].hp == 0) return;
         bricks[r][c].hp--;
         if (bricks[r][c].hp == 0) {
-            Game.Game.incrScore(bricks[r][c].pts);
+           Breakout.Game.incrScore(bricks[r][c].pts);
             //check row
             if (isRowClear(r)) {
-                Game.Game.incrScore(25);
+               Breakout.Game.incrScore(25);
             }
             //increase speed
             removedCt++;
             if (removedCt == 4 || removedCt == 12 || removedCt == 36 || removedCt == 62) {
-                var balls = Game.Game.getBalls();
+                var balls =Breakout.Game.getBalls();
                 for (var i = 0; i < balls.length; i++) {
                     balls[i].increaseSpeed();
                 }
             }
 
             //add ball
-            if (Game.Game.getScore() % 100 == 0) {
-                Game.Game.addBall();
+            if (Breakout.Game.getScore() % 100 == 0) {
+               Breakout.Game.addBall();
             }
 
             //check topRow
             if (r == 0) {
-                Game.Paddle.setHalfWidth();
+               Breakout.Paddle.setHalfWidth();
             }
-            Game.Game.getExplosionManager().addExplosion(time, bricks[r][c].x, bricks[r][c].y,
-                Game.Graphics.getCellWidth(), Game.Graphics.getCellHeight());
+           Breakout.Game.getExplosionManager().addExplosion(time, bricks[r][c].x, bricks[r][c].y,
+               Breakout.Graphics.getCellWidth(),Breakout.Graphics.getCellHeight());
         }
     }
 
@@ -367,8 +367,8 @@ Game.Bricks = (function() {
 function makeBall(isMain,speed) {
 
     var that = {
-        ballRadius: Game.Graphics.getCanvasSize() / 120,
-        x: Game.Paddle.getCurrPositionX() + Game.Paddle.getWidth() / 2,
+        ballRadius:Breakout.Graphics.getCanvasSize() / 120,
+        x: Breakout.Paddle.getCurrPositionX() +Breakout.Paddle.getWidth() / 2,
         y: -1,
         onPaddle: true,
         speed: speed,
@@ -380,7 +380,7 @@ function makeBall(isMain,speed) {
     }
 
     that.directionX = Gen.gaussianWithMidPoint(0.5);
-    that.y = Game.Paddle.getY() - that.ballRadius;
+    that.y =Breakout.Paddle.getY() - that.ballRadius;
     that.directionY = (1 - Math.abs(that.directionX)) * -1;
 
     //console.log(that.directionX*that.directionX + that.directionY*that.directionY);
@@ -391,10 +391,10 @@ function makeBall(isMain,speed) {
             that.releaseTime = initTime + delay;
         }
 
-        if (that.releaseTime != -1 && that.releaseTime > Game.Game.getElapsedTime()) {
-            that.counter = (that.releaseTime - Game.Game.getElapsedTime()) / 1000;
+        if (that.releaseTime != -1 && that.releaseTime >Breakout.Game.getElapsedTime()) {
+            that.counter = (that.releaseTime -Breakout.Game.getElapsedTime()) / 1000;
         }
-        if (that.releaseTime <= Game.Game.getElapsedTime() && that.onPaddle) {
+        if (that.releaseTime <=Breakout.Game.getElapsedTime() && that.onPaddle) {
             that.onPaddle = false;
             that.counter = -1;
         }
@@ -428,7 +428,7 @@ function makeBall(isMain,speed) {
     }
 
     that.increaseSpeed = function() {
-        that.speed += Game.Graphics.getCanvasSize() / 10000;
+        that.speed +=Breakout.Graphics.getCanvasSize() / 10000;
     }
 
     that.bounce = function(isHorizonatal,moveThisFrame) {
@@ -468,7 +468,7 @@ function makeBall(isMain,speed) {
     return that;
 }
 
-Game.Paddle = (function() {
+Breakout.Paddle = (function() {
     var width;
     var currPositionX;
     var y;
@@ -476,10 +476,10 @@ Game.Paddle = (function() {
     var hasHalved;
 
     function init() {
-        moveStep = Game.Graphics.getCanvasSize() / 30;
-        width = Game.Graphics.getCanvasSize() * 0.18;
-        currPositionX = Game.Graphics.getCanvasSize() / 2 - width / 2;
-        y = Game.Graphics.getCanvasSize() - (Game.Graphics.getCanvasSize() / 14);
+        moveStep =Breakout.Graphics.getCanvasSize() / 30;
+        width =Breakout.Graphics.getCanvasSize() * 0.18;
+        currPositionX =Breakout.Graphics.getCanvasSize() / 2 - width / 2;
+        y =Breakout.Graphics.getCanvasSize() - (Breakout.Graphics.getCanvasSize() / 14);
         hasHalved = false;
     }
 
@@ -502,13 +502,13 @@ Game.Paddle = (function() {
     }
 
     function move(dir) {
-        var balls = Game.Game.getBalls();
+        var balls =Breakout.Game.getBalls();
 
         if (dir == KeyCode.LEFT) {
             if (currPositionX - moveStep < 0) return;
             currPositionX -= moveStep;
         } else {
-            if (currPositionX + width + moveStep > Game.Graphics.getCanvasSize()) return;
+            if (currPositionX + width + moveStep >Breakout.Graphics.getCanvasSize()) return;
             currPositionX += moveStep;
         }
         for (var i = 0; i < balls.length; i++) {
@@ -525,7 +525,7 @@ Game.Paddle = (function() {
     }
 } ())
 
-Game.Graphics = (function() {
+Breakout.Graphics = (function() {
     'use strict';
 
     var canvas = document.getElementById('canvas-main');
@@ -566,9 +566,9 @@ Game.Graphics = (function() {
         drawScore();
         drawCounter();
         drawExplosions();
-        if (Game.Game.getLives() == 0)
+        if (Breakout.Game.getLives() == 0)
             drawLost();
-        else if (Game.Game.isPaused())
+        else if (Breakout.Game.isPaused())
             drawPauseMenu();
 
     }
@@ -589,14 +589,14 @@ Game.Graphics = (function() {
         context.font = fontSize + "px GoodTimes";
         context.fillStyle = "#000000";
         context.fillText("Game over", canvasSize / 2, canvasSize * 0.4);
-        context.fillText("score: " + Game.Game.getScore(), canvasSize / 2, canvasSize * 0.5);
+        context.fillText("score: " +Breakout.Game.getScore(), canvasSize / 2, canvasSize * 0.5);
         context.fillText("Press Esc to quit", canvasSize / 2, canvasSize * 0.6);
     }
 
     function drawBricks() {
         for (var i = 0; i < 8; i++) {
-            for (var j = 0; j < Game.Bricks.getNumBricks(); j++) {
-                var b = Game.Bricks.getBrick(i, j);
+            for (var j = 0; j <Breakout.Bricks.getNumBricks(); j++) {
+                var b =Breakout.Bricks.getBrick(i, j);
                 if (b.hp > 0) {
                     context.fillStyle = b.color;
                     context.fillRect(b.x, b.y, cellWidth, cellHeight);
@@ -615,12 +615,12 @@ Game.Graphics = (function() {
         grd.addColorStop("0.9", "#0392cf");
 
         context.fillStyle = grd;
-        //context.fillRect(Game.Paddle.getCurrPosition(), canvasSize - 10, Game.Paddle.getWidth(),7);
-        context.roundRect(Game.Paddle.getCurrPositionX(), Game.Paddle.getY(), Game.Paddle.getWidth(), 7, canvasSize / 150).fill();
+        //context.fillRect(Breakout.Paddle.getCurrPosition(), canvasSize - 10,Breakout.Paddle.getWidth(),7);
+        context.roundRect(Breakout.Paddle.getCurrPositionX(),Breakout.Paddle.getY(),Breakout.Paddle.getWidth(), 7, canvasSize / 150).fill();
     }
 
     function drawBalls() {
-        var balls = Game.Game.getBalls();
+        var balls =Breakout.Game.getBalls();
         for (var i = 0; i < balls.length; i++) {
             context.beginPath();
             context.arc(balls[i].getX(), balls[i].getY(), balls[i].getRadius(), 0, 2 * Math.PI, false);
@@ -635,9 +635,9 @@ Game.Graphics = (function() {
         context.textAlign = "start";
         context.font = fontSize + "px GoodTimes";
         context.fillStyle = "#000000";
-        context.fillText("Score: " + Game.Game.getScore(), canvasSize * 0.02, canvasSize * (49 / 50));
+        context.fillText("Score: " +Breakout.Game.getScore(), canvasSize * 0.02, canvasSize * (49 / 50));
         
-        for(var i = 0; i < Game.Game.getLives();i++){
+        for(var i = 0; i <Breakout.Game.getLives();i++){
             context.fillStyle = "#000000";
             context.roundRect(canvasSize - (canvasSize/48)*(i+1) - cellWidth*(i+1), canvasSize * (95 / 100), cellWidth, canvasSize/30, canvasSize / 100).fill();
         }
@@ -645,10 +645,10 @@ Game.Graphics = (function() {
     }
 
     function drawCounter() {
-        if(Game.Game.getBalls().length == 0){
+        if(Breakout.Game.getBalls().length == 0){
             return;
         }
-        var sec = Game.Game.getBalls()[0].getCounter();
+        var sec =Breakout.Game.getBalls()[0].getCounter();
         //console.log(sec)
         if (sec == -1) return;
         context.textAlign = "center";
@@ -659,7 +659,7 @@ Game.Graphics = (function() {
     }
     
     function drawExplosions(){
-        var e = Game.Game.getExplosionManager();
+        var e =Breakout.Game.getExplosionManager();
         for(var i = 0; i < e.explosions.length;i++){
             for(var j = 0; j < e.explosions[i].particles.length;j++){
                     var that = e.explosions[i];

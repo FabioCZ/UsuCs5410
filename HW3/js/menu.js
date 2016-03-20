@@ -1,7 +1,7 @@
 var Menu = {};
 
 Menu.options ={
-    "New Game" : Game.Game.startGame,
+    "New Game" : Breakout.Game.startGame,
     "High Scores" : 'highScores',
     "Credits" : 'credits'    
 };
@@ -41,7 +41,7 @@ Menu.Buttons = (function(){
     var selected = -1;
     function init(){
         buttons = [];
-        buttons.push({title : "New Game", exec : Game.Game.startGame});
+        buttons.push({title : "New Game", exec : Breakout.Game.startGame});
         buttons.push({title : "High Scores", exec : HighScores.Main.init});
         buttons.push({title : "Credits", exec : Credits.Main.init});
         selected = 0;
