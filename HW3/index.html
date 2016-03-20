@@ -1,17 +1,17 @@
-<!--CS5410 Assignment2, Fabio Gottlicher A01647928-->
+<!--CS5410 Assignment3, Fabio Gottlicher A01647928-->
 <!DOCTYPE HTML>
 <html lang="en-US">
 
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="stylesheet" type="text/css" href="styles/style.css">
 
     <title>Assignment 3 - CS5410</title>
 </head>
 
-<body onload="Game.Game.startGame()">
+<body onload="Menu.Main.init()">
     <h1>Assignment 3 - Breakout</h1>
-    <h4>Credits: Fabio Gottlicher</h4>
+    <!--<h4>Credits: Fabio Gottlicher</h4>-->
         <div id="gameBoard">
             <div  id="gameBoardDummy">
             <canvas id="canvas-main"></canvas>
@@ -20,5 +20,11 @@
     </div>
     
 </body>
-<script src = "game.js"></script>
+<script src = "js/tools.js"></script>
+<script src = "js/particles.js"></script>
+<script src = "js/highScores.js"></script>
+<script src = "js/credits.js"></script>
+<script src = "js/game.js"></script>
+<script src = "js/menu.js"></script>
+
 </html>
