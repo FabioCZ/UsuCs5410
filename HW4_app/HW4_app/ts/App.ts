@@ -3,21 +3,24 @@ class Application {
     private _context: CanvasRenderingContext2D;
 
     constructor() {
-        var canvas = <HTMLCanvasElement>document.getElementById("canvas-main");
-        this._context = canvas.getContext("2d");
-
-        CanvasRenderingContext2D.prototype["clear"] = function() {
+        CanvasRenderingContext2D.prototype["clear"] = function () {
             this.save();
             this.setTransform(1, 0, 0, 1, 0, 0);
             this.clearRect(0, 0, canvas.width, canvas.height);
             this.restore();
         }
-        var game = new Game(10, this._context);
-        game.draw();
+        var canvas = <HTMLCanvasElement>document.getElementById("canvas-main");
+        canvas.height = canvas.clientHeight;
+        canvas.width = canvas.clientWidth;  //dafuq?
+        this._context = canvas.getContext("2d");
+
+
+        var game = new Game(performance.now(), this._context);
 
     }
 
 
 }
-
-var app = new Application();
+function start() {
+    var app = new Application();
+}
