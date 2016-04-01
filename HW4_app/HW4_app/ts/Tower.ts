@@ -1,20 +1,36 @@
-﻿class Tower {
+﻿abstract class ITower {
     x: number;
     y: number;
     radius: number;
+    name: string;
+    constructor(name: string) {
+        this.name = name;
+    }
 
-    towerType: TowerType;
+}
 
-    constructor(x: number, y: number) {
-        this.x = x;
-        this.y = y;
+class TwGroundOne extends  ITower {
+    constructor() {
+        this.radius = 5;
+
+        super("Grnd2");
     }
 }
 
+class TwGroundTwo extends ITower {
+    constructor() {
+        super("Grnd1");
+    }
+}
 
+class TwAir extends ITower {
+    constructor() {
+        super("Air");
+    }
+}
 
-enum TowerType {
-    One,
-    Two,
-    Three
+class TwMixed extends ITower {
+    constructor() {
+        super("Mixed");
+    }
 }
