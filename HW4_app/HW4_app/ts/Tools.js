@@ -8,7 +8,9 @@ var Rect = (function () {
     return Rect;
 }());
 var Coord = (function () {
-    function Coord() {
+    function Coord(x, y) {
+        this.x = x;
+        this.y = y;
     }
     return Coord;
 }());

@@ -14,6 +14,10 @@
 class Coord {
     x: number;
     y: number;
+    constructor(x: number, y: number) {
+        this.x = x;
+        this.y = y;
+    }
 }
 
 function isClickIn(r: Rect, x: number, y: number): boolean {
