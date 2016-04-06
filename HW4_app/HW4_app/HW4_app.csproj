@@ -28,10 +28,12 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="ts\App.ts" />
+    <TypeScriptCompile Include="ts\Creep.ts" />
     <TypeScriptCompile Include="ts\GameHud.ts" />
     <TypeScriptCompile Include="ts\IAppPage.ts" />
     <TypeScriptCompile Include="ts\Game.ts" />
     <TypeScriptCompile Include="ts\GameGraphics.ts" />
+    <TypeScriptCompile Include="ts\PathChecker.ts" />
     <TypeScriptCompile Include="ts\Tools.ts" />
     <TypeScriptCompile Include="ts\Tower.ts" />
   </ItemGroup>

@@ -54,6 +54,12 @@ var Game = (function () {
         this.gameHud = new GameHud(context.canvas.scrollWidth, this.hudHeight, towerTypes);
         document.addEventListener("click", this.clickListener);
         document.addEventListener("mousemove", this.overListener);
+        document.addEventListener("contextmenu", function (e) {
+            e.preventDefault();
+            if (_this.CurrentlyPlacingTower != null) {
+                _this.CurrentlyPlacingTower = null;
+            }
+        });
         this.CurrentlyPlacingTower = null;
         this.activeTowers = [];
         this.loop(performance.now());

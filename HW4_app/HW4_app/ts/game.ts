@@ -34,7 +34,7 @@ class Game implements IAppPage {
         var horWidth = Game.canvasWidth / 2 - borderOpening / 2 - borderOffset;
         var verHeight = (Game.canvasHeight - this.HudHeight) / 2 - borderOpening / 2 - borderOffset
         var r = {
-            borderOffset : borderOffset,
+            borderOffset: borderOffset,
             horWidth: horWidth,
             verHeight: verHeight,
             top: {
@@ -45,15 +45,15 @@ class Game implements IAppPage {
             bottom: {
                 x1: borderOffset,
                 x2: borderOffset + horWidth + borderOpening,
-                y: Game.canvasHeight - 1.5 *borderOffset
+                y: Game.canvasHeight - 1.5 * borderOffset
             },
-            left : {
+            left: {
                 x: borderOffset,
                 y1: this.HudHeight + borderOffset,
-                y2: this.HudHeight + borderOffset+ verHeight + borderOpening
+                y2: this.HudHeight + borderOffset + verHeight + borderOpening
             },
             right: {
-                x: Game.canvasWidth - 1.5*borderOffset,
+                x: Game.canvasWidth - 1.5 * borderOffset,
                 y1: this.HudHeight + borderOffset,
                 y2: this.HudHeight + borderOffset + verHeight + borderOpening
             }
@@ -61,7 +61,7 @@ class Game implements IAppPage {
         return r;
     }
 
-constructor(startTime: number, context: CanvasRenderingContext2D) {
+    constructor(startTime: number, context: CanvasRenderingContext2D) {
         this.startTime = startTime;
         this._context = context;
         Game.canvasHeight = context.canvas.height;
@@ -75,6 +75,12 @@ constructor(startTime: number, context: CanvasRenderingContext2D) {
         this.gameHud = new GameHud(context.canvas.scrollWidth, this.hudHeight, towerTypes);
         document.addEventListener("click", this.clickListener);
         document.addEventListener("mousemove", this.overListener);
+        document.addEventListener("contextmenu", (e) => {
+            e.preventDefault();
+            if (this.CurrentlyPlacingTower != null) {
+                this.CurrentlyPlacingTower = null;
+            }
+        });
         this.CurrentlyPlacingTower = null;
         this.activeTowers = [];
         this.loop(performance.now());
@@ -83,20 +89,22 @@ constructor(startTime: number, context: CanvasRenderingContext2D) {
     public clickListener = (e: MouseEvent) => {
         var x = e.clientX - document.getElementById("canvas-main").getBoundingClientRect().left;
         var y = e.clientY - document.getElementById("canvas-main").getBoundingClientRect().top;
-        console.log("a click!", x, ", ", y, "hh",this.hudHeight);
-        if (y < this.hudHeight) {
+        console.log("a click!", x, ", ", y, "hh", this.hudHeight);
+        if (y < this.hudHeight) {   //HUD click
             console.log("hud click");
             var tower = this.gameHud.handleClick(x, y);
             if (tower != null && this.CurrentlyPlacingTower == null) {
                 this.CurrentlyPlacingTower = tower;
-                this.CurrentlyPlacingTower.setCoords(-1,-1);
+                this.CurrentlyPlacingTower.setCoords(-1, -1);
             }
         } else {
-            if (this.CurrentlyPlacingTower != null) {
+            if (this.CurrentlyPlacingTower != null) {   //placing towers
                 //todo collision checking
                 this.activeTowers.push(this.CurrentlyPlacingTower.copy());
                 this.CurrentlyPlacingTower = null;
             }
+
+            //TODO tower upgrades
             //gameboard event
         }
     }
@@ -113,15 +121,15 @@ constructor(startTime: number, context: CanvasRenderingContext2D) {
     }
 
     private isInBorders(x: number, y: number): boolean {
-        return x > this.BorderSpec.borderOffset *1.5 &&
+        return x > this.BorderSpec.borderOffset * 1.5 &&
             y > this.BorderSpec.borderOffset * 1.5 + this.HudHeight &&
-            x < Game.canvasWidth - this.BorderSpec.borderOffset * 1.5 && 
+            x < Game.canvasWidth - this.BorderSpec.borderOffset * 1.5 &&
             y < Game.canvasHeight - this.BorderSpec.borderOffset * 1.5;
     }
 
-    private isTowerCollision(x: number, y: number,w:number,h:number): boolean {
+    private isTowerCollision(x: number, y: number, w: number, h: number): boolean {
         for (var i = 0; i < this.activeTowers.length; i++) {
-            if (this.activeTowers[i].isCollision(x, y,w,h)) {
+            if (this.activeTowers[i].isCollision(x, y, w, h)) {
                 return true;
             }
         }
