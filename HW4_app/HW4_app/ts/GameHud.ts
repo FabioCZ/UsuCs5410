@@ -50,7 +50,7 @@ class GameHud {
 
     public draw(gameState: Game, ctx: CanvasRenderingContext2D) {
         ctx.fillStyle = "#000000";
-        console.log("drawing hud background,", this.width, ",", this.height);
+        //console.log("drawing hud background,", this.width, ",", this.height);
         ctx.fillRect(0, 0, this.width, this.height);
         for (var i = 0; i < this.towerButtons.length; i++) {
             this.towerButtons[i].draw(ctx);

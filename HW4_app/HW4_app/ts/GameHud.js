@@ -11,7 +11,7 @@ var TowerButton = (function () {
         ctx.strokeText(this.tower.name, centerX, this.rect.y + this.rect.h / 2, this.rect.w);
     };
     return TowerButton;
-})();
+}());
 var GameHud = (function () {
     function GameHud(w, h, towerstype) {
         this.width = w;
@@ -35,12 +35,12 @@ var GameHud = (function () {
     };
     GameHud.prototype.draw = function (gameState, ctx) {
         ctx.fillStyle = "#000000";
-        console.log("drawing hud background,", this.width, ",", this.height);
+        //console.log("drawing hud background,", this.width, ",", this.height);
         ctx.fillRect(0, 0, this.width, this.height);
         for (var i = 0; i < this.towerButtons.length; i++) {
             this.towerButtons[i].draw(ctx);
         }
     };
     return GameHud;
-})();
+}());
 //# sourceMappingURL=GameHud.js.map
