@@ -70,14 +70,19 @@ class Game implements IAppPage {
         Game.baseTowerRadius = Game.canvasHeight / 10;
 
         this.gameGraphics = new GameGraphics(this._context);
-        var towerTypes = [new TwGroundOne(), new TwGroundTwo(), new TwAir(), new TwMixed()];
+        var towerTypes = Array<ITower>();
+        towerTypes.push(ITower.getTowerType(ITower.Ground1Name));
+        towerTypes.push(ITower.getTowerType(ITower.Ground2Name));
+        towerTypes.push(ITower.getTowerType(ITower.MixedName));
+        towerTypes.push(ITower.getTowerType(ITower.AirName));
+
         this.hudHeight = context.canvas.scrollHeight * this.hudRatio;
         this.gameHud = new GameHud(context.canvas.scrollWidth, this.hudHeight, towerTypes);
         document.addEventListener("click", this.clickListener);
         document.addEventListener("mousemove", this.overListener);
         document.addEventListener("contextmenu", (e) => {
-            e.preventDefault();
             if (this.CurrentlyPlacingTower != null) {
+                e.preventDefault();
                 this.CurrentlyPlacingTower = null;
             }
         });
@@ -99,8 +104,7 @@ class Game implements IAppPage {
             }
         } else {
             if (this.CurrentlyPlacingTower != null) {   //placing towers
-                //todo collision checking
-                this.activeTowers.push(this.CurrentlyPlacingTower.copy());
+                this.activeTowers.push(ITower.getTowerType(this.CurrentlyPlacingTower.name));
                 this.CurrentlyPlacingTower = null;
             }
 

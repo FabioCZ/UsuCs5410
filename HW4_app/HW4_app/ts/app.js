@@ -13,7 +13,7 @@ var Application = (function () {
         var game = new Game(performance.now(), this._context);
     }
     return Application;
-}());
+})();
 function start() {
     var app = new Application();
 }

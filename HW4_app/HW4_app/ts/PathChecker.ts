@@ -7,7 +7,8 @@ function CheckPath(gameState: Game, fromX: number, fromY: number, toX: number, t
         for (var i = 0; i < 50; i++) {
             spaceArray[i] = new Array<Coord>();
             for (var j = 0; j < 32; j++) {
-                spaceArray[i][j] = new Coord()
+                spaceArray[i][j] = new Coord(i * Game.towerSize, j * Game.towerSize);
+
             }
         }
     }

@@ -1,1 +1,1 @@
-{"version":3,"file":"Creep.js","sourceRoot":"","sources":["Creep.ts"],"names":[],"mappings":"AAAA;IAAA;IAEA,CAAC;IAAD,YAAC;AAAD,CAAC,AAFD,IAEC"}
+{"version":3,"file":"Creep.js","sourceRoot":"","sources":["Creep.ts"],"names":["Creep","Creep.constructor"],"mappings":"AAAA;IAAAA;IAEAC,CAACA;IAADD,YAACA;AAADA,CAACA,AAFD,IAEC"}

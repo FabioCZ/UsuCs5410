@@ -1,17 +1,35 @@
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-var towerIdCt = 0;
 var ITower = (function () {
     function ITower(name, radius) {
-        this.id = ++towerIdCt;
+        this.id = ++ITower.towerIdCt;
         this.name = name;
         this.x = -1;
         this.y = -1;
         this.radius = radius;
     }
+    Object.defineProperty(ITower, "Ground1Name", {
+        get: function () { return "Ground 1"; },
+        enumerable: true,
+        configurable: true
+    });
+    ;
+    Object.defineProperty(ITower, "Ground2Name", {
+        get: function () { return "Ground 2"; },
+        enumerable: true,
+        configurable: true
+    });
+    ;
+    Object.defineProperty(ITower, "MixedName", {
+        get: function () { return "Mixed"; },
+        enumerable: true,
+        configurable: true
+    });
+    ;
+    Object.defineProperty(ITower, "AirName", {
+        get: function () { return "Air"; },
+        enumerable: true,
+        configurable: true
+    });
+    ;
     ITower.prototype.setCoords = function (x, y) {
         this.x = x;
         this.y = y;
@@ -29,34 +47,23 @@ var ITower = (function () {
         }
         return r;
     };
+    ITower.getTowerType = function (name) {
+        switch (name) {
+            case ITower.Ground1Name:
+                return new ITower(name, Game.baseTowerRadius);
+                break;
+            case ITower.Ground2Name:
+                return new ITower(name, Game.baseTowerRadius);
+                break;
+            case ITower.MixedName:
+                return new ITower(name, Game.baseTowerRadius);
+                break;
+            case ITower.AirName:
+                return new ITower(name, Game.baseTowerRadius);
+                break;
+        }
+    };
+    ITower.towerIdCt = 0;
     return ITower;
-}());
-var TwGroundOne = (function (_super) {
-    __extends(TwGroundOne, _super);
-    function TwGroundOne() {
-        _super.call(this, "Ground 1", Game.baseTowerRadius);
-    }
-    return TwGroundOne;
-}(ITower));
-var TwGroundTwo = (function (_super) {
-    __extends(TwGroundTwo, _super);
-    function TwGroundTwo() {
-        _super.call(this, "Ground 2", Game.baseTowerRadius);
-    }
-    return TwGroundTwo;
-}(ITower));
-var TwAir = (function (_super) {
-    __extends(TwAir, _super);
-    function TwAir() {
-        _super.call(this, "Air", Game.baseTowerRadius * 1.5);
-    }
-    return TwAir;
-}(ITower));
-var TwMixed = (function (_super) {
-    __extends(TwMixed, _super);
-    function TwMixed() {
-        _super.call(this, "Mixed", Game.baseTowerRadius);
-    }
-    return TwMixed;
-}(ITower));
+})();
 //# sourceMappingURL=Tower.js.map

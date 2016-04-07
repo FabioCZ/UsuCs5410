@@ -16,8 +16,7 @@ var Game = (function () {
             }
             else {
                 if (_this.CurrentlyPlacingTower != null) {
-                    //todo collision checking
-                    _this.activeTowers.push(_this.CurrentlyPlacingTower.copy());
+                    _this.activeTowers.push(ITower.getTowerType(_this.CurrentlyPlacingTower.name));
                     _this.CurrentlyPlacingTower = null;
                 }
             }
@@ -49,14 +48,18 @@ var Game = (function () {
         Game.towerSize = Game.canvasHeight / 40;
         Game.baseTowerRadius = Game.canvasHeight / 10;
         this.gameGraphics = new GameGraphics(this._context);
-        var towerTypes = [new TwGroundOne(), new TwGroundTwo(), new TwAir(), new TwMixed()];
+        var towerTypes = Array();
+        towerTypes.push(ITower.getTowerType(ITower.Ground1Name));
+        towerTypes.push(ITower.getTowerType(ITower.Ground2Name));
+        towerTypes.push(ITower.getTowerType(ITower.MixedName));
+        towerTypes.push(ITower.getTowerType(ITower.AirName));
         this.hudHeight = context.canvas.scrollHeight * this.hudRatio;
         this.gameHud = new GameHud(context.canvas.scrollWidth, this.hudHeight, towerTypes);
         document.addEventListener("click", this.clickListener);
         document.addEventListener("mousemove", this.overListener);
         document.addEventListener("contextmenu", function (e) {
-            e.preventDefault();
             if (_this.CurrentlyPlacingTower != null) {
+                e.preventDefault();
                 _this.CurrentlyPlacingTower = null;
             }
         });
@@ -132,5 +135,5 @@ var Game = (function () {
         return false;
     };
     return Game;
-}());
+})();
 //# sourceMappingURL=Game.js.map

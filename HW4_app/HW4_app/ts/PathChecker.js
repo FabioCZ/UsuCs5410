@@ -6,7 +6,7 @@ function CheckPath(gameState, fromX, fromY, toX, toY) {
         for (var i = 0; i < 50; i++) {
             spaceArray[i] = new Array();
             for (var j = 0; j < 32; j++) {
-                spaceArray[i][j] = new Coord();
+                spaceArray[i][j] = new Coord(i * Game.towerSize, j * Game.towerSize);
             }
         }
     }

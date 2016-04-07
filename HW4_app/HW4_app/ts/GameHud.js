@@ -11,7 +11,7 @@ var TowerButton = (function () {
         ctx.strokeText(this.tower.name, centerX, this.rect.y + this.rect.h / 2, this.rect.w);
     };
     return TowerButton;
-}());
+})();
 var GameHud = (function () {
     function GameHud(w, h, towerstype) {
         this.width = w;
@@ -42,5 +42,5 @@ var GameHud = (function () {
         }
     };
     return GameHud;
-}());
+})();
 //# sourceMappingURL=GameHud.js.map
