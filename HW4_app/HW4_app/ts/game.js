@@ -135,5 +135,5 @@ var Game = (function () {
         return false;
     };
     return Game;
-})();
-//# sourceMappingURL=Game.js.map
+}());
+//# sourceMappingURL=game.js.map

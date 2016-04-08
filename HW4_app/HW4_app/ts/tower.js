@@ -65,5 +65,5 @@ var ITower = (function () {
     };
     ITower.towerIdCt = 0;
     return ITower;
-})();
+}());
 //# sourceMappingURL=Tower.js.map

@@ -41,5 +41,5 @@ var GameGraphics = (function () {
         this.ctx.fillRect(b.right.x, b.right.y2, Game.towerSize, b.verHeight);
     };
     return GameGraphics;
-})();
+}());
 //# sourceMappingURL=GameGraphics.js.map

@@ -6,14 +6,14 @@ var Rect = (function () {
         this.h = h;
     }
     return Rect;
-})();
+}());
 var Coord = (function () {
     function Coord(x, y) {
         this.x = x;
         this.y = y;
     }
     return Coord;
-})();
+}());
 function isClickIn(r, x, y) {
     return (x <= r.x + r.w && x >= r.x && y <= r.y + r.h && y >= r.y);
 }

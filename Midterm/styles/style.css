@@ -1,0 +1,39 @@
+/*CS5410 Assignment3, Fabio Gottlicher A01647928*/
+
+/* font courtesy of http://www.1001fonts.com/good-times-font.html */
+@font-face {
+    font-family: 'GoodTimes';
+    src: url('good-times.ttf');
+}
+
+html{
+    height: 100%;    
+}
+body
+{
+    font-family: 'GoodTimes', Tahoma, Geneva, Verdana, sans-serif;
+    color: #444444;
+    height: 100%;
+    overflow: hidden;
+}
+
+h1{
+    text-align: center;
+}
+#all
+{
+    width : 60%;
+}
+
+#canvas-main 
+{
+    width:   100vh;
+    height: 75vh;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+
+
+
