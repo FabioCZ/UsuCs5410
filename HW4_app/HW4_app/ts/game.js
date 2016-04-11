@@ -107,10 +107,10 @@ var Game = (function () {
         enumerable: true,
         configurable: true
     });
-    Game.xToI = function (x) { return x / 50; };
-    Game.yToJ = function (y) { return (y - Game.hudHeight) / 32; };
-    Game.iToX = function (i) { return 50 * i; };
-    Game.jToY = function (j) { return (32 * j) + Game.hudHeight; };
+    Game.xToI = function (x) { return x / Game.towerSize; };
+    Game.yToJ = function (y) { return (y - Game.hudHeight) / Game.towerSize; };
+    Game.iToX = function (i) { return Game.towerSize * i; };
+    Game.jToY = function (j) { return (Game.towerSize * j) + Game.hudHeight; };
     Object.defineProperty(Game.prototype, "BorderSpec", {
         get: function () {
             var borderOffset = 0; //Game.towerSize * 2;

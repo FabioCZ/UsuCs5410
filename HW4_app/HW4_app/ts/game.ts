@@ -28,10 +28,10 @@ class Game implements IAppPage {
     static towerSize: number;
     static baseTowerRadius: number;
     static hudHeight: number;
-    static xToI(x: number) { return x / 50; }
-    static yToJ(y: number) { return (y - Game.hudHeight) / 32; }
-    static iToX(i: number) { return 50 * i; }
-    static jToY(j:number) { return (32 * j) + Game.hudHeight; }
+    static xToI(x: number) { return x / Game.towerSize; }
+    static yToJ(y: number) { return (y - Game.hudHeight) / Game.towerSize; }
+    static iToX(i: number) { return Game.towerSize * i; }
+    static jToY(j: number) { return (Game.towerSize * j) + Game.hudHeight; }
 
     get BorderSpec(): any {
         var borderOffset = 0;//Game.towerSize * 2;

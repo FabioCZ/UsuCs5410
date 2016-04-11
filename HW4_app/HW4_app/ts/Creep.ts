@@ -27,6 +27,10 @@ class Creep {
             this.path = new Array<Coord>();
             for (var i = 0; i <  50; i++) {
                 this.path.push(new Coord(i, j));
+                if (i === 10) {
+                    j--;
+                    this.path.push(new Coord(i, j));
+                }
             }
             this.currCoord = 0;
             this.x = 0;
@@ -49,6 +53,7 @@ class Creep {
                 if (next.x === curr.x + 1) { //next right
                     this.x += this.speed;
                     if (this.x > Game.iToX(next.x)) {
+                        console.log('coord transition to ',next.x);
                         this.x = Game.iToX(next.x);
                         this.currCoord++;
                     }
@@ -58,13 +63,15 @@ class Creep {
                         this.x = Game.iToX(next.x);
                         this.currCoord++;
                     }
-                } else if (next.x === curr.x + 1) { //next down
+                } else if (next.y === curr.y + 1) { //next down
                     this.y += this.speed;
                     if (this.y > Game.jToY(next.y)) {
                         this.y = Game.jToY(next.y);
                         this.currCoord++;
                     }
-                } else if (next.x === curr.x - 1) { // next up
+                } else if (next.y === curr.y - 1) { // next up
+                    console.log('up to ', next.y);
+
                     this.y -= this.speed;
                     if (this.y < Game.jToY(next.y)) {
                         this.y = Game.jToY(next.y);
