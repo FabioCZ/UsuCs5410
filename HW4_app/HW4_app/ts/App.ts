@@ -14,8 +14,9 @@ class Application {
         canvas.width = canvas.clientWidth;  //dafuq?
         this._context = canvas.getContext("2d");
 
-
-        var game = new Game(performance.now(), this._context);
+        var l = new LevelSpec();
+        l.creepNum = 10;
+        var game = new Game(performance.now(), this._context,l);
 
     }
 

@@ -11,11 +11,12 @@
     static get AirName(): string { return "Air" };
 
 
-    constructor(name: string, radius: number) {
+    constructor(name: string, radius: number, x = -1, y = -1) {
+        console.log('new tower ', x, ",", y);
         this.id = ++ITower.towerIdCt;
         this.name = name;
-        this.x = -1;
-        this.y = -1;
+        this.x = x;
+        this.y = y;
         this.radius = radius;
     }
 
@@ -39,20 +40,16 @@
         return r;
     }
 
-    static getTowerType(name: string): ITower {
+    static getTowerType(name: string,x?:number,y?:number): ITower {
         switch (name) {
             case ITower.Ground1Name:
-                return new ITower(name, Game.baseTowerRadius);
-                break;
+                return new ITower(name, Game.baseTowerRadius,x,y);
             case ITower.Ground2Name:
-                return new ITower(name, Game.baseTowerRadius);
-                break;
+                return new ITower(name, Game.baseTowerRadius,x,y);
             case ITower.MixedName:
-                return new ITower(name, Game.baseTowerRadius);
-                break;
+                return new ITower(name, Game.baseTowerRadius,x,y);
             case ITower.AirName:
-                return new ITower(name, Game.baseTowerRadius);
-                break;
+                return new ITower(name, Game.baseTowerRadius*1.5,x,y);
         }
     }
 

@@ -7,6 +7,13 @@ var Rect = (function () {
     }
     return Rect;
 }());
+var Pair = (function () {
+    function Pair(f, s) {
+        this.first = f;
+        this.second = s;
+    }
+    return Pair;
+}());
 var Coord = (function () {
     function Coord(x, y) {
         this.x = x;
@@ -14,8 +21,11 @@ var Coord = (function () {
     }
     return Coord;
 }());
-function isClickIn(r, x, y) {
+function IsCoordInRect(r, x, y) {
     return (x <= r.x + r.w && x >= r.x && y <= r.y + r.h && y >= r.y);
+}
+function RandomBetween(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 function clone(obj) {
     var cloneObj = new (obj.constructor());

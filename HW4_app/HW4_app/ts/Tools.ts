@@ -11,6 +11,15 @@
     }
 }
 
+class Pair {
+    first: number;
+    second: number;
+    constructor(f: number, s: number) {
+        this.first = f;
+        this.second = s;
+    }  
+}
+
 class Coord {
     x: number;
     y: number;
@@ -20,8 +29,12 @@ class Coord {
     }
 }
 
-function isClickIn(r: Rect, x: number, y: number): boolean {
+function IsCoordInRect(r: Rect, x: number, y: number): boolean {
     return (x <= r.x + r.w && x >= r.x && y <= r.y + r.h && y >= r.y);
+}
+
+function RandomBetween(min: number, max: number) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 function clone(obj): any {

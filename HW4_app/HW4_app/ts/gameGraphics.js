@@ -5,9 +5,10 @@ var GameGraphics = (function () {
     GameGraphics.prototype.draw = function (gameState) {
         this.game = gameState;
         this.ctx.fillStyle = "#5e8257";
-        this.ctx.fillRect(0, gameState.HudHeight, this.ctx.canvas.width, this.ctx.canvas.height - gameState.HudHeight);
+        this.ctx.fillRect(0, Game.hudHeight, this.ctx.canvas.width, this.ctx.canvas.height - Game.hudHeight);
         this.drawBorders();
         this.drawTowers();
+        this.drawCreep();
     };
     GameGraphics.prototype.drawTowers = function () {
         this.ctx.fillStyle = "#ff0000";
@@ -26,7 +27,6 @@ var GameGraphics = (function () {
     GameGraphics.prototype.drawBorders = function () {
         var b = this.game.BorderSpec;
         this.ctx.fillStyle = "#ff0000";
-        console.log('drawing border');
         //top
         this.ctx.fillRect(b.top.x1, b.top.y, b.horWidth, Game.towerSize);
         this.ctx.fillRect(b.top.x2, b.top.y, b.horWidth, Game.towerSize);
@@ -39,6 +39,16 @@ var GameGraphics = (function () {
         //right
         this.ctx.fillRect(b.right.x, b.right.y1, Game.towerSize, b.verHeight);
         this.ctx.fillRect(b.right.x, b.right.y2, Game.towerSize, b.verHeight);
+    };
+    GameGraphics.prototype.drawCreep = function () {
+        for (var i = 0; i < this.game.Creep.length; i++) {
+            if (this.game.Creep[i].state === CreepState.Active) {
+                var x = this.game.Creep[i].x;
+                var y = this.game.Creep[i].y;
+                this.ctx.fillStyle = "#33ccff";
+                this.ctx.fillRect(x, y, Game.towerSize, Game.towerSize);
+            }
+        }
     };
     return GameGraphics;
 }());

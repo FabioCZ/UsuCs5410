@@ -40,7 +40,7 @@ class GameHud {
 
     public handleClick(x: number, y: number): ITower {
         for (var i = 0; i < this.towerButtons.length; i++) {
-            if (isClickIn(this.towerButtons[i].rect, x, y)) {
+            if (IsCoordInRect(this.towerButtons[i].rect, x, y)) {
                 console.log("commencing tower placement");
                 return this.towerButtons[i].tower;
             }

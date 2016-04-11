@@ -1,17 +1,22 @@
-var spaceArray = new Array();
-//50*32
-function GetPath(gameState, fromX, fromY, toX, toY) {
-    var q = new Array();
-    var fromXArr = fromX / 50;
-    var fromYArr = (fromY - gameState.HudHeight) / 32;
-    if (spaceArray.length === 0) {
-        for (var i = 0; i < 50; i++) {
-            spaceArray[i] = new Array();
-            for (var j = 0; j < 32; j++) {
-                spaceArray[i][j] = new Coord(i * Game.towerSize, gameState.HudHeight + j * Game.towerSize);
-            }
-        }
-    }
-    return null;
-}
+var spaceArray = new Array(); //represents the game board
+var pathsVer = new Array(); //stores paths from some square to finish for the vertical path (top->bottom)
+var pathsHor = new Array(); //stores paths from some square to finish for the horizontal path (left->right) 
+//function SetPaths(gameState: Game, fromI: number, fromJ: number, toI: number, toJ: number) : boolean {
+//    var hor = FindPath(gameState,)
+//}
+////50*32
+//function FindPath(gameState: Game, fromI: number, fromJ: number, toI: number, toJ: number): Array<Coord> {
+//    var q = new Array<Coord>();
+//    //var fromXArr = fromX / 50;
+//    //var fromYArr = (fromY - gameState.HudHeight) / 32;
+//    if (spaceArray.length === 0) {
+//        for (var i = 0; i < 50; i++) {
+//            spaceArray[i] = new Array<boolean>();
+//            for (var j = 0; j < 32; j++) {
+//                spaceArray[i][j] = true;
+//            }
+//        }
+//    }
+//    return null;
+//}
 //# sourceMappingURL=PathChecker.js.map

@@ -1,9 +1,12 @@
 var ITower = (function () {
-    function ITower(name, radius) {
+    function ITower(name, radius, x, y) {
+        if (x === void 0) { x = -1; }
+        if (y === void 0) { y = -1; }
+        console.log('new tower ', x, ",", y);
         this.id = ++ITower.towerIdCt;
         this.name = name;
-        this.x = -1;
-        this.y = -1;
+        this.x = x;
+        this.y = y;
         this.radius = radius;
     }
     Object.defineProperty(ITower, "Ground1Name", {
@@ -47,20 +50,16 @@ var ITower = (function () {
         }
         return r;
     };
-    ITower.getTowerType = function (name) {
+    ITower.getTowerType = function (name, x, y) {
         switch (name) {
             case ITower.Ground1Name:
-                return new ITower(name, Game.baseTowerRadius);
-                break;
+                return new ITower(name, Game.baseTowerRadius, x, y);
             case ITower.Ground2Name:
-                return new ITower(name, Game.baseTowerRadius);
-                break;
+                return new ITower(name, Game.baseTowerRadius, x, y);
             case ITower.MixedName:
-                return new ITower(name, Game.baseTowerRadius);
-                break;
+                return new ITower(name, Game.baseTowerRadius, x, y);
             case ITower.AirName:
-                return new ITower(name, Game.baseTowerRadius);
-                break;
+                return new ITower(name, Game.baseTowerRadius * 1.5, x, y);
         }
     };
     ITower.towerIdCt = 0;
