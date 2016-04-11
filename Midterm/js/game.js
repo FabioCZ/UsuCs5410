@@ -57,7 +57,7 @@ Bomb.Game = (function() {
                     addScore(score,'level'+currLevel);
                     addScore(Math.round(elapsedTime/10)/100,'timeLevel'+currLevel);
                     addScore(score+carryoverScore,'total');
-                    addScore(Math.round(elapsedTime+carryoverTime/10)/100,'time');
+                    addScore(Math.round((elapsedTime+carryoverTime)/10)/100,'time');
                     addedScore=true;
                     }
                     
@@ -79,7 +79,7 @@ Bomb.Game = (function() {
     }
 
     function startGameInit() {
-        startGame(0,0,5);
+        startGame(0,0,1);
     }
     
     function startGame(coScore,coTime,level){
