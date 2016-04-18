@@ -14,6 +14,13 @@ var Pair = (function () {
     }
     return Pair;
 }());
+var ArCoord = (function () {
+    function ArCoord(i, j) {
+        this.i = i;
+        this.j = j;
+    }
+    return ArCoord;
+}());
 var Coord = (function () {
     function Coord(x, y) {
         this.x = x;

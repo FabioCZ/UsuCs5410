@@ -15,7 +15,7 @@ class Application {
         this._context = canvas.getContext("2d");
 
         var l = new LevelSpec();
-        l.creepNum = 10;
+        l.creepNum = 100;
         var game = new Game(performance.now(), this._context,l);
 
     }

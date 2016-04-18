@@ -23,6 +23,7 @@ var Game = (function () {
                 if (_this.CurrentlyPlacingTower != null) {
                     _this.activeTowers.push(ITower.getTowerType(_this.CurrentlyPlacingTower.name, _this.CurrentlyPlacingTower.x, _this.CurrentlyPlacingTower.y));
                     _this.CurrentlyPlacingTower = null;
+                    _this.reCalcPaths = true;
                 }
             }
         };
@@ -46,8 +47,9 @@ var Game = (function () {
             //TODO shooting!
             //Update creep position
             for (var i = 0; i < _this.creep.length; i++) {
-                _this.creep[i].update(_this);
+                _this.creep[i].update(_this, _this.reCalcPaths);
             }
+            _this.reCalcPaths = false;
         };
         this.draw = function () {
             _this._context["clear"]();
@@ -78,12 +80,13 @@ var Game = (function () {
             }
         });
         this.CurrentlyPlacingTower = null;
+        this.reCalcPaths = true;
         this.activeTowers = [];
         this.creep = [];
         //Add creep
         ///TODO make better
         for (var i = 0; i < levelSpec.creepNum; i++) {
-            this.creep.push(new Creep(this, true, RandomBetween(startTime, startTime + 10000)));
+            this.creep.push(new Creep(this, true, RandomBetween(startTime, startTime + 10000), CType.Land, 100));
         }
         this.loop(performance.now());
     }
@@ -163,4 +166,4 @@ var Game = (function () {
     };
     return Game;
 }());
-//# sourceMappingURL=game.js.map
+//# sourceMappingURL=Game.js.map

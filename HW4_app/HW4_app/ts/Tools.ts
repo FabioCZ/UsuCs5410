@@ -20,6 +20,14 @@ class Pair {
     }  
 }
 
+class ArCoord {
+    i: number;
+    j: number;
+    constructor(i: number, j: number) {
+        this.i = i;
+        this.j = j;
+    }
+}
 class Coord {
     x: number;
     y: number;

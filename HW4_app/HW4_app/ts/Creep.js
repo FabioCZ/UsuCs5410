@@ -5,68 +5,86 @@ var CreepState;
     CreepState[CreepState["Done"] = 2] = "Done";
     CreepState[CreepState["Dead"] = 3] = "Dead";
 })(CreepState || (CreepState = {}));
+var CType;
+(function (CType) {
+    CType[CType["Air"] = 0] = "Air";
+    CType[CType["Land"] = 1] = "Land";
+    CType[CType["Mixed"] = 2] = "Mixed";
+})(CType || (CType = {}));
 var Creep = (function () {
     //TODO visual
-    function Creep(gs, isHorizontalPath, entryTime) {
+    function Creep(gs, isHorizontalPath, entryTime, type, hp) {
         this.speed = Game.towerSize / 40; //TODO
         this.isHorizontalPath = isHorizontalPath;
         this.entryTime = entryTime;
         this.state = CreepState.Waiting;
+        this.type = type;
+        this.hp = hp;
+        this.maxHp = hp;
         if (isHorizontalPath) {
             //TODO actual path
-            var j = RandomBetween(11, 21);
-            this.path = new Array();
-            for (var i = 0; i < 50; i++) {
-                this.path.push(new Coord(i, j));
-                if (i === 10) {
-                    j--;
-                    this.path.push(new Coord(i, j));
-                }
-            }
-            this.currCoord = 0;
-            this.x = 0;
+            var j = RandomBetween(11, 20);
             this.y = Game.jToY(j);
+            this.x = 0;
         }
         else {
         }
     }
-    Creep.prototype.update = function (gs) {
+    Object.defineProperty(Creep.prototype, "RatioHpLeft", {
+        get: function () { return this.hp / this.maxHp; },
+        enumerable: true,
+        configurable: true
+    });
+    ;
+    Creep.prototype.hit = function (damage) {
+        this.hp -= damage;
+        if (this.hp < 0) {
+            this.state = CreepState.Dead;
+        }
+    };
+    Creep.prototype.decrSpeed = function () {
+        this.speed /= 2;
+    };
+    Creep.prototype.incrSpeed = function () {
+        this.speed *= 2;
+    };
+    Creep.prototype.update = function (gs, recalcPath) {
         if (this.entryTime < gs.ElapsedTime && this.state === CreepState.Waiting) {
-            console.log(this.entryTime);
+            //console.log(this.entryTime);
             this.state = CreepState.Active;
         }
         if (this.state === CreepState.Active) {
-            if (this.currCoord < this.path.length - 1) {
-                var curr = this.path[this.currCoord];
-                var next = this.path[this.currCoord + 1];
-                if (next.x === curr.x + 1) {
+            if (this.path.length === null || recalcPath) {
+            }
+            if (this.path.length > 1) {
+                var curr = this.path[0];
+                var next = this.path[1];
+                if (next.i === curr.i + 1) {
                     this.x += this.speed;
-                    if (this.x > Game.iToX(next.x)) {
-                        console.log('coord transition to ', next.x);
-                        this.x = Game.iToX(next.x);
-                        this.currCoord++;
+                    if (this.x > Game.iToX(next.i)) {
+                        this.x = Game.iToX(next.i);
+                        this.path.splice(0, 1);
                     }
                 }
-                else if (next.x === curr.x - 1) {
+                else if (next.i === curr.i - 1) {
                     this.x -= this.speed;
-                    if (this.x < Game.iToX(next.x)) {
-                        this.x = Game.iToX(next.x);
-                        this.currCoord++;
+                    if (this.x < Game.iToX(next.i)) {
+                        this.x = Game.iToX(next.i);
+                        this.path.splice(0, 1);
                     }
                 }
-                else if (next.y === curr.y + 1) {
+                else if (next.j === curr.j + 1) {
                     this.y += this.speed;
-                    if (this.y > Game.jToY(next.y)) {
-                        this.y = Game.jToY(next.y);
-                        this.currCoord++;
+                    if (this.y > Game.jToY(next.j)) {
+                        this.y = Game.jToY(next.j);
+                        this.path.splice(0, 1);
                     }
                 }
-                else if (next.y === curr.y - 1) {
-                    console.log('up to ', next.y);
+                else if (next.j === curr.j - 1) {
                     this.y -= this.speed;
-                    if (this.y < Game.jToY(next.y)) {
-                        this.y = Game.jToY(next.y);
-                        this.currCoord++;
+                    if (this.y < Game.jToY(next.j)) {
+                        this.y = Game.jToY(next.j);
+                        this.path.splice(0, 1);
                     }
                 }
                 else {

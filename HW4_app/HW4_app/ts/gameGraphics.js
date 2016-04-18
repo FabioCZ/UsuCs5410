@@ -1,3 +1,33 @@
+var Colors = (function () {
+    function Colors() {
+    }
+    Object.defineProperty(Colors, "Red", {
+        get: function () { return "#ff0000"; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Colors, "Green", {
+        get: function () { return "#todo"; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Colors, "LtGreen", {
+        get: function () { return "#66ff33"; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Colors, "LtGrey", {
+        get: function () { return "#todo"; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Colors, "Grey", {
+        get: function () { return "#todo"; },
+        enumerable: true,
+        configurable: true
+    });
+    return Colors;
+}());
 var GameGraphics = (function () {
     function GameGraphics(ctx) {
         this.ctx = ctx;
@@ -45,6 +75,10 @@ var GameGraphics = (function () {
             if (this.game.Creep[i].state === CreepState.Active) {
                 var x = this.game.Creep[i].x;
                 var y = this.game.Creep[i].y;
+                this.ctx.fillStyle = Colors.LtGreen;
+                this.ctx.fillRect(x, y - Game.towerSize / 6, this.game.Creep[i].RatioHpLeft * Game.towerSize, Game.towerSize / 6);
+                this.ctx.fillStyle = Colors.Red;
+                this.ctx.fillRect(this.game.Creep[i].RatioHpLeft, y - Game.towerSize / 6, (1 - this.game.Creep[i].RatioHpLeft) * Game.towerSize, Game.towerSize / 6);
                 this.ctx.fillStyle = "#33ccff";
                 this.ctx.fillRect(x, y, Game.towerSize, Game.towerSize);
             }

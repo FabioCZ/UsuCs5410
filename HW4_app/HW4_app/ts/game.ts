@@ -19,9 +19,11 @@ class Game implements IAppPage {
     private money: number;
     private activeTowers: ITower[];
     private creep: Creep[];
+    private reCalcPaths: boolean;
 
     get ActiveTowers(): ITower[] { return this.activeTowers; }
     get Creep(): Creep[] { return this.creep; }
+
 
     static canvasWidth: number;
     static canvasHeight: number;
@@ -93,12 +95,13 @@ class Game implements IAppPage {
             }
         });
         this.CurrentlyPlacingTower = null;
+        this.reCalcPaths = true;
         this.activeTowers = [];
         this.creep = [];
         //Add creep
         ///TODO make better
         for (var i = 0; i < levelSpec.creepNum; i++) {
-            this.creep.push(new Creep(this, true, RandomBetween(startTime, startTime + 10000)));
+            this.creep.push(new Creep(this, true, RandomBetween(startTime, startTime + 10000),CType.Land,100));
         }
 
         this.loop(performance.now());
@@ -119,6 +122,7 @@ class Game implements IAppPage {
             if (this.CurrentlyPlacingTower != null) {   //placing towers
                 this.activeTowers.push(ITower.getTowerType(this.CurrentlyPlacingTower.name,this.CurrentlyPlacingTower.x,this.CurrentlyPlacingTower.y));
                 this.CurrentlyPlacingTower = null;
+                this.reCalcPaths = true;
             }
 
             //TODO tower upgrades
@@ -164,8 +168,9 @@ class Game implements IAppPage {
         //TODO shooting!
         //Update creep position
         for (var i = 0; i < this.creep.length; i++) {
-            this.creep[i].update(this);
+            this.creep[i].update(this,this.reCalcPaths);
         }
+        this.reCalcPaths = false;
     }
 
     public draw = () => {
