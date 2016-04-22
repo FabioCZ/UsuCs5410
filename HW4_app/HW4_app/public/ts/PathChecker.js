@@ -20,37 +20,37 @@ var PathChecker = (function () {
     PathChecker.isValidMove = function (newX, newY, isHor) {
         if (newX >= PathChecker.sizeX || newY >= PathChecker.sizeY || newX < 0 || newY < 0)
             return false;
-        if (isHor) {
-            if (PathChecker.PathsHor[newX][newY] === CellType.Tower)
-                return false;
+        if (isHor && PathChecker._pathsHor[newX][newY] === CellType.Tower) {
+            return false;
         }
-        else {
-            if (PathChecker.PathsVer[newX][newY] === CellType.Tower)
-                return false;
+        else if (!isHor && PathChecker._pathsVer[newX][newY] === CellType.Tower) {
+            return false;
         }
         return true;
     };
-    PathChecker.setHintPaths = function (game) {
-        PathChecker.setHintPath(game, 0, 16, true);
-        PathChecker.setHintPath(game, 25, 0, false);
+    PathChecker.setCreepPaths = function (game) {
+        console.log("resetting creep paths");
+        PathChecker.setCreepPath(game, 0, 16, true, false);
+        //PathChecker.setCreepPath(game, 25, 0, false,false);
     };
-    PathChecker.setHintPath = function (game, initI, initJ, isHorizontal) {
-        var mazeVisited = new Array(32);
+    PathChecker.setCreepPath = function (game, initI, initJ, isHorizontal, isCustom) {
+        var mazeVisited = new Array(this.sizeX);
+        var back = isCustom ? (isHorizontal ? PathChecker._pathsHor : PathChecker._pathsVer) : null;
         if (isHorizontal) {
-            PathChecker._pathsHor = new Array(32);
+            PathChecker._pathsHor = new Array(this.sizeX);
         }
         else {
-            PathChecker._pathsVer = new Array(32);
+            PathChecker._pathsVer = new Array(this.sizeX);
         }
-        for (var i = 0; i < 32; i++) {
+        for (var i = 0; i < this.sizeX; i++) {
             if (isHorizontal) {
-                PathChecker._pathsHor[i] = new Array(50);
+                PathChecker._pathsHor[i] = new Array(this.sizeY);
             }
             else {
-                PathChecker._pathsVer[i] = new Array(50);
+                PathChecker._pathsVer[i] = new Array(this.sizeY);
             }
-            mazeVisited[i] = new Array(50);
-            for (var j = 0; j < 50; j++) {
+            mazeVisited[i] = new Array(this.sizeY);
+            for (var j = 0; j < this.sizeY; j++) {
                 if (isHorizontal) {
                     PathChecker._pathsHor[i][j] = CellType.Empty;
                 }
@@ -62,12 +62,28 @@ var PathChecker = (function () {
         }
         if (game.ActiveTowers != undefined) {
             for (var i = 0; i < game.ActiveTowers.length; i++) {
-                var t = game.ActiveTowers[i];
+                var tI = Game.xToI(game.ActiveTowers[i].x);
+                var tJ = Game.yToJ(game.ActiveTowers[i].y);
+                if (i >= 128) {
+                    console.log("tower", tI, ",", tJ);
+                }
                 if (isHorizontal) {
-                    PathChecker.PathsHor[Game.xToI(t.x)][Game.yToJ(t.y)] = CellType.Tower;
+                    PathChecker._pathsHor[tI][tJ] = CellType.Tower;
                 }
                 else {
-                    PathChecker.PathsVer[Game.xToI(t.x)][Game.yToJ(t.y)] = CellType.Tower;
+                    PathChecker._pathsVer[tI][tJ] = CellType.Tower;
+                }
+            }
+        }
+        if (game.WallTowers != undefined) {
+            for (var i = 0; i < game.WallTowers.length; i++) {
+                var tI = Game.xToI(game.WallTowers[i].x);
+                var tJ = Game.yToJ(game.WallTowers[i].y);
+                if (isHorizontal) {
+                    PathChecker._pathsHor[tI][tJ] = CellType.Tower;
+                }
+                else {
+                    PathChecker._pathsVer[tI][tJ] = CellType.Tower;
                 }
             }
         }
@@ -75,18 +91,28 @@ var PathChecker = (function () {
         queue.push({ x: initI, y: initJ, path: new Array() });
         while (queue.length > 0) {
             var c = queue.shift();
-            //console.log('c is', c);
+            //console.log('c is', c, ' l:', queue.length);
             if (isHorizontal && c.x === 49 && c.y > 11 && c.y < 20) {
                 for (var i = 0; i < c.path.length; i++) {
                     PathChecker._pathsHor[c.path[i].x][c.path[i].y] = CellType.Path;
                 }
-                return;
+                if (isCustom) {
+                    var toRet = PathChecker._pathsHor;
+                    PathChecker._pathsHor = back;
+                    return toRet;
+                }
+                return PathChecker._pathsHor;
             }
             if (!isHorizontal && c.x > 20 && c.x < 29 && c.y === 31) {
                 for (var i = 0; i < c.path.length; i++) {
                     PathChecker._pathsVer[c.path[i].x][c.path[i].y] = CellType.Path;
                 }
-                return;
+                if (isCustom) {
+                    var toRet = PathChecker._pathsHor;
+                    PathChecker._pathsVer = back;
+                    return toRet;
+                }
+                return PathChecker._pathsHor;
             }
             if (mazeVisited[c.x][c.y]) {
                 continue;
@@ -112,10 +138,10 @@ var PathChecker = (function () {
             validMoves.push({ x: x + 1, y: y });
         return validMoves;
     };
-    PathChecker._pathsVer = new Array(); //stores paths from some square to finish for the vertical path (top->bottom)
-    PathChecker._pathsHor = new Array(); //stores paths from some square to finish for the horizontal path (left->right) 
-    PathChecker.sizeX = 32;
-    PathChecker.sizeY = 50;
+    PathChecker._pathsVer = new Array(); //stores path from some square to finish for the vertical path (top->bottom)
+    PathChecker._pathsHor = new Array(); //stores path from some square to finish for the horizontal path (left->right) 
+    PathChecker.sizeX = 50;
+    PathChecker.sizeY = 32;
     return PathChecker;
 }());
 //# sourceMappingURL=PathChecker.js.map

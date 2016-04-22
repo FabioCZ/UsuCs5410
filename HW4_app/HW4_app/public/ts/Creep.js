@@ -21,13 +21,15 @@ var Dir;
 var Creep = (function () {
     //TODO visual
     function Creep(gs, isHorizontalPath, entryTime, type, hp) {
-        this.speed = Game.towerSize / 40; //TODO
+        this.speed = Game.towerSize / 400; //TODO
         this.isHorizontalPath = isHorizontalPath;
         this.entryTime = entryTime;
         this.state = CreepState.Waiting;
         this.type = type;
         this.hp = hp;
         this.maxHp = hp;
+        this.path = this.isHorizontalPath ? PathChecker.PathsHor : PathChecker.PathsVer;
+        this.isCustompath = false;
         if (isHorizontalPath) {
             //TODO actual path
             this.y = Game.jToY(16);
@@ -61,58 +63,51 @@ var Creep = (function () {
             this.state = CreepState.Active;
         }
         if (this.state === CreepState.Active) {
-            var i = Game.xToI(this.x);
-            var j = Game.yToJ(this.y);
-            var dir = this.findNextCoord(i, j, this.isHorizontalPath);
-            switch (dir) {
-                case Dir.Up:
+            var currI = Game.xToI(this.x + Game.towerSize - 0.001);
+            var currJ = Game.yToJ(this.y + Game.towerSize - 0.001);
+            if (this.isCustompath && Game.newPlacement) {
+                this.path = PathChecker.setCreepPath(gs, currI, currJ, this.isHorizontalPath, true); //path changing due to new towers, get new custom path
+            }
+            else {
+                this.path = this.isHorizontalPath ? PathChecker.PathsHor : PathChecker.PathsVer;
+            }
+            var succ = false;
+            while (!succ) {
+                if (this.path[currI][currJ - 1] != undefined && this.path[currI][currJ - 1] === CellType.Path) {
                     this.y -= this.speed * delta;
-                    break;
-                case Dir.Right:
+                    if (this.y < Game.jToY(currJ - 1))
+                        this.y = Game.jToY(currJ - 1);
+                    succ = true;
+                }
+                else if (this.path[currI + 1] != undefined && this.path[currI + 1][currJ] === CellType.Path) {
                     this.x += this.speed * delta;
-                    break;
-                case Dir.Down:
+                    if (this.x > Game.iToX(currI + 1))
+                        this.x = Game.iToX(currI + 1);
+                    succ = true;
+                }
+                else if (this.path[currI][currJ + 1] != undefined && this.path[currI][currJ + 1] === CellType.Path) {
                     this.y += this.speed * delta;
-                    break;
-                case Dir.Left:
+                    if (this.y > Game.jToY(currJ + 1))
+                        this.y = Game.jToY(currJ + 1);
+                    succ = true;
+                }
+                else if (this.path[currI - 1] != undefined && this.path[currI - 1][currJ] === CellType.Path) {
                     this.x -= this.speed * delta;
-                    break;
-            }
-        }
-    };
-    Creep.prototype.findNextCoord = function (currI, currJ, isHor) {
-        if (isHor) {
-            if (PathChecker.PathsHor[currI][currJ - 1] != undefined && PathChecker.PathsHor[currI][currJ - 1] === CellType.Path) {
-                return Dir.Up;
-            }
-            else if (PathChecker.PathsHor[currI + 1] != undefined && PathChecker.PathsHor[currI + 1][currJ] === CellType.Path) {
-                return Dir.Right;
-            }
-            if (PathChecker.PathsHor[currI][currJ + 1] != undefined && PathChecker.PathsHor[currI][currJ + 1] === CellType.Path) {
-                return Dir.Down;
-            }
-            else if (PathChecker.PathsHor[currI - 1] != undefined && PathChecker.PathsHor[currI - 1][currJ] === CellType.Path) {
-                return Dir.Left;
-            }
-            else {
-                throw Error("ooops.");
-            }
-        }
-        else {
-            if (PathChecker.PathsVer[currI][currJ - 1] === CellType.Path) {
-                return Dir.Up;
-            }
-            else if (PathChecker.PathsVer[currI + 1][currJ] === CellType.Path) {
-                return Dir.Right;
-            }
-            if (PathChecker.PathsVer[currI][currJ + 1] === CellType.Path) {
-                return Dir.Down;
-            }
-            else if (PathChecker.PathsVer[currI - 1][currJ] === CellType.Path) {
-                return Dir.Left;
-            }
-            else {
-                throw Error("ooops.");
+                    if (this.x < Game.iToX(currI - 1))
+                        this.x = Game.iToX(currI - 1);
+                    succ = true;
+                }
+                else {
+                    if (!this.isCustompath) {
+                        console.log('custom path');
+                        this.path = PathChecker.setCreepPath(gs, currI, currJ, this.isHorizontalPath, true); //path changing due to new towers, get new custom path
+                        this.isCustompath = true;
+                    }
+                    else {
+                        this.path = this.isHorizontalPath ? PathChecker.PathsHor : PathChecker.PathsVer;
+                        this.isCustompath = false;
+                    }
+                }
             }
         }
     };

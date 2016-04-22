@@ -26,21 +26,23 @@ class Creep {
     y: number;
     hp: number;
     maxHp: number;
-    public get RatioHpLeft() { return this.hp/this.maxHp};
+    public get RatioHpLeft() { return this.hp / this.maxHp };
     speed: number;
-    currCoord : number;
+    path: any;
+    isCustompath : boolean;
 
     //TODO visual
 
-    constructor(gs: Game, isHorizontalPath: boolean, entryTime: number, type:CType,hp:number) {
-        this.speed = Game.towerSize / 40;   //TODO
+    constructor(gs: Game, isHorizontalPath: boolean, entryTime: number, type: CType, hp: number) {
+        this.speed = Game.towerSize / 400;   //TODO
         this.isHorizontalPath = isHorizontalPath;
         this.entryTime = entryTime;
         this.state = CreepState.Waiting;
         this.type = type;
         this.hp = hp;
         this.maxHp = hp;
-
+        this.path = this.isHorizontalPath ? PathChecker.PathsHor : PathChecker.PathsVer;
+        this.isCustompath = false;
         if (isHorizontalPath) {
             //TODO actual path
             this.y = Game.jToY(16);
@@ -50,6 +52,7 @@ class Creep {
             );
             this.y = 0;
         }
+
     }
 
     public hit(damage: number) {
@@ -67,67 +70,50 @@ class Creep {
         this.speed *= 2;
     }
 
-    public update(gs: Game,delta: number) {
+    public update(gs: Game, delta: number) {
         if (this.entryTime < gs.ElapsedTime && this.state === CreepState.Waiting) {
             this.state = CreepState.Active;
         }
 
         if (this.state === CreepState.Active) {
-            var i = Game.xToI(this.x);
-            var j = Game.yToJ(this.y);
+            var currI = Game.xToI(this.x + Game.towerSize - 0.001);
+            var currJ = Game.yToJ(this.y + Game.towerSize - 0.001);
+            if (this.isCustompath && Game.newPlacement) {
+                this.path = PathChecker.setCreepPath(gs, currI, currJ, this.isHorizontalPath, true); //path changing due to new towers, get new custom path
+            } else {
+                this.path = this.isHorizontalPath ? PathChecker.PathsHor : PathChecker.PathsVer;
+            }
 
-            var dir = this.findNextCoord(i, j, this.isHorizontalPath);
-
-            switch(dir) {
-                case Dir.Up:
+            var succ = false;
+            while (!succ) {
+                
+                if (this.path[currI][currJ - 1] != undefined && this.path[currI][currJ - 1] === CellType.Path) {
                     this.y -= this.speed * delta;
-                    break;
-                case Dir.Right:
+                    if (this.y < Game.jToY(currJ - 1)) this.y = Game.jToY(currJ - 1);
+                    succ = true;
+                } else if (this.path[currI + 1] != undefined && this.path[currI + 1][currJ] === CellType.Path) {
                     this.x += this.speed * delta;
-                    break;
-                case Dir.Down:
+                    if (this.x > Game.iToX(currI + 1)) this.x = Game.iToX(currI + 1);
+                    succ = true;
+                } else if (this.path[currI][currJ + 1] != undefined && this.path[currI][currJ + 1] === CellType.Path) {
                     this.y += this.speed * delta;
-                    break;
-                case Dir.Left:
+                    if (this.y > Game.jToY(currJ + 1)) this.y = Game.jToY(currJ + 1);
+                    succ = true;
+                } else if (this.path[currI - 1] != undefined && this.path[currI - 1][currJ] === CellType.Path) {
                     this.x -= this.speed * delta;
-                    break;
-            }
+                    if (this.x < Game.iToX(currI - 1)) this.x = Game.iToX(currI - 1);
+                    succ = true;
+                } else {
+                    if (!this.isCustompath) {
+                        console.log('custom path');
+                        this.path = PathChecker.setCreepPath(gs, currI, currJ, this.isHorizontalPath, true); //path changing due to new towers, get new custom path
+                        this.isCustompath = true;
+                    } else {
+                        this.path = this.isHorizontalPath ? PathChecker.PathsHor : PathChecker.PathsVer;
+                        this.isCustompath = false;
+                    }
+                }
         }
     }
-
-    public findNextCoord(currI: number, currJ: number, isHor: boolean): Dir {
-        if (isHor) {
-            if (PathChecker.PathsHor[currI][currJ - 1] != undefined && PathChecker.PathsHor[currI][currJ - 1] === CellType.Path) {
-                return Dir.Up;
-                //return new ArCoord(currI, currJ - 1);
-            } else if (PathChecker.PathsHor[currI + 1] != undefined && PathChecker.PathsHor[currI + 1][currJ] === CellType.Path) {
-                return Dir.Right;
-                 //return new ArCoord(currI + 1, currJ);
-            } if (PathChecker.PathsHor[currI][currJ + 1] != undefined && PathChecker.PathsHor[currI][currJ + 1] === CellType.Path) {
-                return Dir.Down;
-                //return new ArCoord(currI, currJ + 1);
-            } else if (PathChecker.PathsHor[currI - 1] != undefined && PathChecker.PathsHor[currI - 1][currJ] === CellType.Path) {
-                return Dir.Left;
-                //return new ArCoord(currI - 1, currJ);
-            } else {
-                throw Error("ooops.");
-            }
-        } else {
-            if (PathChecker.PathsVer[currI][currJ - 1] === CellType.Path) {
-                return Dir.Up;
-                //return new ArCoord(currI, currJ - 1);
-            } else if (PathChecker.PathsVer[currI + 1][currJ] === CellType.Path) {
-                return Dir.Right;
-                //return new ArCoord(currI + 1, currJ);
-            } if (PathChecker.PathsVer[currI][currJ + 1] === CellType.Path) {
-                return Dir.Down;
-                //return new ArCoord(currI, currJ + 1);
-            } else if (PathChecker.PathsVer[currI - 1][currJ] === CellType.Path) {
-                return Dir.Left;
-                //return new ArCoord(currI - 1, currJ);
-            } else {
-                throw Error("ooops.");
-            }
-        }
-    }
+}
 }

@@ -11,7 +11,7 @@ var Game = (function () {
             var x = e.clientX - document.getElementById("canvas-main").getBoundingClientRect().left;
             var y = e.clientY - document.getElementById("canvas-main").getBoundingClientRect().top;
             if (y < Game.hudHeight) {
-                console.log("hud click");
+                //console.log("hud click");
                 var tower = _this.gameHud.handleClick(x, y);
                 if (tower != null && _this.CurrentlyPlacingTower == null) {
                     _this.CurrentlyPlacingTower = tower;
@@ -22,7 +22,8 @@ var Game = (function () {
                 if (_this.CurrentlyPlacingTower != null) {
                     _this.activeTowers.push(ITower.getTowerType(_this.CurrentlyPlacingTower.name, _this.CurrentlyPlacingTower.x, _this.CurrentlyPlacingTower.y));
                     _this.CurrentlyPlacingTower = null;
-                    PathChecker.setHintPaths(_this);
+                    PathChecker.setCreepPaths(_this);
+                    Game.newPlacement = true;
                 }
             }
         };
@@ -36,8 +37,8 @@ var Game = (function () {
             var x = e.clientX - document.getElementById("canvas-main").getBoundingClientRect().left;
             var y = e.clientY - document.getElementById("canvas-main").getBoundingClientRect().top;
             if (_this.CurrentlyPlacingTower != null && _this.isInBorders(x, y) && !_this.isTowerCollision(x, y, Game.towerSize, Game.towerSize)) {
-                x = x - x % Game.towerSize;
-                y = y - y % Game.towerSize;
+                var x = Game.xToI(x) * Game.towerSize;
+                var y = Game.yToJ(y) * Game.towerSize + Game.hudHeight;
                 _this.CurrentlyPlacingTower.setCoords(x, y);
             }
         };
@@ -67,6 +68,7 @@ var Game = (function () {
             for (var i = 0; i < _this.creep.length; i++) {
                 _this.creep[i].update(_this, delta);
             }
+            Game.newPlacement = false;
         };
         this.draw = function () {
             _this._context["clear"]();
@@ -87,7 +89,6 @@ var Game = (function () {
         towerTypes.push(ITower.getTowerType(ITower.Ground2Name));
         towerTypes.push(ITower.getTowerType(ITower.MixedName));
         towerTypes.push(ITower.getTowerType(ITower.AirName));
-        PathChecker.setHintPaths(this);
         Game.hudHeight = context.canvas.scrollHeight * this.hudRatio;
         this.gameHud = new GameHud(context.canvas.scrollWidth, Game.hudHeight, towerTypes);
         document.addEventListener("click", this.clickListener);
@@ -96,7 +97,9 @@ var Game = (function () {
         document.addEventListener("keydown", this.keyListener);
         this.CurrentlyPlacingTower = null;
         this.activeTowers = [];
+        this.wallTowers = [];
         this.initBorder();
+        PathChecker.setCreepPaths(this);
         this.creep = [];
         //Add creep
         ///TODO make better
@@ -120,13 +123,20 @@ var Game = (function () {
         enumerable: true,
         configurable: true
     });
+    Object.defineProperty(Game.prototype, "WallTowers", {
+        get: function () { return this.wallTowers; },
+        enumerable: true,
+        configurable: true
+    });
     Object.defineProperty(Game.prototype, "Creep", {
         get: function () { return this.creep; },
         enumerable: true,
         configurable: true
     });
-    Game.xToI = function (x) { return x / Game.towerSize; };
-    Game.yToJ = function (y) { return (y - Game.hudHeight) / Game.towerSize; };
+    Game.xToI = function (x) { return ~~(x / Game.towerSize); };
+    Game.yToJ = function (y) { return ~~((y - Game.hudHeight) / Game.towerSize); };
+    Game.xToINoRound = function (x) { return (x / Game.towerSize); };
+    Game.yToJNoRound = function (y) { return ((y - Game.hudHeight) / Game.towerSize); };
     Game.iToX = function (i) { return Game.towerSize * i; };
     Game.jToY = function (j) { return (Game.towerSize * j) + Game.hudHeight; };
     Object.defineProperty(Game.prototype, "BorderSpec", {
@@ -168,14 +178,14 @@ var Game = (function () {
     Game.prototype.initBorder = function () {
         for (var j = 0; j < 32; j++) {
             if (j < 12 || j > 19) {
-                this.activeTowers.push(ITower.getTowerType(ITower.WallName, Game.iToX(0), Game.jToY(j)));
-                this.activeTowers.push(ITower.getTowerType(ITower.WallName, Game.iToX(49), Game.jToY(j)));
+                this.wallTowers.push(ITower.getTowerType(ITower.WallName, Game.iToX(0), Game.jToY(j)));
+                this.wallTowers.push(ITower.getTowerType(ITower.WallName, Game.iToX(49), Game.jToY(j)));
             }
         }
         for (var i = 1; i < 49; i++) {
             if (i < 21 || i > 28) {
-                this.activeTowers.push(ITower.getTowerType(ITower.WallName, Game.iToX(i), Game.jToY(0)));
-                this.activeTowers.push(ITower.getTowerType(ITower.WallName, Game.iToX(i), Game.jToY(31)));
+                this.wallTowers.push(ITower.getTowerType(ITower.WallName, Game.iToX(i), Game.jToY(0)));
+                this.wallTowers.push(ITower.getTowerType(ITower.WallName, Game.iToX(i), Game.jToY(31)));
             }
         }
     };

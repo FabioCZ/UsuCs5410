@@ -19,19 +19,23 @@ class Game {
 
     private money: number;
     private activeTowers: ITower[];
+    private wallTowers: ITower[];
     private creep: Creep[];
 
     get ActiveTowers(): ITower[] { return this.activeTowers; }
+    get WallTowers(): ITower[] { return this.wallTowers; }
     get Creep(): Creep[] { return this.creep; }
 
-
+    static newPlacement: boolean;
     static canvasWidth: number;
     static canvasHeight: number;
     static towerSize: number;
     static baseTowerRadius: number;
     static hudHeight: number;
-    static xToI(x: number) { return x / Game.towerSize; }
-    static yToJ(y: number) { return (y - Game.hudHeight) / Game.towerSize; }
+    static xToI(x: number) { return ~~(x / Game.towerSize); }
+    static yToJ(y: number) { return ~~((y - Game.hudHeight) / Game.towerSize); }
+    static xToINoRound(x: number) { return (x / Game.towerSize); }
+    static yToJNoRound(y: number) { return ((y - Game.hudHeight) / Game.towerSize); }
     static iToX(i: number) { return Game.towerSize * i; }
     static jToY(j: number) { return (Game.towerSize * j) + Game.hudHeight; }
 
@@ -84,7 +88,6 @@ class Game {
         towerTypes.push(ITower.getTowerType(ITower.Ground2Name));
         towerTypes.push(ITower.getTowerType(ITower.MixedName));
         towerTypes.push(ITower.getTowerType(ITower.AirName));
-        PathChecker.setHintPaths(this);
 
         Game.hudHeight = context.canvas.scrollHeight * this.hudRatio;
         this.gameHud = new GameHud(context.canvas.scrollWidth, Game.hudHeight, towerTypes);
@@ -94,7 +97,9 @@ class Game {
         document.addEventListener("keydown",this.keyListener);
         this.CurrentlyPlacingTower = null;
         this.activeTowers = [];
+        this.wallTowers = [];
         this.initBorder();
+        PathChecker.setCreepPaths(this);
         this.creep = [];
         //Add creep
         ///TODO make better
@@ -108,15 +113,15 @@ class Game {
     public initBorder() {
         for (var j = 0; j < 32; j++) {
             if (j < 12 || j > 19) {
-                this.activeTowers.push(ITower.getTowerType(ITower.WallName, Game.iToX(0), Game.jToY(j)));
-                this.activeTowers.push(ITower.getTowerType(ITower.WallName, Game.iToX(49), Game.jToY(j)));
+                this.wallTowers.push(ITower.getTowerType(ITower.WallName, Game.iToX(0), Game.jToY(j)));
+                this.wallTowers.push(ITower.getTowerType(ITower.WallName, Game.iToX(49), Game.jToY(j)));
             }
         }
 
         for (var i = 1; i < 49; i++) {
             if (i < 21 || i > 28) {
-                this.activeTowers.push(ITower.getTowerType(ITower.WallName, Game.iToX(i), Game.jToY(0)));
-                this.activeTowers.push(ITower.getTowerType(ITower.WallName, Game.iToX(i), Game.jToY(31)));
+                this.wallTowers.push(ITower.getTowerType(ITower.WallName, Game.iToX(i), Game.jToY(0)));
+                this.wallTowers.push(ITower.getTowerType(ITower.WallName, Game.iToX(i), Game.jToY(31)));
             }
         }
     }
@@ -125,7 +130,7 @@ class Game {
         var x = e.clientX - document.getElementById("canvas-main").getBoundingClientRect().left;
         var y = e.clientY - document.getElementById("canvas-main").getBoundingClientRect().top;
         if (y < Game.hudHeight) {   //HUD click
-            console.log("hud click");
+            //console.log("hud click");
             var tower = this.gameHud.handleClick(x, y);
             if (tower != null && this.CurrentlyPlacingTower == null) {
                 this.CurrentlyPlacingTower = tower;
@@ -135,7 +140,8 @@ class Game {
             if (this.CurrentlyPlacingTower != null) {   //placing towers
                 this.activeTowers.push(ITower.getTowerType(this.CurrentlyPlacingTower.name,this.CurrentlyPlacingTower.x,this.CurrentlyPlacingTower.y));
                 this.CurrentlyPlacingTower = null;
-                PathChecker.setHintPaths(this);
+                PathChecker.setCreepPaths(this);
+                Game.newPlacement = true;
             }
 
             //TODO tower upgrades
@@ -154,9 +160,9 @@ class Game {
         var x = e.clientX - document.getElementById("canvas-main").getBoundingClientRect().left;
         var y = e.clientY - document.getElementById("canvas-main").getBoundingClientRect().top;
         if (this.CurrentlyPlacingTower != null && this.isInBorders(x, y) && !this.isTowerCollision(x, y, Game.towerSize, Game.towerSize)) {
-            x = x - x % Game.towerSize;
-            y = y - y % Game.towerSize;
-            this.CurrentlyPlacingTower.setCoords(x, y);
+            var x = Game.xToI(x) * Game.towerSize;
+            var y = Game.yToJ(y) * Game.towerSize + Game.hudHeight;
+            this.CurrentlyPlacingTower.setCoords(x,y);
         }
     }
 
@@ -207,6 +213,7 @@ class Game {
         for (var i = 0; i < this.creep.length; i++) {
             this.creep[i].update(this,delta);
         }
+        Game.newPlacement = false;
     }
 
     public draw = () => {

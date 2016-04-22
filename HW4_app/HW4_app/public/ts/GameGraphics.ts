@@ -1,6 +1,6 @@
 ﻿class Colors {
     public static get Red() { return "#ff0000"; }
-    public static get Green() { return "#todo"; }
+    public static get Green() { return "#5e825"; }
     public static get LtGreen() { return "#66ff33"; }
     public static get LtGrey() { return "#todo"; }
     public static get Grey() { return "#todo"; }
@@ -16,11 +16,27 @@ class GameGraphics {
 
     draw(gameState: Game) {
         this.game = gameState;
-        this.ctx.fillStyle = "#5e8257";
+        this.ctx.fillStyle = Colors.Green;
         this.ctx.fillRect(0, Game.hudHeight, this.ctx.canvas.width, this.ctx.canvas.height - Game.hudHeight);
-        //this.drawBorders();
+        for (var i = 0; i < 50; i++) {
+            for (var j = 0; j < 32; j++) {
+                if (PathChecker.PathsHor[i][j] === CellType.Path) {
+                    this.ctx.fillStyle = Colors.Red;
+                    this.ctx.fillRect(Game.iToX(i),Game.jToY(j),Game.towerSize,Game.towerSize);
+                }
+            }
+        }
         this.drawTowers();
+        this.drawWalls();
         this.drawCreep();
+    }
+
+    drawWalls() {
+        this.ctx.fillStyle = Colors.LtGreen;
+        for (var i = 0; i < this.game.WallTowers.length; i++) {
+            var t = this.game.WallTowers[i];
+            this.ctx.fillRect(t.x, t.y, Game.towerSize, Game.towerSize);
+        }
     }
 
     drawTowers() {
@@ -36,23 +52,6 @@ class GameGraphics {
             var t = this.game.ActiveTowers[i];
             this.ctx.strokeRect(t.x, t.y, Game.towerSize, Game.towerSize);
         }
-    }
-
-    drawBorders() {
-        var b = this.game.BorderSpec;
-        this.ctx.fillStyle = "#ff0000";
-        //top
-        this.ctx.fillRect(b.top.x1, b.top.y, b.horWidth, Game.towerSize);
-        this.ctx.fillRect(b.top.x2, b.top.y, b.horWidth, Game.towerSize);
-        //bottom
-        this.ctx.fillRect(b.bottom.x1, b.bottom.y, b.horWidth, Game.towerSize);
-        this.ctx.fillRect(b.bottom.x2, b.bottom.y, b.horWidth, Game.towerSize);
-        //left
-        this.ctx.fillRect(b.left.x, b.left.y1, Game.towerSize, b.verHeight);
-        this.ctx.fillRect(b.left.x, b.left.y2, Game.towerSize, b.verHeight);
-        //right
-        this.ctx.fillRect(b.right.x, b.right.y1, Game.towerSize, b.verHeight);
-        this.ctx.fillRect(b.right.x, b.right.y2, Game.towerSize, b.verHeight);
     }
 
     drawCreep() {
