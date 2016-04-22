@@ -22,28 +22,37 @@
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="styles\style.css" />
-    <Content Include="index.html" />
+    <Content Include="public\styles\style.css" />
+    <Content Include="public\index.html" />
     <Content Include="web.config" />
   </ItemGroup>
   <ItemGroup>
-    <TypeScriptCompile Include="ts\App.ts" />
-    <TypeScriptCompile Include="ts\Creep.ts" />
-    <TypeScriptCompile Include="ts\GameHud.ts" />
-    <TypeScriptCompile Include="ts\IAppPage.ts" />
-    <TypeScriptCompile Include="ts\Game.ts" />
-    <TypeScriptCompile Include="ts\GameGraphics.ts" />
-    <TypeScriptCompile Include="ts\PathChecker.ts" />
-    <TypeScriptCompile Include="ts\Tools.ts" />
-    <TypeScriptCompile Include="ts\Tower.ts" />
+    <TypeScriptCompile Include="public\ts\App.ts" />
+    <TypeScriptCompile Include="public\ts\Controls.ts" />
+    <TypeScriptCompile Include="public\ts\Credits.ts" />
+    <TypeScriptCompile Include="public\ts\Creep.ts" />
+    <TypeScriptCompile Include="public\ts\GameHud.ts" />
+    <TypeScriptCompile Include="public\ts\Highscore.ts" />
+    <TypeScriptCompile Include="public\ts\Game.ts" />
+    <TypeScriptCompile Include="public\ts\GameGraphics.ts" />
+    <TypeScriptCompile Include="public\ts\MainMenu.ts" />
+    <TypeScriptCompile Include="public\ts\PathChecker.ts" />
+    <TypeScriptCompile Include="public\ts\Tools.ts" />
+    <TypeScriptCompile Include="public\ts\Tower.ts" />
+    <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\requirejs\require.d.ts" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="packages.config" />
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>
     </None>
     <None Include="web.Release.config">
       <DependentUpon>web.config</DependentUpon>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">12.0</VisualStudioVersion>

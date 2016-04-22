@@ -1,0 +1,11 @@
+{
+  "name": "towerdefbackend",
+  "version": "1.0.0",
+  "description": "tower defense back end",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Fabio Gottlicher",
+  "license": "MIT"
+}
