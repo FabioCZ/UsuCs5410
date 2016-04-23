@@ -30,7 +30,7 @@ class Game {
     get WallTowers(): Tower[] { return this.wallTowers; }
     get Creep(): Creep[] { return this.creep; }
 
-    static newPlacement: boolean;
+    static newTowerPlaced: boolean;
     static canvasWidth: number;
     static canvasHeight: number;
     static towerSize: number;
@@ -113,34 +113,32 @@ class Game {
     }
 
     public startLevel() {
-        //Add creep
-        ///TODO make better
         switch (this.levelNum) {
             case 1:
                 for (var i = 0; i < 10; i++) {
-                    this.creep.push(new Creep(this, true, RandomBetween(this.elapsedTime, this.elapsedTime + 10000), CType.Land1));
+                    this.creep.push(new Creep(this, true, RandomBetween(this.elapsedTime + 1000, this.elapsedTime + 10000), CType.Land1));
                 }
                 for (var i = 0; i < 5; i++) {
-                    this.creep.push(new Creep(this, true, RandomBetween(this.elapsedTime, this.elapsedTime + 10000), CType.Land2));
+                    this.creep.push(new Creep(this, true, RandomBetween(this.elapsedTime + 1000, this.elapsedTime + 10000), CType.Land2));
                 }
                 break;
             case 2:
                 for (var i = 0; i < 10; i++) {
-                    this.creep.push(new Creep(this, true, RandomBetween(this.elapsedTime, this.elapsedTime + 15000), CType.Land2));
+                    this.creep.push(new Creep(this, true, RandomBetween(this.elapsedTime + 1000, this.elapsedTime + 15000), CType.Land2));
                 }
                 for (var i = 0; i < 5; i++) {
-                    this.creep.push(new Creep(this, false, RandomBetween(this.elapsedTime, this.elapsedTime + 15000), CType.Land1));
+                    this.creep.push(new Creep(this, false, RandomBetween(this.elapsedTime + 1000, this.elapsedTime + 15000), CType.Land1));
                 }
                 break;
             case 3:
                 for (var i = 0; i < 10; i++) {
-                    this.creep.push(new Creep(this, true, RandomBetween(this.elapsedTime, this.elapsedTime + 25000), CType.Land2));
-                    this.creep.push(new Creep(this, false, RandomBetween(this.elapsedTime, this.elapsedTime + 25000), CType.Land1));
+                    this.creep.push(new Creep(this, true, RandomBetween(this.elapsedTime + 1000, this.elapsedTime + 25000), CType.Land2));
+                    this.creep.push(new Creep(this, false, RandomBetween(this.elapsedTime + 1000, this.elapsedTime + 25000), CType.Land1));
                 }
                 for (var i = 0; i < 5; i++) {
-                    this.creep.push(new Creep(this, false, RandomBetween(this.elapsedTime, this.elapsedTime + 25000), CType.Land1));
-                    this.creep.push(new Creep(this, true, RandomBetween(this.elapsedTime, this.elapsedTime + 25000), CType.Air));
-                    this.creep.push(new Creep(this, false, RandomBetween(this.elapsedTime, this.elapsedTime + 25000), CType.Air));
+                    this.creep.push(new Creep(this, false, RandomBetween(this.elapsedTime + 1000, this.elapsedTime + 25000), CType.Land1));
+                    this.creep.push(new Creep(this, true, RandomBetween(this.elapsedTime + 1000, this.elapsedTime + 25000), CType.Air));
+                    this.creep.push(new Creep(this, false, RandomBetween(this.elapsedTime + 1000, this.elapsedTime + 25000), CType.Air));
                 }
                 break;
             case 4:
@@ -148,6 +146,7 @@ class Game {
             case 5:
                 break;
         }
+        this.hasStarted = true;
     }
 
     public initBorder() {
@@ -180,6 +179,7 @@ class Game {
             } else if (!r['new'] && this.selectedTowerIndex > -1) {
                 if (r['t'] == null) {
                     this.activeTowers.splice(this.selectedTowerIndex, 1);
+                    this.selectedTowerIndex = -1;
                 } else {
                     this.activeTowers[this.selectedTowerIndex] = r['t'];
                 }
@@ -188,7 +188,7 @@ class Game {
             if (this.CurrentlyPlacingTower != null) { //placing towers
                 this.activeTowers.push(Tower.towerFactory(this.CurrentlyPlacingTower.name, this.CurrentlyPlacingTower.x, this.CurrentlyPlacingTower.y));
                 this.CurrentlyPlacingTower = null;
-                Game.newPlacement = true;
+                Game.newTowerPlaced = true;
             } else {
                 this.selectedTowerIndex = this.isTowerCollision(x, y, Game.towerSize / 5, Game.towerSize / 5);
                 if (this.selectedTowerIndex > -1) {
@@ -206,6 +206,7 @@ class Game {
         if (this.gameHud.isATowerSelected()) {
             e.preventDefault();
             this.gameHud.setSelected(null);
+            this.selectedTowerIndex = -1;
         }
     }
 
@@ -265,9 +266,9 @@ class Game {
         //TODO shooting!
         //Update creep position
         for (var i = 0; i < this.creep.length; i++) {
-            this.creep[i].update(this,delta);
+            this.livesLeft -= this.creep[i].update(this,delta); //creep update returns 1 if a creep has made it
         }
-        Game.newPlacement = false;
+        Game.newTowerPlaced = false;
     }
 
     public draw = (delta) => {

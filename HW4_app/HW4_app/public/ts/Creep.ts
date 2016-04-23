@@ -87,13 +87,13 @@ class Creep {
         this.speed *= 2;
     }
 
-    public update(gs: Game, delta: number) {
+    public update(gs: Game, delta: number) : number {
         if (this.entryTime < gs.ElapsedTime && this.state === CreepState.Waiting) {
             this.state = CreepState.Active;
         }
 
         if (this.state === CreepState.Active) {
-            if (this.path == undefined || Game.newPlacement) {
+            if (this.path == undefined || Game.newTowerPlaced) {
                 var i = Game.xToI(this.x);
                 var j = Game.yToJ(this.y);
                 this.path = PathChecker.getCreepPath(gs, i, j, this.isHorizontalPath).slice();
@@ -134,8 +134,10 @@ class Creep {
                 }
             } else {
                 this.state = CreepState.Done;
+                return 1;
             }
         }
+        return 0;
     }
 
     public draw(ctx: CanvasRenderingContext2D, delta: number) {

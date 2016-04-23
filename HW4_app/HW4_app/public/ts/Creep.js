@@ -81,7 +81,7 @@ var Creep = (function () {
             this.state = CreepState.Active;
         }
         if (this.state === CreepState.Active) {
-            if (this.path == undefined || Game.newPlacement) {
+            if (this.path == undefined || Game.newTowerPlaced) {
                 var i = Game.xToI(this.x);
                 var j = Game.yToJ(this.y);
                 this.path = PathChecker.getCreepPath(gs, i, j, this.isHorizontalPath).slice();
@@ -127,8 +127,10 @@ var Creep = (function () {
             }
             else {
                 this.state = CreepState.Done;
+                return 1;
             }
         }
+        return 0;
     };
     Creep.prototype.draw = function (ctx, delta) {
         if (this.state !== CreepState.Active)

@@ -11,7 +11,8 @@
         ctx.fillStyle = Colors.Grey;
         ctx.fillRect(this.rect.x, this.rect.y, this.rect.w, this.rect.h);
         ctx.textAlign = "center";
-        ctx.strokeText(this.tower.name, centerX, this.rect.y + this.rect.h / 2, this.rect.w);
+        ctx.fillStyle = Colors.Black;
+        ctx.fillText(this.tower.name, centerX, this.rect.y + this.rect.h / 2, this.rect.w);
     }
 
 }
@@ -35,21 +36,34 @@ class TowerDetails {
 
     public draw(ctx:CanvasRenderingContext2D) {
         var centerX = this.rect.x + this.rect.w / 2;
-        ctx.font = 
         ctx.fillStyle = Colors.Grey;
         ctx.fillRect(this.rect.x, this.rect.y, this.rect.w, this.rect.h);
         if (this.tower != null) {
             ctx.textAlign = "center";
-            ctx.strokeText("Selected tower: " + this.tower.name, centerX, this.rect.y + this.rect.h / 4, this.rect.w);
+            ctx.fillStyle = Colors.Black;
+            ctx.fillText("Selected tower: " + this.tower.name, centerX, this.rect.y + this.rect.h / 4, this.rect.w);
 
             ctx.fillStyle = Colors.LtGrey;
             ctx.fillRect(this.buttonRectSell.x, this.buttonRectSell.y, this.buttonRectSell.w, this.buttonRectSell.h);
             ctx.fillRect(this.buttonRectUpg.x, this.buttonRectUpg.y, this.buttonRectUpg.w, this.buttonRectUpg.h);
 
+
         } else {
             ctx.textAlign = "center";
-            ctx.strokeText("No tower selected", centerX, this.rect.y + this.rect.h / 2, this.rect.w);
+            ctx.fillStyle = Colors.Black;
+            ctx.fillText("No tower selected", centerX, this.rect.y + this.rect.h / 2, this.rect.w);
         }
+    }
+}
+
+class GameState {
+    rect: Rect;
+    constructor(rect: Rect) {
+        this.rect = rect;
+    }
+
+    draw(gs: Game) {
+        
     }
 }
 
@@ -111,7 +125,7 @@ class GameHud {
     }
 
     public draw(gameState: Game, ctx: CanvasRenderingContext2D) {
-        var fontSize = ctx.canvas.clientWidth / 60;
+        var fontSize = ctx.canvas.clientWidth / 70;
         ctx.font = fontSize + "px GoodTimes";
         ctx.fillStyle = Colors.Black;
         ctx.fillRect(0, 0, this.width, this.height);

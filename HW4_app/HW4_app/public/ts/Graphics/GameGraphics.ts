@@ -51,12 +51,15 @@ class GameGraphics {
         //TODO placing and selected
 
         for (var i = 0; i < this.game.ActiveTowers.length; i++) {
-            this.game.ActiveTowers[i].draw(this.ctx,false);
+            if (this.game.selectedTowerIndex === i) {
+                this.game.ActiveTowers[i].draw(this.ctx, true);
+            } else {
+                this.game.ActiveTowers[i].draw(this.ctx, false);
+            }
         }
         if (this.game.CurrentlyPlacingTower != null) {
             this.game.CurrentlyPlacingTower.draw(this.ctx,true);
         }
-        //if(this.game)
     }
 
     drawCreep() {

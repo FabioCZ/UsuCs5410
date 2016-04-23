@@ -8,7 +8,8 @@ var TowerButton = (function () {
         ctx.fillStyle = Colors.Grey;
         ctx.fillRect(this.rect.x, this.rect.y, this.rect.w, this.rect.h);
         ctx.textAlign = "center";
-        ctx.strokeText(this.tower.name, centerX, this.rect.y + this.rect.h / 2, this.rect.w);
+        ctx.fillStyle = Colors.Black;
+        ctx.fillText(this.tower.name, centerX, this.rect.y + this.rect.h / 2, this.rect.w);
     };
     return TowerButton;
 }());
@@ -24,22 +25,31 @@ var TowerDetails = (function () {
     };
     TowerDetails.prototype.draw = function (ctx) {
         var centerX = this.rect.x + this.rect.w / 2;
-        ctx.font =
-            ctx.fillStyle = Colors.Grey;
+        ctx.fillStyle = Colors.Grey;
         ctx.fillRect(this.rect.x, this.rect.y, this.rect.w, this.rect.h);
         if (this.tower != null) {
             ctx.textAlign = "center";
-            ctx.strokeText("Selected tower: " + this.tower.name, centerX, this.rect.y + this.rect.h / 4, this.rect.w);
+            ctx.fillStyle = Colors.Black;
+            ctx.fillText("Selected tower: " + this.tower.name, centerX, this.rect.y + this.rect.h / 4, this.rect.w);
             ctx.fillStyle = Colors.LtGrey;
             ctx.fillRect(this.buttonRectSell.x, this.buttonRectSell.y, this.buttonRectSell.w, this.buttonRectSell.h);
             ctx.fillRect(this.buttonRectUpg.x, this.buttonRectUpg.y, this.buttonRectUpg.w, this.buttonRectUpg.h);
         }
         else {
             ctx.textAlign = "center";
-            ctx.strokeText("No tower selected", centerX, this.rect.y + this.rect.h / 2, this.rect.w);
+            ctx.fillStyle = Colors.Black;
+            ctx.fillText("No tower selected", centerX, this.rect.y + this.rect.h / 2, this.rect.w);
         }
     };
     return TowerDetails;
+}());
+var GameState = (function () {
+    function GameState(rect) {
+        this.rect = rect;
+    }
+    GameState.prototype.draw = function (gs) {
+    };
+    return GameState;
 }());
 var GameHud = (function () {
     function GameHud(w, h, towerstype) {
@@ -84,7 +94,7 @@ var GameHud = (function () {
         return this.towerDetails.tower != null;
     };
     GameHud.prototype.draw = function (gameState, ctx) {
-        var fontSize = ctx.canvas.clientWidth / 60;
+        var fontSize = ctx.canvas.clientWidth / 70;
         ctx.font = fontSize + "px GoodTimes";
         ctx.fillStyle = Colors.Black;
         ctx.fillRect(0, 0, this.width, this.height);

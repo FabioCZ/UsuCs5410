@@ -23,6 +23,7 @@ var Game = (function () {
                 else if (!r['new'] && _this.selectedTowerIndex > -1) {
                     if (r['t'] == null) {
                         _this.activeTowers.splice(_this.selectedTowerIndex, 1);
+                        _this.selectedTowerIndex = -1;
                     }
                     else {
                         _this.activeTowers[_this.selectedTowerIndex] = r['t'];
@@ -33,7 +34,7 @@ var Game = (function () {
                 if (_this.CurrentlyPlacingTower != null) {
                     _this.activeTowers.push(Tower.towerFactory(_this.CurrentlyPlacingTower.name, _this.CurrentlyPlacingTower.x, _this.CurrentlyPlacingTower.y));
                     _this.CurrentlyPlacingTower = null;
-                    Game.newPlacement = true;
+                    Game.newTowerPlaced = true;
                 }
                 else {
                     _this.selectedTowerIndex = _this.isTowerCollision(x, y, Game.towerSize / 5, Game.towerSize / 5);
@@ -51,6 +52,7 @@ var Game = (function () {
             if (_this.gameHud.isATowerSelected()) {
                 e.preventDefault();
                 _this.gameHud.setSelected(null);
+                _this.selectedTowerIndex = -1;
             }
         };
         this.overListener = function (e) {
@@ -87,9 +89,9 @@ var Game = (function () {
             //TODO shooting!
             //Update creep position
             for (var i = 0; i < _this.creep.length; i++) {
-                _this.creep[i].update(_this, delta);
+                _this.livesLeft -= _this.creep[i].update(_this, delta); //creep update returns 1 if a creep has made it
             }
-            Game.newPlacement = false;
+            Game.newTowerPlaced = false;
         };
         this.draw = function (delta) {
             _this._context["clear"]();
@@ -195,34 +197,32 @@ var Game = (function () {
         configurable: true
     });
     Game.prototype.startLevel = function () {
-        //Add creep
-        ///TODO make better
         switch (this.levelNum) {
             case 1:
                 for (var i = 0; i < 10; i++) {
-                    this.creep.push(new Creep(this, true, RandomBetween(this.elapsedTime, this.elapsedTime + 10000), CType.Land1));
+                    this.creep.push(new Creep(this, true, RandomBetween(this.elapsedTime + 1000, this.elapsedTime + 10000), CType.Land1));
                 }
                 for (var i = 0; i < 5; i++) {
-                    this.creep.push(new Creep(this, true, RandomBetween(this.elapsedTime, this.elapsedTime + 10000), CType.Land2));
+                    this.creep.push(new Creep(this, true, RandomBetween(this.elapsedTime + 1000, this.elapsedTime + 10000), CType.Land2));
                 }
                 break;
             case 2:
                 for (var i = 0; i < 10; i++) {
-                    this.creep.push(new Creep(this, true, RandomBetween(this.elapsedTime, this.elapsedTime + 15000), CType.Land2));
+                    this.creep.push(new Creep(this, true, RandomBetween(this.elapsedTime + 1000, this.elapsedTime + 15000), CType.Land2));
                 }
                 for (var i = 0; i < 5; i++) {
-                    this.creep.push(new Creep(this, false, RandomBetween(this.elapsedTime, this.elapsedTime + 15000), CType.Land1));
+                    this.creep.push(new Creep(this, false, RandomBetween(this.elapsedTime + 1000, this.elapsedTime + 15000), CType.Land1));
                 }
                 break;
             case 3:
                 for (var i = 0; i < 10; i++) {
-                    this.creep.push(new Creep(this, true, RandomBetween(this.elapsedTime, this.elapsedTime + 25000), CType.Land2));
-                    this.creep.push(new Creep(this, false, RandomBetween(this.elapsedTime, this.elapsedTime + 25000), CType.Land1));
+                    this.creep.push(new Creep(this, true, RandomBetween(this.elapsedTime + 1000, this.elapsedTime + 25000), CType.Land2));
+                    this.creep.push(new Creep(this, false, RandomBetween(this.elapsedTime + 1000, this.elapsedTime + 25000), CType.Land1));
                 }
                 for (var i = 0; i < 5; i++) {
-                    this.creep.push(new Creep(this, false, RandomBetween(this.elapsedTime, this.elapsedTime + 25000), CType.Land1));
-                    this.creep.push(new Creep(this, true, RandomBetween(this.elapsedTime, this.elapsedTime + 25000), CType.Air));
-                    this.creep.push(new Creep(this, false, RandomBetween(this.elapsedTime, this.elapsedTime + 25000), CType.Air));
+                    this.creep.push(new Creep(this, false, RandomBetween(this.elapsedTime + 1000, this.elapsedTime + 25000), CType.Land1));
+                    this.creep.push(new Creep(this, true, RandomBetween(this.elapsedTime + 1000, this.elapsedTime + 25000), CType.Air));
+                    this.creep.push(new Creep(this, false, RandomBetween(this.elapsedTime + 1000, this.elapsedTime + 25000), CType.Air));
                 }
                 break;
             case 4:
@@ -230,6 +230,7 @@ var Game = (function () {
             case 5:
                 break;
         }
+        this.hasStarted = true;
     };
     Game.prototype.initBorder = function () {
         for (var j = 0; j < 16; j++) {
