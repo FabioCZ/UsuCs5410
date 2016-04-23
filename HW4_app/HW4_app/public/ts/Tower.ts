@@ -1,10 +1,23 @@
-﻿class ITower {
+﻿enum AttackType {
+    None,
+    Shot,
+    Missile,
+    Freeze
+}
+class Tower {
     public x: number;
     public y: number;
+    public angleRad: number;
+
     public radius: number;
     public name: string;
-    public id: number;
-    static towerIdCt = 0;
+    public cost: number;
+    public upgradeLevel: number;
+    public attack: number;
+    public baseImg: any;
+    public turretImg: any;
+    public tFileBaseName: any;
+
     static get Ground1Name(): string { return "Ground 1" };
     static get Ground2Name(): string { return "Ground 2" };
     static get MixedName(): string { return "Mixed" };
@@ -12,14 +25,57 @@
     static get WallName(): string { return "Wall" };
 
 
-    constructor(name: string, radius: number, x = -1, y = -1) {
-        if(name !== ITower.WallName) console.log('new tower ', x, ",", y);
-        this.id = ++ITower.towerIdCt;
+    constructor(name: string, x = -1, y = -1) {
+        if(name !== Tower.WallName) console.log('new tower ', x, ",", y);
         this.name = name;
         this.x = x;
         this.y = y;
-        this.radius = radius;
+        this.turretImg = new Image();
+        this.baseImg = new Image();
+        this.baseImg.src = "img/tower/turret-base.gif";
+        this.upgradeLevel = 1;
+        this.angleRad = 0;
+        this.radius = Game.baseTowerRadius;
+        switch(name) {
+            case Tower.Ground1Name:
+                this.tFileBaseName = "img/tower/turret-1";
+                this.cost = 10;
+                break;
+            case Tower.Ground2Name:
+                this.tFileBaseName = "img/tower/turret-2";
+                this.cost = 15;
+                break;
+            case Tower.MixedName:
+                this.tFileBaseName = "img/tower/turret-3";
+                this.cost = 20;
+                break;
+            case Tower.AirName:
+                this.cost = 15;
+                this.tFileBaseName = "img/tower/turret-7";
+                break;
+            case Tower.WallName:
+                this.radius = 0;
+                this.baseImg.src = "img/wall.png";
+                this.turretImg = null;
+                break;
+        }
+        this.setTurretImage();
     }
+
+    public setTurretImage() {
+        if (this.name === Tower.WallName) return;
+        var name = this.tFileBaseName + "-" + this.upgradeLevel + ".png";
+        this.turretImg.src = name;
+    }
+
+    public upgrade() {
+        if (this.upgradeLevel === 3) return;
+        this.upgradeLevel++;
+        console.log("tower upgraded to level ", this.upgradeLevel);
+        this.setTurretImage();
+        this.attack *= 4/3;
+    }
+
 
     public setCoords(x: number, y: number) {
         this.x = x;
@@ -33,27 +89,39 @@
             y < this.y + Game.towerSize;
     }
 
-    public copy(): ITower {
-        var r = new ITower(this.name, this.radius);
+    public copy(): Tower {
+        var r = new Tower(this.name, this.radius);
         for (var attribut in this) {
             r[attribut] = this[attribut];
         }
         return r;
     }
 
-    static getTowerType(name: string,x?:number,y?:number): ITower {
-        switch (name) {
-            case ITower.Ground1Name:
-                return new ITower(name, Game.baseTowerRadius,x,y);
-            case ITower.Ground2Name:
-                return new ITower(name, Game.baseTowerRadius,x,y);
-            case ITower.MixedName:
-                return new ITower(name, Game.baseTowerRadius,x,y);
-            case ITower.AirName:
-                return new ITower(name, Game.baseTowerRadius * 1.5, x, y);
-            case ITower.WallName:
-                return new ITower(name, 0, x, y);
+    public draw(ctx: CanvasRenderingContext2D, drawRadius: boolean) {
+        if (drawRadius) {
+            var old = ctx.globalAlpha;
+            ctx.globalAlpha = 0.5;
+            ctx.beginPath();
+            ctx.arc(this.x + Game.towerSize / 2, this.y + Game.towerSize / 2, this.radius, 0, 2 * Math.PI, false);
+            ctx.fillStyle = Colors.Yellow;
+            ctx.fill();
+            ctx.globalAlpha = old;
         }
+        if (this.name === Tower.WallName) {
+            ctx.drawImage(this.baseImg, this.x - Game.towerSize * 0.2, this.y - Game.towerSize * 0.2, Game.towerSize * 1.4, Game.towerSize * 1.4);
+            return;
+        }
+        ctx.save();
+        ctx.translate(this.x + Game.towerSize / 2, this.y + Game.towerSize / 2);
+        ctx.rotate(this.angleRad);
+        ctx.translate(-(this.x + Game.towerSize / 2), -(this.y + Game.towerSize / 2));
+        ctx.drawImage(this.turretImg, this.x, this.y, Game.towerSize, Game.towerSize);
+        ctx.restore();
+
+    }
+
+    static towerFactory(name: string, x?: number, y?: number): Tower {
+        return new Tower(name, x, y);
     }
 
 }

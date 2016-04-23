@@ -28,14 +28,15 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="public\ts\App.ts" />
-    <TypeScriptCompile Include="public\ts\Controls.ts" />
-    <TypeScriptCompile Include="public\ts\Credits.ts" />
+    <TypeScriptCompile Include="public\ts\Menus\Controls.ts" />
+    <TypeScriptCompile Include="public\ts\Menus\Credits.ts" />
     <TypeScriptCompile Include="public\ts\Creep.ts" />
-    <TypeScriptCompile Include="public\ts\GameHud.ts" />
-    <TypeScriptCompile Include="public\ts\Highscore.ts" />
+    <TypeScriptCompile Include="public\ts\Graphics\GameHud.ts" />
+    <TypeScriptCompile Include="public\ts\Graphics\Sprite.ts" />
+    <TypeScriptCompile Include="public\ts\Menus\Highscore.ts" />
     <TypeScriptCompile Include="public\ts\Game.ts" />
-    <TypeScriptCompile Include="public\ts\GameGraphics.ts" />
-    <TypeScriptCompile Include="public\ts\MainMenu.ts" />
+    <TypeScriptCompile Include="public\ts\Graphics\GameGraphics.ts" />
+    <TypeScriptCompile Include="public\ts\Menus\MainMenu.ts" />
     <TypeScriptCompile Include="public\ts\PathChecker.ts" />
     <TypeScriptCompile Include="public\ts\Tools.ts" />
     <TypeScriptCompile Include="public\ts\Tower.ts" />
@@ -54,6 +55,7 @@
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">12.0</VisualStudioVersion>
   </PropertyGroup>

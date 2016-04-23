@@ -18,7 +18,7 @@ class MainMenu {
         document.addEventListener("mousemove", this.overListener);
         document.addEventListener("click", this.clickListener);
         this.buttons = new Array<MenuItem>();
-        this.buttons.push(new MenuItem("New Game", () => { this.removeListeners(); new Game(performance.now(), ctx,1,null) }));
+        this.buttons.push(new MenuItem("New Game", () => { this.removeListeners(); new Game(performance.now(), ctx,1,{tower:null,money:100,lives:5}) }));
         this.buttons.push(new MenuItem("High Scores", () => { this.removeListeners(); new HighScore(ctx)}));
         this.buttons.push(new MenuItem("Controls", () => { this.removeListeners(); new Controls(ctx)}));
         this.buttons.push(new MenuItem("Credits", () => { this.removeListeners(); new Credits(ctx)}));

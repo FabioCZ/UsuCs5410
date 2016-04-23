@@ -12,18 +12,34 @@ var Game = (function () {
             var y = e.clientY - document.getElementById("canvas-main").getBoundingClientRect().top;
             if (y < Game.hudHeight) {
                 //console.log("hud click");
-                var tower = _this.gameHud.handleClick(x, y);
-                if (tower != null && _this.CurrentlyPlacingTower == null) {
-                    _this.CurrentlyPlacingTower = tower;
+                var r = _this.gameHud.handleClick(x, y);
+                if (r == null)
+                    return;
+                if (r['new'] && _this.CurrentlyPlacingTower == null) {
+                    _this.CurrentlyPlacingTower = r['t'];
                     _this.CurrentlyPlacingTower.setCoords(-1, -1);
+                    _this.selectedTowerIndex = -1;
+                }
+                else if (!r['new'] && _this.selectedTowerIndex > -1) {
+                    if (r['t'] == null) {
+                        _this.activeTowers.splice(_this.selectedTowerIndex, 1);
+                    }
+                    else {
+                        _this.activeTowers[_this.selectedTowerIndex] = r['t'];
+                    }
                 }
             }
             else {
                 if (_this.CurrentlyPlacingTower != null) {
-                    _this.activeTowers.push(ITower.getTowerType(_this.CurrentlyPlacingTower.name, _this.CurrentlyPlacingTower.x, _this.CurrentlyPlacingTower.y));
+                    _this.activeTowers.push(Tower.towerFactory(_this.CurrentlyPlacingTower.name, _this.CurrentlyPlacingTower.x, _this.CurrentlyPlacingTower.y));
                     _this.CurrentlyPlacingTower = null;
-                    PathChecker.setCreepPaths(_this);
                     Game.newPlacement = true;
+                }
+                else {
+                    _this.selectedTowerIndex = _this.isTowerCollision(x, y, Game.towerSize / 5, Game.towerSize / 5);
+                    if (_this.selectedTowerIndex > -1) {
+                        _this.gameHud.setSelected(_this.ActiveTowers[_this.selectedTowerIndex]);
+                    }
                 }
             }
         };
@@ -32,11 +48,15 @@ var Game = (function () {
                 e.preventDefault();
                 _this.CurrentlyPlacingTower = null;
             }
+            if (_this.gameHud.isATowerSelected()) {
+                e.preventDefault();
+                _this.gameHud.setSelected(null);
+            }
         };
         this.overListener = function (e) {
             var x = e.clientX - document.getElementById("canvas-main").getBoundingClientRect().left;
             var y = e.clientY - document.getElementById("canvas-main").getBoundingClientRect().top;
-            if (_this.CurrentlyPlacingTower != null && _this.isInBorders(x, y) && !_this.isTowerCollision(x, y, Game.towerSize, Game.towerSize)) {
+            if (_this.CurrentlyPlacingTower != null && _this.isInBorders(x, y) && _this.isTowerCollision(x, y, Game.towerSize, Game.towerSize) === -1) {
                 var x = Game.xToI(x) * Game.towerSize;
                 var y = Game.yToJ(y) * Game.towerSize + Game.hudHeight;
                 _this.CurrentlyPlacingTower.setCoords(x, y);
@@ -58,8 +78,9 @@ var Game = (function () {
         this.loop = function (time) {
             var prev = _this.elapsedTime;
             _this.elapsedTime = time - _this.startTime - _this.pausedTime;
-            _this.update(_this.elapsedTime - prev);
-            _this.draw();
+            var delta = _this.elapsedTime - prev;
+            _this.update(delta);
+            _this.draw(delta);
             requestAnimationFrame(_this.loop);
         };
         this.update = function (delta) {
@@ -70,9 +91,9 @@ var Game = (function () {
             }
             Game.newPlacement = false;
         };
-        this.draw = function () {
+        this.draw = function (delta) {
             _this._context["clear"]();
-            _this.gameGraphics.draw(_this);
+            _this.gameGraphics.draw(_this, delta);
             _this.gameHud.draw(_this, _this._context);
         };
         this.startTime = startTime;
@@ -80,15 +101,15 @@ var Game = (function () {
         this._context = context;
         Game.canvasHeight = context.canvas.height;
         Game.canvasWidth = context.canvas.width;
-        Game.towerSize = Game.canvasHeight / 40;
+        Game.towerSize = Game.canvasHeight / 20; //40
         Game.baseTowerRadius = Game.canvasHeight / 10;
         this.bindings = JSON.parse(localStorage.getItem("TD.keyBindings"));
         this.gameGraphics = new GameGraphics(this._context);
         var towerTypes = Array();
-        towerTypes.push(ITower.getTowerType(ITower.Ground1Name));
-        towerTypes.push(ITower.getTowerType(ITower.Ground2Name));
-        towerTypes.push(ITower.getTowerType(ITower.MixedName));
-        towerTypes.push(ITower.getTowerType(ITower.AirName));
+        towerTypes.push(Tower.towerFactory(Tower.Ground1Name));
+        towerTypes.push(Tower.towerFactory(Tower.Ground2Name));
+        towerTypes.push(Tower.towerFactory(Tower.MixedName));
+        towerTypes.push(Tower.towerFactory(Tower.AirName));
         Game.hudHeight = context.canvas.scrollHeight * this.hudRatio;
         this.gameHud = new GameHud(context.canvas.scrollWidth, Game.hudHeight, towerTypes);
         document.addEventListener("click", this.clickListener);
@@ -99,13 +120,11 @@ var Game = (function () {
         this.activeTowers = [];
         this.wallTowers = [];
         this.initBorder();
-        PathChecker.setCreepPaths(this);
+        PathChecker.resetCreepPaths();
         this.creep = [];
-        //Add creep
-        ///TODO make better
-        for (var i = 0; i < Application.LevelSpec[levelNum - 1].creepNum; i++) {
-            this.creep.push(new Creep(this, true, RandomBetween(startTime, startTime + 10000), CType.Land, 100));
-        }
+        this.levelNum = levelNum;
+        this.hasStarted = false;
+        this.selectedTowerIndex = -1;
         this.loop(performance.now());
     }
     Object.defineProperty(Game.prototype, "ElapsedTime", {
@@ -175,17 +194,54 @@ var Game = (function () {
         enumerable: true,
         configurable: true
     });
+    Game.prototype.startLevel = function () {
+        //Add creep
+        ///TODO make better
+        switch (this.levelNum) {
+            case 1:
+                for (var i = 0; i < 10; i++) {
+                    this.creep.push(new Creep(this, true, RandomBetween(this.elapsedTime, this.elapsedTime + 10000), CType.Land1));
+                }
+                for (var i = 0; i < 5; i++) {
+                    this.creep.push(new Creep(this, true, RandomBetween(this.elapsedTime, this.elapsedTime + 10000), CType.Land2));
+                }
+                break;
+            case 2:
+                for (var i = 0; i < 10; i++) {
+                    this.creep.push(new Creep(this, true, RandomBetween(this.elapsedTime, this.elapsedTime + 15000), CType.Land2));
+                }
+                for (var i = 0; i < 5; i++) {
+                    this.creep.push(new Creep(this, false, RandomBetween(this.elapsedTime, this.elapsedTime + 15000), CType.Land1));
+                }
+                break;
+            case 3:
+                for (var i = 0; i < 10; i++) {
+                    this.creep.push(new Creep(this, true, RandomBetween(this.elapsedTime, this.elapsedTime + 25000), CType.Land2));
+                    this.creep.push(new Creep(this, false, RandomBetween(this.elapsedTime, this.elapsedTime + 25000), CType.Land1));
+                }
+                for (var i = 0; i < 5; i++) {
+                    this.creep.push(new Creep(this, false, RandomBetween(this.elapsedTime, this.elapsedTime + 25000), CType.Land1));
+                    this.creep.push(new Creep(this, true, RandomBetween(this.elapsedTime, this.elapsedTime + 25000), CType.Air));
+                    this.creep.push(new Creep(this, false, RandomBetween(this.elapsedTime, this.elapsedTime + 25000), CType.Air));
+                }
+                break;
+            case 4:
+                break;
+            case 5:
+                break;
+        }
+    };
     Game.prototype.initBorder = function () {
-        for (var j = 0; j < 32; j++) {
-            if (j < 12 || j > 19) {
-                this.wallTowers.push(ITower.getTowerType(ITower.WallName, Game.iToX(0), Game.jToY(j)));
-                this.wallTowers.push(ITower.getTowerType(ITower.WallName, Game.iToX(49), Game.jToY(j)));
+        for (var j = 0; j < 16; j++) {
+            if (j < 6 || j > 9) {
+                this.wallTowers.push(Tower.towerFactory(Tower.WallName, Game.iToX(0), Game.jToY(j)));
+                this.wallTowers.push(Tower.towerFactory(Tower.WallName, Game.iToX(24), Game.jToY(j)));
             }
         }
-        for (var i = 1; i < 49; i++) {
-            if (i < 21 || i > 28) {
-                this.wallTowers.push(ITower.getTowerType(ITower.WallName, Game.iToX(i), Game.jToY(0)));
-                this.wallTowers.push(ITower.getTowerType(ITower.WallName, Game.iToX(i), Game.jToY(31)));
+        for (var i = 1; i < 24; i++) {
+            if (i < 10 || i > 14) {
+                this.wallTowers.push(Tower.towerFactory(Tower.WallName, Game.iToX(i), Game.jToY(0)));
+                this.wallTowers.push(Tower.towerFactory(Tower.WallName, Game.iToX(i), Game.jToY(15)));
             }
         }
     };
@@ -198,10 +254,10 @@ var Game = (function () {
     Game.prototype.isTowerCollision = function (x, y, w, h) {
         for (var i = 0; i < this.activeTowers.length; i++) {
             if (this.activeTowers[i].isCollision(x, y, w, h)) {
-                return true;
+                return i;
             }
         }
-        return false;
+        return -1;
     };
     return Game;
 }());

@@ -8,8 +8,9 @@ var CreepState;
 var CType;
 (function (CType) {
     CType[CType["Air"] = 0] = "Air";
-    CType[CType["Land"] = 1] = "Land";
-    CType[CType["Mixed"] = 2] = "Mixed";
+    CType[CType["Land1"] = 1] = "Land1";
+    CType[CType["Land2"] = 2] = "Land2";
+    CType[CType["Land3"] = 3] = "Land3";
 })(CType || (CType = {}));
 var Dir;
 (function (Dir) {
@@ -20,25 +21,42 @@ var Dir;
 })(Dir || (Dir = {}));
 var Creep = (function () {
     //TODO visual
-    function Creep(gs, isHorizontalPath, entryTime, type, hp) {
-        this.speed = Game.towerSize / 400; //TODO
+    function Creep(gs, isHorizontalPath, entryTime, type) {
+        this.speed = Game.towerSize / 600; //TODO
         this.isHorizontalPath = isHorizontalPath;
         this.entryTime = entryTime;
         this.state = CreepState.Waiting;
         this.type = type;
-        this.hp = hp;
-        this.maxHp = hp;
-        this.path = this.isHorizontalPath ? PathChecker.PathsHor : PathChecker.PathsVer;
-        this.isCustompath = false;
         if (isHorizontalPath) {
             //TODO actual path
-            this.y = Game.jToY(16);
+            this.lastDir = Dir.Left;
+            this.y = Game.jToY(RandomBetween(6, 9));
             this.x = 0;
         }
         else {
-            this.x = Game.iToX(25);
+            this.lastDir = Dir.Right;
+            this.x = Game.iToX(RandomBetween(10, 14));
             this.y = 0;
         }
+        switch (type) {
+            case CType.Air:
+                this.sprite = new Sprite("img/bat.png", 128);
+                this.hp = 40;
+                break;
+            case CType.Land1:
+                this.sprite = new Sprite("img/cow.png", 512);
+                this.hp = 50;
+                break;
+            case CType.Land2:
+                this.sprite = new Sprite("img/llama.png", 512);
+                this.hp = 90;
+                break;
+            case CType.Land3:
+                this.sprite = new Sprite("img/pig.png", 512);
+                this.hp = 125;
+                break;
+        }
+        this.maxHp = this.hp;
     }
     Object.defineProperty(Creep.prototype, "RatioHpLeft", {
         get: function () { return this.hp / this.maxHp; },
@@ -63,53 +81,64 @@ var Creep = (function () {
             this.state = CreepState.Active;
         }
         if (this.state === CreepState.Active) {
-            var currI = Game.xToI(this.x + Game.towerSize - 0.001);
-            var currJ = Game.yToJ(this.y + Game.towerSize - 0.001);
-            if (this.isCustompath && Game.newPlacement) {
-                this.path = PathChecker.setCreepPath(gs, currI, currJ, this.isHorizontalPath, true); //path changing due to new towers, get new custom path
+            if (this.path == undefined || Game.newPlacement) {
+                var i = Game.xToI(this.x);
+                var j = Game.yToJ(this.y);
+                this.path = PathChecker.getCreepPath(gs, i, j, this.isHorizontalPath).slice();
             }
-            else {
-                this.path = this.isHorizontalPath ? PathChecker.PathsHor : PathChecker.PathsVer;
-            }
-            var succ = false;
-            while (!succ) {
-                if (this.path[currI][currJ - 1] != undefined && this.path[currI][currJ - 1] === CellType.Path) {
-                    this.y -= this.speed * delta;
-                    if (this.y < Game.jToY(currJ - 1))
-                        this.y = Game.jToY(currJ - 1);
-                    succ = true;
-                }
-                else if (this.path[currI + 1] != undefined && this.path[currI + 1][currJ] === CellType.Path) {
+            if (this.path.length > 1) {
+                var curr = this.path[0];
+                var next = this.path[1];
+                if (next.i === curr.i + 1) {
+                    this.lastDir = Dir.Right;
                     this.x += this.speed * delta;
-                    if (this.x > Game.iToX(currI + 1))
-                        this.x = Game.iToX(currI + 1);
-                    succ = true;
+                    if (this.x > Game.iToX(next.i)) {
+                        this.x = Game.iToX(next.i);
+                        this.path.splice(0, 1);
+                    }
                 }
-                else if (this.path[currI][currJ + 1] != undefined && this.path[currI][currJ + 1] === CellType.Path) {
-                    this.y += this.speed * delta;
-                    if (this.y > Game.jToY(currJ + 1))
-                        this.y = Game.jToY(currJ + 1);
-                    succ = true;
-                }
-                else if (this.path[currI - 1] != undefined && this.path[currI - 1][currJ] === CellType.Path) {
+                else if (next.i === curr.i - 1) {
+                    this.lastDir = Dir.Left;
                     this.x -= this.speed * delta;
-                    if (this.x < Game.iToX(currI - 1))
-                        this.x = Game.iToX(currI - 1);
-                    succ = true;
+                    if (this.x < Game.iToX(next.i)) {
+                        this.x = Game.iToX(next.i);
+                        this.path.splice(0, 1);
+                    }
+                }
+                else if (next.j === curr.j + 1) {
+                    this.lastDir = Dir.Down;
+                    this.y += this.speed * delta;
+                    if (this.y > Game.jToY(next.j)) {
+                        this.y = Game.jToY(next.j);
+                        this.path.splice(0, 1);
+                    }
+                }
+                else if (next.j === curr.j - 1) {
+                    this.lastDir = Dir.Up;
+                    this.y -= this.speed * delta;
+                    if (this.y < Game.jToY(next.j)) {
+                        this.y = Game.jToY(next.j);
+                        this.path.splice(0, 1);
+                    }
                 }
                 else {
-                    if (!this.isCustompath) {
-                        console.log('custom path');
-                        this.path = PathChecker.setCreepPath(gs, currI, currJ, this.isHorizontalPath, true); //path changing due to new towers, get new custom path
-                        this.isCustompath = true;
-                    }
-                    else {
-                        this.path = this.isHorizontalPath ? PathChecker.PathsHor : PathChecker.PathsVer;
-                        this.isCustompath = false;
-                    }
+                    throw ("error in creep path");
                 }
             }
+            else {
+                this.state = CreepState.Done;
+            }
         }
+    };
+    Creep.prototype.draw = function (ctx, delta) {
+        if (this.state !== CreepState.Active)
+            return;
+        this.sprite.draw(ctx, this.x, this.y, this.lastDir, delta);
+        //health bar
+        ctx.fillStyle = Colors.LtGreen;
+        ctx.fillRect(this.x, this.y - Game.towerSize / 10, this.RatioHpLeft * Game.towerSize, Game.towerSize / 10);
+        ctx.fillStyle = Colors.Red;
+        ctx.fillRect(this.RatioHpLeft, this.y - Game.towerSize / 10, (1 - this.RatioHpLeft) * Game.towerSize, Game.towerSize / 10);
     };
     return Creep;
 }());

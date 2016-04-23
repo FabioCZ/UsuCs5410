@@ -7,8 +7,9 @@
 
 enum CType {
     Air,
-    Land,
-    Mixed
+    Land1,
+    Land2,
+    Land3
 }
 
 enum Dir {
@@ -29,30 +30,46 @@ class Creep {
     public get RatioHpLeft() { return this.hp / this.maxHp };
     speed: number;
     path: any;
-    isCustompath : boolean;
+    sprite: Sprite;
+    lastDir:Dir;
 
     //TODO visual
 
-    constructor(gs: Game, isHorizontalPath: boolean, entryTime: number, type: CType, hp: number) {
-        this.speed = Game.towerSize / 400;   //TODO
+    constructor(gs: Game, isHorizontalPath: boolean, entryTime: number, type: CType) {
+        this.speed = Game.towerSize / 600;   //TODO
         this.isHorizontalPath = isHorizontalPath;
         this.entryTime = entryTime;
         this.state = CreepState.Waiting;
         this.type = type;
-        this.hp = hp;
-        this.maxHp = hp;
-        this.path = this.isHorizontalPath ? PathChecker.PathsHor : PathChecker.PathsVer;
-        this.isCustompath = false;
         if (isHorizontalPath) {
             //TODO actual path
-            this.y = Game.jToY(16);
+            this.lastDir = Dir.Left;
+            this.y = Game.jToY(RandomBetween(6,9));
             this.x = 0;
         } else {
-            this.x = Game.iToX(25
-            );
+            this.lastDir = Dir.Right;
+            this.x = Game.iToX(RandomBetween(10,14));
             this.y = 0;
         }
-
+        switch (type) {
+            case CType.Air:
+                this.sprite = new Sprite("img/bat.png", 128);
+                this.hp = 40;
+                break;
+            case CType.Land1:
+                this.sprite = new Sprite("img/cow.png", 512);
+                this.hp = 50;
+                break;
+            case CType.Land2:
+                this.sprite = new Sprite("img/llama.png", 512);
+                this.hp = 90;
+                break;
+            case CType.Land3:
+                this.sprite = new Sprite("img/pig.png", 512);
+                this.hp = 125;
+                break;
+        }
+        this.maxHp = this.hp;
     }
 
     public hit(damage: number) {
@@ -76,44 +93,59 @@ class Creep {
         }
 
         if (this.state === CreepState.Active) {
-            var currI = Game.xToI(this.x + Game.towerSize - 0.001);
-            var currJ = Game.yToJ(this.y + Game.towerSize - 0.001);
-            if (this.isCustompath && Game.newPlacement) {
-                this.path = PathChecker.setCreepPath(gs, currI, currJ, this.isHorizontalPath, true); //path changing due to new towers, get new custom path
-            } else {
-                this.path = this.isHorizontalPath ? PathChecker.PathsHor : PathChecker.PathsVer;
+            if (this.path == undefined || Game.newPlacement) {
+                var i = Game.xToI(this.x);
+                var j = Game.yToJ(this.y);
+                this.path = PathChecker.getCreepPath(gs, i, j, this.isHorizontalPath).slice();
             }
-
-            var succ = false;
-            while (!succ) {
-                
-                if (this.path[currI][currJ - 1] != undefined && this.path[currI][currJ - 1] === CellType.Path) {
-                    this.y -= this.speed * delta;
-                    if (this.y < Game.jToY(currJ - 1)) this.y = Game.jToY(currJ - 1);
-                    succ = true;
-                } else if (this.path[currI + 1] != undefined && this.path[currI + 1][currJ] === CellType.Path) {
+            if (this.path.length > 1) {
+                var curr = this.path[0];
+                var next = this.path[1];
+                if (next.i === curr.i + 1) { //next right
+                    this.lastDir = Dir.Right;
                     this.x += this.speed * delta;
-                    if (this.x > Game.iToX(currI + 1)) this.x = Game.iToX(currI + 1);
-                    succ = true;
-                } else if (this.path[currI][currJ + 1] != undefined && this.path[currI][currJ + 1] === CellType.Path) {
-                    this.y += this.speed * delta;
-                    if (this.y > Game.jToY(currJ + 1)) this.y = Game.jToY(currJ + 1);
-                    succ = true;
-                } else if (this.path[currI - 1] != undefined && this.path[currI - 1][currJ] === CellType.Path) {
-                    this.x -= this.speed * delta;
-                    if (this.x < Game.iToX(currI - 1)) this.x = Game.iToX(currI - 1);
-                    succ = true;
-                } else {
-                    if (!this.isCustompath) {
-                        console.log('custom path');
-                        this.path = PathChecker.setCreepPath(gs, currI, currJ, this.isHorizontalPath, true); //path changing due to new towers, get new custom path
-                        this.isCustompath = true;
-                    } else {
-                        this.path = this.isHorizontalPath ? PathChecker.PathsHor : PathChecker.PathsVer;
-                        this.isCustompath = false;
+                    if (this.x > Game.iToX(next.i)) {
+                        this.x = Game.iToX(next.i);
+                        this.path.splice(0, 1);
                     }
+                } else if (next.i === curr.i - 1) { // next left
+                    this.lastDir = Dir.Left;
+                    this.x -= this.speed * delta;
+                    if (this.x < Game.iToX(next.i)) {
+                        this.x = Game.iToX(next.i);
+                        this.path.splice(0, 1);
+                    }
+                } else if (next.j === curr.j + 1) { //next down
+                    this.lastDir = Dir.Down;
+                    this.y += this.speed * delta;
+                    if (this.y > Game.jToY(next.j)) {
+                        this.y = Game.jToY(next.j);
+                        this.path.splice(0, 1);
+                    }
+                } else if (next.j === curr.j - 1) { // next up
+                    this.lastDir = Dir.Up;
+                    this.y -= this.speed * delta;
+                    if (this.y < Game.jToY(next.j)) {
+                        this.y = Game.jToY(next.j);
+                        this.path.splice(0, 1);
+                    }
+                } else {
+                    throw ("error in creep path");
                 }
+            } else {
+                this.state = CreepState.Done;
+            }
         }
     }
-}
+
+    public draw(ctx: CanvasRenderingContext2D, delta: number) {
+        if (this.state !== CreepState.Active) return;
+        this.sprite.draw(ctx, this.x, this.y, this.lastDir, delta);
+
+        //health bar
+        ctx.fillStyle = Colors.LtGreen;
+        ctx.fillRect(this.x, this.y - Game.towerSize / 10, this.RatioHpLeft * Game.towerSize, Game.towerSize / 10);
+        ctx.fillStyle = Colors.Red;
+        ctx.fillRect(this.RatioHpLeft, this.y - Game.towerSize / 10, (1 - this.RatioHpLeft) * Game.towerSize, Game.towerSize / 10);
+    }
 }

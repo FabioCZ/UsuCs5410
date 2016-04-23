@@ -1,12 +1,14 @@
-﻿requirejs(['js/jquery-2.2.3.min.js',
+﻿//Application entry point
+requirejs(['js/jquery-2.2.3.min.js',
+    'ts/Graphics/GameGraphics.js',
+    'ts/Graphics/GameHud.js',
+    'ts/Graphics/Sprite.js',
+    'ts/Menus/Controls.js',
+    'ts/Menus/Credits.js',
+    'ts/Menus/Highscore.js',
+    'ts/Menus/MainMenu.js',
     'ts/Creep.js',
-    'ts/Controls.js',
-    'ts/Credits.js',
     'ts/Game.js',
-    'ts/GameGraphics.js',
-    'ts/GameHud.js',
-    'ts/Highscore.js',
-    'ts/MainMenu.js',
     'ts/PathChecker.js',
     'ts/Tools.js',
     'ts/Tower.js',
@@ -32,14 +34,6 @@ class Application {
         this._context = canvas.getContext("2d");
 
         Application.SetDefaultKeyBindings();
-        //TODO level specs here
-        Application.LevelSpec = [];
-        for (var i = 0; i < 5; i++) {
-            var l = new LevelSpec();
-            l.creepNum = 100;
-            Application.LevelSpec.push(l);
-        }
-
 
         //var game = new Game(performance.now(), this._context,l);
         var menu = new MainMenu(this._context);

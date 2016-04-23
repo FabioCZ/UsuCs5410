@@ -36,14 +36,6 @@ var GameGraphics = (function () {
         this.game = gameState;
         this.ctx.fillStyle = Colors.Green;
         this.ctx.fillRect(0, Game.hudHeight, this.ctx.canvas.width, this.ctx.canvas.height - Game.hudHeight);
-        for (var i = 0; i < 50; i++) {
-            for (var j = 0; j < 32; j++) {
-                if (PathChecker.PathsHor[i][j] === CellType.Path) {
-                    this.ctx.fillStyle = Colors.Red;
-                    this.ctx.fillRect(Game.iToX(i), Game.jToY(j), Game.towerSize, Game.towerSize);
-                }
-            }
-        }
         this.drawTowers();
         this.drawWalls();
         this.drawCreep();

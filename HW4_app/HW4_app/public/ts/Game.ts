@@ -15,15 +15,19 @@ class Game {
     private gameHud: GameHud;
     private gameGraphics: GameGraphics;
     private bindings: Array<Binding>;
-    public CurrentlyPlacingTower: ITower;
+    public CurrentlyPlacingTower: Tower;
+    public selectedTowerIndex: number;
 
+    public hasStarted;
+    public levelNum : number;
     private money: number;
-    private activeTowers: ITower[];
-    private wallTowers: ITower[];
+    private livesLeft:number;
+    private activeTowers: Tower[];
+    private wallTowers: Tower[];
     private creep: Creep[];
 
-    get ActiveTowers(): ITower[] { return this.activeTowers; }
-    get WallTowers(): ITower[] { return this.wallTowers; }
+    get ActiveTowers(): Tower[] { return this.activeTowers; }
+    get WallTowers(): Tower[] { return this.wallTowers; }
     get Creep(): Creep[] { return this.creep; }
 
     static newPlacement: boolean;
@@ -78,16 +82,16 @@ class Game {
         this._context = context;
         Game.canvasHeight = context.canvas.height;
         Game.canvasWidth = context.canvas.width;
-        Game.towerSize = Game.canvasHeight / 40;
+        Game.towerSize = Game.canvasHeight / 20;    //40
         Game.baseTowerRadius = Game.canvasHeight / 10;
         this.bindings = JSON.parse(localStorage.getItem("TD.keyBindings"));
 
         this.gameGraphics = new GameGraphics(this._context);
-        var towerTypes = Array<ITower>();
-        towerTypes.push(ITower.getTowerType(ITower.Ground1Name));
-        towerTypes.push(ITower.getTowerType(ITower.Ground2Name));
-        towerTypes.push(ITower.getTowerType(ITower.MixedName));
-        towerTypes.push(ITower.getTowerType(ITower.AirName));
+        var towerTypes = Array<Tower>();
+        towerTypes.push(Tower.towerFactory(Tower.Ground1Name));
+        towerTypes.push(Tower.towerFactory(Tower.Ground2Name));
+        towerTypes.push(Tower.towerFactory(Tower.MixedName));
+        towerTypes.push(Tower.towerFactory(Tower.AirName));
 
         Game.hudHeight = context.canvas.scrollHeight * this.hudRatio;
         this.gameHud = new GameHud(context.canvas.scrollWidth, Game.hudHeight, towerTypes);
@@ -99,29 +103,65 @@ class Game {
         this.activeTowers = [];
         this.wallTowers = [];
         this.initBorder();
-        PathChecker.setCreepPaths(this);
+        PathChecker.resetCreepPaths();
         this.creep = [];
-        //Add creep
-        ///TODO make better
-        for (var i = 0; i < Application.LevelSpec[levelNum-1].creepNum; i++) {
-            this.creep.push(new Creep(this, true, RandomBetween(startTime, startTime + 10000),CType.Land,100));
-        }
+        this.levelNum = levelNum;
+        this.hasStarted = false;
+        this.selectedTowerIndex = -1;
 
         this.loop(performance.now());
     }
 
+    public startLevel() {
+        //Add creep
+        ///TODO make better
+        switch (this.levelNum) {
+            case 1:
+                for (var i = 0; i < 10; i++) {
+                    this.creep.push(new Creep(this, true, RandomBetween(this.elapsedTime, this.elapsedTime + 10000), CType.Land1));
+                }
+                for (var i = 0; i < 5; i++) {
+                    this.creep.push(new Creep(this, true, RandomBetween(this.elapsedTime, this.elapsedTime + 10000), CType.Land2));
+                }
+                break;
+            case 2:
+                for (var i = 0; i < 10; i++) {
+                    this.creep.push(new Creep(this, true, RandomBetween(this.elapsedTime, this.elapsedTime + 15000), CType.Land2));
+                }
+                for (var i = 0; i < 5; i++) {
+                    this.creep.push(new Creep(this, false, RandomBetween(this.elapsedTime, this.elapsedTime + 15000), CType.Land1));
+                }
+                break;
+            case 3:
+                for (var i = 0; i < 10; i++) {
+                    this.creep.push(new Creep(this, true, RandomBetween(this.elapsedTime, this.elapsedTime + 25000), CType.Land2));
+                    this.creep.push(new Creep(this, false, RandomBetween(this.elapsedTime, this.elapsedTime + 25000), CType.Land1));
+                }
+                for (var i = 0; i < 5; i++) {
+                    this.creep.push(new Creep(this, false, RandomBetween(this.elapsedTime, this.elapsedTime + 25000), CType.Land1));
+                    this.creep.push(new Creep(this, true, RandomBetween(this.elapsedTime, this.elapsedTime + 25000), CType.Air));
+                    this.creep.push(new Creep(this, false, RandomBetween(this.elapsedTime, this.elapsedTime + 25000), CType.Air));
+                }
+                break;
+            case 4:
+                break;
+            case 5:
+                break;
+        }
+    }
+
     public initBorder() {
-        for (var j = 0; j < 32; j++) {
-            if (j < 12 || j > 19) {
-                this.wallTowers.push(ITower.getTowerType(ITower.WallName, Game.iToX(0), Game.jToY(j)));
-                this.wallTowers.push(ITower.getTowerType(ITower.WallName, Game.iToX(49), Game.jToY(j)));
+        for (var j = 0; j < 16; j++) {
+            if (j < 6 || j > 9) {
+                this.wallTowers.push(Tower.towerFactory(Tower.WallName, Game.iToX(0), Game.jToY(j)));
+                this.wallTowers.push(Tower.towerFactory(Tower.WallName, Game.iToX(24), Game.jToY(j)));
             }
         }
 
-        for (var i = 1; i < 49; i++) {
-            if (i < 21 || i > 28) {
-                this.wallTowers.push(ITower.getTowerType(ITower.WallName, Game.iToX(i), Game.jToY(0)));
-                this.wallTowers.push(ITower.getTowerType(ITower.WallName, Game.iToX(i), Game.jToY(31)));
+        for (var i = 1; i < 24; i++) {
+            if (i < 10 || i > 14) {
+                this.wallTowers.push(Tower.towerFactory(Tower.WallName, Game.iToX(i), Game.jToY(0)));
+                this.wallTowers.push(Tower.towerFactory(Tower.WallName, Game.iToX(i), Game.jToY(15)));
             }
         }
     }
@@ -131,21 +171,30 @@ class Game {
         var y = e.clientY - document.getElementById("canvas-main").getBoundingClientRect().top;
         if (y < Game.hudHeight) {   //HUD click
             //console.log("hud click");
-            var tower = this.gameHud.handleClick(x, y);
-            if (tower != null && this.CurrentlyPlacingTower == null) {
-                this.CurrentlyPlacingTower = tower;
+            var r = this.gameHud.handleClick(x, y);
+            if(r == null) return;
+            if (r['new'] && this.CurrentlyPlacingTower == null) {
+                this.CurrentlyPlacingTower = r['t'];
                 this.CurrentlyPlacingTower.setCoords(-1, -1);
+                this.selectedTowerIndex = -1;
+            } else if (!r['new'] && this.selectedTowerIndex > -1) {
+                if (r['t'] == null) {
+                    this.activeTowers.splice(this.selectedTowerIndex, 1);
+                } else {
+                    this.activeTowers[this.selectedTowerIndex] = r['t'];
+                }
             }
         } else {
-            if (this.CurrentlyPlacingTower != null) {   //placing towers
-                this.activeTowers.push(ITower.getTowerType(this.CurrentlyPlacingTower.name,this.CurrentlyPlacingTower.x,this.CurrentlyPlacingTower.y));
+            if (this.CurrentlyPlacingTower != null) { //placing towers
+                this.activeTowers.push(Tower.towerFactory(this.CurrentlyPlacingTower.name, this.CurrentlyPlacingTower.x, this.CurrentlyPlacingTower.y));
                 this.CurrentlyPlacingTower = null;
-                PathChecker.setCreepPaths(this);
                 Game.newPlacement = true;
+            } else {
+                this.selectedTowerIndex = this.isTowerCollision(x, y, Game.towerSize / 5, Game.towerSize / 5);
+                if (this.selectedTowerIndex > -1) {
+                    this.gameHud.setSelected(this.ActiveTowers[this.selectedTowerIndex]);
+                }
             }
-
-            //TODO tower upgrades
-            //gameboard event
         }
     }
 
@@ -154,12 +203,16 @@ class Game {
             e.preventDefault();
             this.CurrentlyPlacingTower = null;
         }
+        if (this.gameHud.isATowerSelected()) {
+            e.preventDefault();
+            this.gameHud.setSelected(null);
+        }
     }
 
     public overListener = (e: MouseEvent) => {
         var x = e.clientX - document.getElementById("canvas-main").getBoundingClientRect().left;
         var y = e.clientY - document.getElementById("canvas-main").getBoundingClientRect().top;
-        if (this.CurrentlyPlacingTower != null && this.isInBorders(x, y) && !this.isTowerCollision(x, y, Game.towerSize, Game.towerSize)) {
+        if (this.CurrentlyPlacingTower != null && this.isInBorders(x, y) && this.isTowerCollision(x, y, Game.towerSize, Game.towerSize) === -1) {
             var x = Game.xToI(x) * Game.towerSize;
             var y = Game.yToJ(y) * Game.towerSize + Game.hudHeight;
             this.CurrentlyPlacingTower.setCoords(x,y);
@@ -190,20 +243,21 @@ class Game {
             y < Game.canvasHeight - this.BorderSpec.borderOffset - Game.towerSize;
     }
 
-    private isTowerCollision(x: number, y: number, w: number, h: number): boolean {
+    private isTowerCollision(x: number, y: number, w: number, h: number): number {
         for (var i = 0; i < this.activeTowers.length; i++) {
             if (this.activeTowers[i].isCollision(x, y, w, h)) {
-                return true;
+                return i;
             }
         }
-        return false;
+        return -1;
     }
 
     public loop = (time) => {
         var prev = this.elapsedTime;
         this.elapsedTime = time - this.startTime - this.pausedTime;
-        this.update(this.elapsedTime - prev);
-        this.draw();
+        var delta = this.elapsedTime - prev;
+        this.update(delta);
+        this.draw(delta);
         requestAnimationFrame(this.loop);
     }
 
@@ -216,9 +270,9 @@ class Game {
         Game.newPlacement = false;
     }
 
-    public draw = () => {
+    public draw = (delta) => {
         this._context["clear"]();
-        this.gameGraphics.draw(this);
+        this.gameGraphics.draw(this,delta);
         this.gameHud.draw(this, this._context);
     }
 }

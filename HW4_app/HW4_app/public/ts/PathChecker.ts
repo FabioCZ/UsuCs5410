@@ -1,73 +1,84 @@
 ﻿enum CellType {
     Tower,
     Empty,
-    Path
+    Visited,
 }
 
 class PathChecker {
-    private static _pathsVer = new Array<Array<CellType>>(); //stores path from some square to finish for the vertical path (top->bottom)
-    private static _pathsHor = new Array<Array<CellType>>(); //stores path from some square to finish for the horizontal path (left->right) 
+    //private static _pathsVer = new Array<Array<CellType>>(); //stores path from some square to finish for the vertical path (top->bottom)
+    //private static _pathsHor = new Array<Array<CellType>>(); //stores path from some square to finish for the horizontal path (left->right) 
+    private static _pathsVer: Array<Array<Array<ArCoord>>>; //stores path from some square to finish for the vertical path (top->bottom)
+    private static _pathsHor: Array<Array<Array<ArCoord>>>; //stores path from some square to finish for the horizontal path (left->right) 
     public static get PathsVer() { return PathChecker._pathsVer; }
     public static get PathsHor() { return PathChecker._pathsHor; }
-    private static sizeX = 50;
-    private static sizeY = 32;
+    private static sizeX = 25;
+    private static sizeY = 16;
     private static stateArray: Array<Array<CellType>>;
 
     private static isValidMove(newX, newY, isHor) {
         if (newX >= PathChecker.sizeX || newY >= PathChecker.sizeY || newX < 0 || newY < 0) return false;
-        if (isHor && PathChecker._pathsHor[newX][newY] === CellType.Tower) {
+        if (isHor && PathChecker.stateArray[newX][newY] === CellType.Tower) {
             return false;
-        } else if (!isHor && PathChecker._pathsVer[newX][newY] === CellType.Tower) {
+        } else if (!isHor && PathChecker.stateArray[newX][newY] === CellType.Tower) {
             return false;
         }
         return true;
     }
 
-    public static setCreepPaths(game: Game) {
+    public static resetCreepPaths() {
         console.log("resetting creep paths");
-        PathChecker.setCreepPath(game, 0, 16, true,false);
-        //PathChecker.setCreepPath(game, 25, 0, false,false);
+        if (PathChecker._pathsHor == undefined) {
+            PathChecker._pathsHor = new Array<Array<Array<ArCoord>>>(PathChecker.sizeX);
+            PathChecker._pathsVer = new Array<Array<Array<ArCoord>>>(PathChecker.sizeX);
+
+        }
+        for (var i = 0; i < PathChecker.sizeX; i++) {
+            if (PathChecker._pathsHor[i] == undefined) {
+                PathChecker._pathsHor[i] = new Array<Array<ArCoord>>(PathChecker.sizeY);
+                PathChecker._pathsVer[i] = new Array<Array<ArCoord>>(PathChecker.sizeY);
+            }
+            for (var j = 0; j < PathChecker.sizeY; j++) {
+                PathChecker._pathsHor[i][j] = null;
+                PathChecker._pathsVer[i][j] = null;
+            }
+        }
     }
 
-    public static setCreepPath(game: Game, initI: number, initJ: number, isHorizontal: boolean, isCustom : boolean): Array<Array<CellType>>  {
+    public static getCreepPath(game: Game,i: number, j: number, isHorizontal: boolean): Array<ArCoord> {
+        if (isHorizontal) {
+            if (PathChecker._pathsHor[i][j] == null) {
+                PathChecker.setCreepPath(game, i, j, isHorizontal);
+            }
+            return PathChecker._pathsHor[i][j];
+        } else {
+            if (PathChecker._pathsVer[i][j] == null) {
+                PathChecker.setCreepPath(game, i, j, isHorizontal);
+            }
+            return PathChecker._pathsVer[i][j];
+        }
+    }
+
+    public static setCreepPath(game: Game, initI: number, initJ: number, isHorizontal: boolean)  {
         
         var mazeVisited = new Array<Array<boolean>>(this.sizeX);
-        var back = isCustom ? (isHorizontal ? PathChecker._pathsHor : PathChecker._pathsVer) : null;
-        if (isHorizontal) {
-            PathChecker._pathsHor = new Array<Array<CellType>>(this.sizeX);
-        } else {
-            PathChecker._pathsVer = new Array<Array<CellType>>(this.sizeX);
-        } 
+        PathChecker.stateArray = new Array<Array<CellType>>(this.sizeX);
 
         for (var i = 0; i < this.sizeX; i++) {
-            if (isHorizontal) {
-                PathChecker._pathsHor[i] = new Array<CellType>(this.sizeY);
-            } else {
-                PathChecker._pathsVer[i] = new Array<CellType>(this.sizeY);
-            }
+            PathChecker.stateArray[i] = new Array<CellType>(this.sizeY);
             mazeVisited[i] = new Array<boolean>(this.sizeY);
             for (var j = 0; j < this.sizeY; j++) {
-                if (isHorizontal) {
-                    PathChecker._pathsHor[i][j] = CellType.Empty;
-                } else {
-                    PathChecker._pathsVer[i][j] = CellType.Empty;
-                }
-                mazeVisited[i][j] = false;
+                PathChecker.stateArray[i][j] = CellType.Empty;
             }
         }
 
-        if (game.ActiveTowers != undefined) {
+        if (game.ActiveTowers != undefined && game.ActiveTowers.length > 0) {
             for (var i = 0; i < game.ActiveTowers.length; i++) {
                 var tI = Game.xToI(game.ActiveTowers[i].x);
                 var tJ = Game.yToJ(game.ActiveTowers[i].y);
                 if (i >= 128) {
                     console.log("tower", tI, ",", tJ);
                 }
-                if (isHorizontal) {
-                    PathChecker._pathsHor[tI][tJ] = CellType.Tower;
-                } else {
-                    PathChecker._pathsVer[tI][tJ] = CellType.Tower;
-                }
+                PathChecker.stateArray[tI][tJ] = CellType.Tower;
             }
         }
 
@@ -75,11 +86,7 @@ class PathChecker {
             for (var i = 0; i < game.WallTowers.length; i++) {
                 var tI = Game.xToI(game.WallTowers[i].x);
                 var tJ = Game.yToJ(game.WallTowers[i].y);
-                if (isHorizontal) {
-                    PathChecker._pathsHor[tI][tJ] = CellType.Tower;
-                } else {
-                    PathChecker._pathsVer[tI][tJ] = CellType.Tower;
-                }
+                PathChecker.stateArray[tI][tJ] = CellType.Tower;
             }
         }
 
@@ -89,32 +96,37 @@ class PathChecker {
         while (queue.length > 0) {
             var c = queue.shift();
             //console.log('c is', c, ' l:', queue.length);
-            if (isHorizontal && c.x === 49 && c.y > 11 && c.y < 20) {
-                for (var i = 0; i < c.path.length; i++) {
-                    PathChecker._pathsHor[c.path[i].x][c.path[i].y] = CellType.Path;
+            if (isHorizontal && c.x === 24 && c.y > 6 && c.y < 9) {
+                var temp = [];
+                //temp.push(new ArCoord(-1, -1));
+
+                for (var i = c.path.length - 1; i >= 0; i--) {
+                    temp.push(new ArCoord(c.path[i].x, c.path[i].y));
+                    
+                    PathChecker._pathsHor[c.path[i].x][c.path[i].y] = temp.slice().reverse();
+                    if (i == 0) {
+                        temp.push(new ArCoord(initI, initJ));
+                        PathChecker._pathsHor[initI][initJ] = temp.slice().reverse();
+                    }
                 }
-                if (isCustom) {
-                    var toRet = PathChecker._pathsHor;
-                    PathChecker._pathsHor = back;
-                    return toRet;
-                }
-                return PathChecker._pathsHor;
             }
-            if (!isHorizontal && c.x > 20 && c.x < 29 && c.y === 31) {
-                for (var i = 0; i < c.path.length; i++) {
-                    PathChecker._pathsVer[c.path[i].x][c.path[i].y] = CellType.Path;
+            if (!isHorizontal && c.x > 10 && c.x < 14 && c.y === 15) {
+                var temp = [];
+                //temp.push(new ArCoord(-1, -1));
+                for (var i = c.path.length - 1; i >= 0; i--) {
+                    temp.push(new ArCoord(c.path[i].x, c.path[i].y));
+
+                    PathChecker._pathsVer[c.path[i].x][c.path[i].y] = temp.slice().reverse();
+                    if (i == 0) {
+                        temp.push(new ArCoord(initI, initJ));
+                        PathChecker._pathsHor[initI][initJ] = temp.slice().reverse();
+                    }
                 }
-                if (isCustom) {
-                    var toRet = PathChecker._pathsHor;
-                    PathChecker._pathsVer = back;
-                    return toRet;
-                }
-                return PathChecker._pathsHor;
             }
-            if (mazeVisited[c.x][c.y]) {
+            if (PathChecker.stateArray[c.x][c.y] === CellType.Visited) {
                 continue;
             }
-            mazeVisited[c.x][c.y] = true;
+            PathChecker.stateArray[c.x][c.y] = CellType.Visited;
             var validMoves = PathChecker.getValidMoves(c.x, c.y,isHorizontal);
             for (var i = 0; i < validMoves.length; i++) {
                 var newPath = c.path.slice();

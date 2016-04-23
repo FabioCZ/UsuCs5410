@@ -1,4 +1,4 @@
-﻿///<reference path="../../Scripts/typings/jquery/jquery.d.ts" />
+﻿///<reference path="../../../Scripts/typings/jquery/jquery.d.ts" />
 class HighScore {
 
     private ctx: CanvasRenderingContext2D;
