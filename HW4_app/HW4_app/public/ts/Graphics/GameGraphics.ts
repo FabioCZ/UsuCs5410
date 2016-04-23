@@ -6,7 +6,9 @@
     public static get Grey() { return "#7D7D7D"; }
     public static get Yellow() { return "#FCEA5B" }
     public static get Black() { return "#000000"; }
-    public static get LtBlue() { return "78D0FF"; }
+    public static get LtBlue() { return "#8CC9FF"; }
+    public static get DarkBlue() { return "#00315C"; }
+
 }
 
 class GameGraphics {
@@ -14,14 +16,14 @@ class GameGraphics {
     private ctx: CanvasRenderingContext2D;
     private delta: number;
     private bk: any;
-    private bkPattern;
+    static bkPattern;
 
     constructor(ctx: CanvasRenderingContext2D) {
         this.ctx = ctx;
         var bk = new Image();
         bk.src = "img/grass.png";
         bk.onload = (e:any) => {
-            this.bkPattern = this.ctx.createPattern(bk, "repeat");
+            GameGraphics.bkPattern = this.ctx.createPattern(bk, "repeat");
         };
 
     }
@@ -36,9 +38,11 @@ class GameGraphics {
     }
 
     drawBackground() {
+        this.ctx.save();
         this.ctx.rect(0, Game.hudHeight, this.ctx.canvas.width, this.ctx.canvas.height - Game.hudHeight);
-        this.ctx.fillStyle = this.bkPattern;
+        this.ctx.fillStyle = GameGraphics.bkPattern;
         this.ctx.fill();
+        this.ctx.restore();
     }
 
     drawWalls() {

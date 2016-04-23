@@ -5,8 +5,6 @@
 }
 
 class PathChecker {
-    //private static _pathsVer = new Array<Array<CellType>>(); //stores path from some square to finish for the vertical path (top->bottom)
-    //private static _pathsHor = new Array<Array<CellType>>(); //stores path from some square to finish for the horizontal path (left->right) 
     private static _pathsVer: Array<Array<Array<ArCoord>>>; //stores path from some square to finish for the vertical path (top->bottom)
     private static _pathsHor: Array<Array<Array<ArCoord>>>; //stores path from some square to finish for the horizontal path (left->right) 
     public static get PathsVer() { return PathChecker._pathsVer; }
@@ -104,19 +102,17 @@ class PathChecker {
 
         if (game.ActiveTowers != undefined && game.ActiveTowers.length > 0) {
             for (var i = 0; i < game.ActiveTowers.length; i++) {
-                var tI = Game.xToI(game.ActiveTowers[i].x);
-                var tJ = Game.yToJ(game.ActiveTowers[i].y);
-                if (i >= 128) {
-                    console.log("tower", tI, ",", tJ);
-                }
+                var tI = Game.xToI(game.ActiveTowers[i].x+Game.towerSize/2);
+                var tJ = Game.yToJ(game.ActiveTowers[i].y + Game.towerSize / 2);
+                console.log("tower", tI, ",", tJ);
                 PathChecker.stateArray[tI][tJ] = CellType.Tower;
             }
         }
 
         if (game.WallTowers != undefined) {
             for (var i = 0; i < game.WallTowers.length; i++) {
-                var tI = Game.xToI(game.WallTowers[i].x);
-                var tJ = Game.yToJ(game.WallTowers[i].y);
+                var tI = Game.xToI(game.WallTowers[i].x + Game.towerSize / 2);
+                var tJ = Game.yToJ(game.WallTowers[i].y + Game.towerSize / 2);
                 PathChecker.stateArray[tI][tJ] = CellType.Tower;
             }
         }
@@ -126,8 +122,8 @@ class PathChecker {
 
         while (queue.length > 0) {
             var c = queue.shift();
-            //console.log('c is', c, ' l:', queue.length);
-            if (isHorizontal && c.x === 24 && c.y > 6 && c.y < 9) {
+
+            if (isHorizontal && c.x === 24 && c.y > 6 && c.y <= 9) {
                 var temp = [];
                 //temp.push(new ArCoord(-1, -1));
 
@@ -140,19 +136,22 @@ class PathChecker {
                         PathChecker._pathsHor[initI][initJ] = temp.slice().reverse();
                     }
                 }
+                return;
             }
-            if (!isHorizontal && c.x > 10 && c.x < 14 && c.y === 15) {
+            if (!isHorizontal && c.x > 10 && c.x <= 14 && c.y === 15) {
                 var temp = [];
                 //temp.push(new ArCoord(-1, -1));
+
                 for (var i = c.path.length - 1; i >= 0; i--) {
                     temp.push(new ArCoord(c.path[i].x, c.path[i].y));
 
                     PathChecker._pathsVer[c.path[i].x][c.path[i].y] = temp.slice().reverse();
                     if (i == 0) {
                         temp.push(new ArCoord(initI, initJ));
-                        PathChecker._pathsHor[initI][initJ] = temp.slice().reverse();
+                        PathChecker._pathsVer[initI][initJ] = temp.slice().reverse();
                     }
                 }
+                return;
             }
             if (PathChecker.stateArray[c.x][c.y] === CellType.Visited) {
                 continue;
@@ -165,6 +164,10 @@ class PathChecker {
                 queue.push({ x: validMoves[i].x, y: validMoves[i].y, path: newPath });
             }
         }
+
+        console.log('no path, delete last tower', queue.length);
+        game.deleteLatestTower();
+        this.setCreepPath(game, initI, initJ, isHorizontal);
     }
 
     private static getValidMoves(x, y,isHor) {

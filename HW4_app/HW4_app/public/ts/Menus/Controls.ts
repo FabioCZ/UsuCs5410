@@ -32,11 +32,11 @@ class Controls {
         document.addEventListener("click", this.clickListener);
         document.addEventListener("keydown",this.keyListener);
         this.buttons = new Array<MenuItem>();
-        this.buttons.push(new MenuItem("Key Controls:", () => { this.removeListeners(); new MainMenu(ctx) }));
+        this.buttons.push(new MenuItem("Key Controls:", null));
         this.buttons.push(new MenuItem("", () => { this.recording = 0; }));
         this.buttons.push(new MenuItem("", () => { this.recording = 1; }));
         this.buttons.push(new MenuItem("", () => { this.recording = 2; }));
-        this.buttons.push(new MenuItem("Back", () => { this.removeListeners(); new MainMenu(ctx) }));
+        this.buttons.push(new MenuItem("Back", () => { this.removeListeners(); Application.CurrScreen = new MainMenu(ctx) }));
         this.getCurrBindings();
         this.buttonSpacing = this.ctx.canvas.clientHeight / (this.buttons.length + 1);
         this.recording = null;

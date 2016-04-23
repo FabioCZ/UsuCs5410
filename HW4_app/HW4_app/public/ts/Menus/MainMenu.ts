@@ -18,10 +18,10 @@ class MainMenu {
         document.addEventListener("mousemove", this.overListener);
         document.addEventListener("click", this.clickListener);
         this.buttons = new Array<MenuItem>();
-        this.buttons.push(new MenuItem("New Game", () => { this.removeListeners(); new Game(performance.now(), ctx,1,{tower:null,money:100,lives:5}) }));
-        this.buttons.push(new MenuItem("High Scores", () => { this.removeListeners(); new HighScore(ctx)}));
-        this.buttons.push(new MenuItem("Controls", () => { this.removeListeners(); new Controls(ctx)}));
-        this.buttons.push(new MenuItem("Credits", () => { this.removeListeners(); new Credits(ctx)}));
+        this.buttons.push(new MenuItem("New Game", () => { this.removeListeners(); Application.CurrScreen = new Game(performance.now(), ctx,1,{towers:null,money:100,lives:15,score:0}) }));
+        this.buttons.push(new MenuItem("High Scores", () => { this.removeListeners(); Application.CurrScreen = new HighScore(ctx)}));
+        this.buttons.push(new MenuItem("Controls", () => { this.removeListeners(); Application.CurrScreen = new Controls(ctx)}));
+        this.buttons.push(new MenuItem("Credits", () => { this.removeListeners(); Application.CurrScreen =  new Credits(ctx)}));
         this.buttonSpacing = this.ctx.canvas.clientHeight / (this.buttons.length + 1);
     } 
 

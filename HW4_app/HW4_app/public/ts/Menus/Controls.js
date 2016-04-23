@@ -57,11 +57,11 @@ var Controls = (function () {
         document.addEventListener("click", this.clickListener);
         document.addEventListener("keydown", this.keyListener);
         this.buttons = new Array();
-        this.buttons.push(new MenuItem("Key Controls:", function () { _this.removeListeners(); new MainMenu(ctx); }));
+        this.buttons.push(new MenuItem("Key Controls:", null));
         this.buttons.push(new MenuItem("", function () { _this.recording = 0; }));
         this.buttons.push(new MenuItem("", function () { _this.recording = 1; }));
         this.buttons.push(new MenuItem("", function () { _this.recording = 2; }));
-        this.buttons.push(new MenuItem("Back", function () { _this.removeListeners(); new MainMenu(ctx); }));
+        this.buttons.push(new MenuItem("Back", function () { _this.removeListeners(); Application.CurrScreen = new MainMenu(ctx); }));
         this.getCurrBindings();
         this.buttonSpacing = this.ctx.canvas.clientHeight / (this.buttons.length + 1);
         this.recording = null;

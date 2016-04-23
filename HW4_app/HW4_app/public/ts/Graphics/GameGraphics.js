@@ -37,7 +37,12 @@ var Colors = (function () {
         configurable: true
     });
     Object.defineProperty(Colors, "LtBlue", {
-        get: function () { return "78D0FF"; },
+        get: function () { return "#8CC9FF"; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Colors, "DarkBlue", {
+        get: function () { return "#00315C"; },
         enumerable: true,
         configurable: true
     });
@@ -50,7 +55,7 @@ var GameGraphics = (function () {
         var bk = new Image();
         bk.src = "img/grass.png";
         bk.onload = function (e) {
-            _this.bkPattern = _this.ctx.createPattern(bk, "repeat");
+            GameGraphics.bkPattern = _this.ctx.createPattern(bk, "repeat");
         };
     }
     GameGraphics.prototype.draw = function (gameState, delta) {
@@ -62,9 +67,11 @@ var GameGraphics = (function () {
         this.drawCreep();
     };
     GameGraphics.prototype.drawBackground = function () {
+        this.ctx.save();
         this.ctx.rect(0, Game.hudHeight, this.ctx.canvas.width, this.ctx.canvas.height - Game.hudHeight);
-        this.ctx.fillStyle = this.bkPattern;
+        this.ctx.fillStyle = GameGraphics.bkPattern;
         this.ctx.fill();
+        this.ctx.restore();
     };
     GameGraphics.prototype.drawWalls = function () {
         this.ctx.fillStyle = Colors.LtGreen;

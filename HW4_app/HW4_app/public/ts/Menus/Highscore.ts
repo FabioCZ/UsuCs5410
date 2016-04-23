@@ -16,7 +16,7 @@ class HighScore {
         this.buttons.push(new MenuItem("3 : N/A", null));
         this.buttons.push(new MenuItem("4 : N/A", null));
         this.buttons.push(new MenuItem("5 : N/A", null));
-        this.buttons.push(new MenuItem("Back", () => {this.removeListeners(); new MainMenu(ctx);}));
+        this.buttons.push(new MenuItem("Back", () => { this.removeListeners(); Application.CurrScreen = new MainMenu(ctx);}));
         this.buttonSpacing = this.ctx.canvas.clientHeight / (this.buttons.length + 1);
         HighScore.GetScores(this.updateScores);
     }

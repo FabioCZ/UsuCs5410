@@ -10,6 +10,8 @@ requirejs(['js/jquery-2.2.3.min.js',
     'ts/Creep.js',
     'ts/Game.js',
     'ts/PathChecker.js',
+    'ts/Projectiles.js',
+    'ts/Sound.js',
     'ts/Tools.js',
     'ts/Tower.js',
 ], function () {
@@ -30,10 +32,12 @@ var Application = (function () {
         canvas.width = canvas.clientWidth; //dafuq?
         this._context = canvas.getContext("2d");
         Application.SetDefaultKeyBindings();
+        Sound.init();
         //Calculate air paths
         PathChecker.calcAirPaths();
         //var game = new Game(performance.now(), this._context,l);
-        var menu = new MainMenu(this._context);
+        //Application.CurrScreen = new MainMenu(this._context);
+        Application.CurrScreen = new Game(performance.now(), this._context, 1, { towers: null, money: 100, lives: 15, score: 0 });
     }
     Application.SetDefaultKeyBindings = function () {
         //Set default key bindings:

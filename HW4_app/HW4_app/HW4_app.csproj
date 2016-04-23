@@ -39,6 +39,8 @@
     <TypeScriptCompile Include="public\ts\Graphics\GameGraphics.ts" />
     <TypeScriptCompile Include="public\ts\Menus\MainMenu.ts" />
     <TypeScriptCompile Include="public\ts\PathChecker.ts" />
+    <TypeScriptCompile Include="public\ts\Projectiles.ts" />
+    <TypeScriptCompile Include="public\ts\Sound.ts" />
     <TypeScriptCompile Include="public\ts\Tools.ts" />
     <TypeScriptCompile Include="public\ts\Tower.ts" />
     <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />

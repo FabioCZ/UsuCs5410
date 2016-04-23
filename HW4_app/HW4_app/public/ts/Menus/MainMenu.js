@@ -38,10 +38,10 @@ var MainMenu = (function () {
         document.addEventListener("mousemove", this.overListener);
         document.addEventListener("click", this.clickListener);
         this.buttons = new Array();
-        this.buttons.push(new MenuItem("New Game", function () { _this.removeListeners(); new Game(performance.now(), ctx, 1, { tower: null, money: 100, lives: 5 }); }));
-        this.buttons.push(new MenuItem("High Scores", function () { _this.removeListeners(); new HighScore(ctx); }));
-        this.buttons.push(new MenuItem("Controls", function () { _this.removeListeners(); new Controls(ctx); }));
-        this.buttons.push(new MenuItem("Credits", function () { _this.removeListeners(); new Credits(ctx); }));
+        this.buttons.push(new MenuItem("New Game", function () { _this.removeListeners(); Application.CurrScreen = new Game(performance.now(), ctx, 1, { towers: null, money: 100, lives: 15, score: 0 }); }));
+        this.buttons.push(new MenuItem("High Scores", function () { _this.removeListeners(); Application.CurrScreen = new HighScore(ctx); }));
+        this.buttons.push(new MenuItem("Controls", function () { _this.removeListeners(); Application.CurrScreen = new Controls(ctx); }));
+        this.buttons.push(new MenuItem("Credits", function () { _this.removeListeners(); Application.CurrScreen = new Credits(ctx); }));
         this.buttonSpacing = this.ctx.canvas.clientHeight / (this.buttons.length + 1);
     }
     MainMenu.prototype.draw = function () {
