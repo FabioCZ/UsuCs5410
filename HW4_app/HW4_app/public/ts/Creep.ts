@@ -54,6 +54,9 @@ class Creep {
         switch (type) {
             case CType.Air:
                 this.sprite = new Sprite("img/bat.png", 128);
+                var i = Game.xToI(this.x);
+                var j = Game.yToJ(this.y);
+                this.path = isHorizontalPath ? PathChecker.AirPathsHor[i][j] : PathChecker.AirPathsVer[i][j];  
                 this.hp = 40;
                 break;
             case CType.Land1:
@@ -93,7 +96,7 @@ class Creep {
         }
 
         if (this.state === CreepState.Active) {
-            if (this.path == undefined || Game.newTowerPlaced) {
+            if (this.path == undefined || Game.newTowerPlaced || this.type !== CType.Air) {
                 var i = Game.xToI(this.x);
                 var j = Game.yToJ(this.y);
                 this.path = PathChecker.getCreepPath(gs, i, j, this.isHorizontalPath).slice();

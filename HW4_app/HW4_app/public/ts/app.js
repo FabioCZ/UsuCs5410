@@ -30,6 +30,8 @@ var Application = (function () {
         canvas.width = canvas.clientWidth; //dafuq?
         this._context = canvas.getContext("2d");
         Application.SetDefaultKeyBindings();
+        //Calculate air paths
+        PathChecker.calcAirPaths();
         //var game = new Game(performance.now(), this._context,l);
         var menu = new MainMenu(this._context);
     }

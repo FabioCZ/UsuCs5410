@@ -19,22 +19,25 @@ var Tower = (function () {
         this.baseImg.src = "img/tower/turret-base.gif";
         this.upgradeLevel = 1;
         this.angleRad = 0;
-        this.radius = Game.baseTowerRadius;
         switch (name) {
             case Tower.Ground1Name:
                 this.tFileBaseName = "img/tower/turret-1";
+                this.radius = Game.baseTowerRadius;
                 this.cost = 10;
                 break;
             case Tower.Ground2Name:
                 this.tFileBaseName = "img/tower/turret-2";
+                this.radius = Game.baseTowerRadius / 2;
                 this.cost = 15;
                 break;
             case Tower.MixedName:
                 this.tFileBaseName = "img/tower/turret-3";
+                this.radius = Game.baseTowerRadius;
                 this.cost = 20;
                 break;
             case Tower.AirName:
                 this.cost = 15;
+                this.radius = Game.baseTowerRadius * 2;
                 this.tFileBaseName = "img/tower/turret-7";
                 break;
             case Tower.WallName:
@@ -46,13 +49,13 @@ var Tower = (function () {
         this.setTurretImage();
     }
     Object.defineProperty(Tower, "Ground1Name", {
-        get: function () { return "Ground 1"; },
+        get: function () { return "Bomb"; },
         enumerable: true,
         configurable: true
     });
     ;
     Object.defineProperty(Tower, "Ground2Name", {
-        get: function () { return "Ground 2"; },
+        get: function () { return "Slow"; },
         enumerable: true,
         configurable: true
     });
@@ -117,8 +120,15 @@ var Tower = (function () {
             ctx.globalAlpha = old;
         }
         if (this.name === Tower.WallName) {
-            ctx.drawImage(this.baseImg, this.x - Game.towerSize * 0.2, this.y - Game.towerSize * 0.2, Game.towerSize * 1.4, Game.towerSize * 1.4);
+            ctx.drawImage(this.baseImg, this.x, this.y, Game.towerSize, Game.towerSize);
             return;
+        }
+        if (this.name === Tower.Ground2Name && !drawRadius) {
+            ctx.beginPath();
+            ctx.arc(this.x + Game.towerSize / 2, this.y + Game.towerSize / 2, this.radius, 0, 2 * Math.PI, false);
+            ctx.lineWidth = Game.towerSize / 10;
+            ctx.strokeStyle = Colors.LtBlue;
+            ctx.stroke();
         }
         ctx.save();
         ctx.translate(this.x + Game.towerSize / 2, this.y + Game.towerSize / 2);

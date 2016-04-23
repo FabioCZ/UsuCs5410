@@ -6,6 +6,7 @@
     public static get Grey() { return "#7D7D7D"; }
     public static get Yellow() { return "#FCEA5B" }
     public static get Black() { return "#000000"; }
+    public static get LtBlue() { return "78D0FF"; }
 }
 
 class GameGraphics {

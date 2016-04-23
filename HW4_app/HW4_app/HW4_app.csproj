@@ -28,6 +28,7 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="public\ts\App.ts" />
+    <TypeScriptCompile Include="public\ts\Graphics\Particles.ts" />
     <TypeScriptCompile Include="public\ts\Menus\Controls.ts" />
     <TypeScriptCompile Include="public\ts\Menus\Credits.ts" />
     <TypeScriptCompile Include="public\ts\Creep.ts" />

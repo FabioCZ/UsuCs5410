@@ -35,6 +35,9 @@ class Application {
 
         Application.SetDefaultKeyBindings();
 
+        //Calculate air paths
+        PathChecker.calcAirPaths();
+
         //var game = new Game(performance.now(), this._context,l);
         var menu = new MainMenu(this._context);
 

@@ -5,7 +5,7 @@ var HighScore = (function () {
         this.overListener = function (e) {
             var x = e.clientX - document.getElementById("canvas-main").getBoundingClientRect().left;
             var y = e.clientY - document.getElementById("canvas-main").getBoundingClientRect().top;
-            var selectedIndex = Math.floor(y / _this.buttonSpacing);
+            var selectedIndex = Math.floor((y - _this.buttonSpacing / 2) / _this.buttonSpacing);
             if (selectedIndex < 0 || selectedIndex >= _this.buttons.length) {
                 _this.buttons.forEach(function (b) { b.selected = false; });
             }

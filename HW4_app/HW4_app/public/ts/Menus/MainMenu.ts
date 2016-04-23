@@ -28,7 +28,7 @@ class MainMenu {
     public overListener = (e: MouseEvent) => {
         var x = e.clientX - document.getElementById("canvas-main").getBoundingClientRect().left;
         var y = e.clientY - document.getElementById("canvas-main").getBoundingClientRect().top;
-        var selectedIndex = Math.floor(y / this.buttonSpacing);
+        var selectedIndex = Math.floor((y-this.buttonSpacing/2) / this.buttonSpacing);
         if (selectedIndex < 0 || selectedIndex >= this.buttons.length || x > this.ctx.canvas.clientWidth || x < 0) {
             this.buttons.forEach((b) => { b.selected = false; });
         } else {

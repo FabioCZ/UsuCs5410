@@ -66,3 +66,16 @@ function drawBk(context: CanvasRenderingContext2D) {
     context.fillStyle = grd;
     context.fillRect(0, 0, canvasSize.w, canvasSize.h);
 }
+
+function gaussianWithMidPoint(num) {
+    var randNum = ((Math.random() + Math.random() + Math.random() + Math.random() + Math.random() + Math.random())) / 3;
+    return num * randNum;
+}
+
+function direction() {
+    var angle = Math.random() * 2 * Math.PI;
+    return {
+        x: Math.cos(angle),
+        y: Math.sin(angle)
+    };
+}

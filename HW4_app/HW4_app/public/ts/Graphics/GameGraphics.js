@@ -36,6 +36,11 @@ var Colors = (function () {
         enumerable: true,
         configurable: true
     });
+    Object.defineProperty(Colors, "LtBlue", {
+        get: function () { return "78D0FF"; },
+        enumerable: true,
+        configurable: true
+    });
     return Colors;
 }());
 var GameGraphics = (function () {

@@ -24,7 +24,7 @@ class HighScore {
     public overListener = (e: MouseEvent) => {
         var x = e.clientX - document.getElementById("canvas-main").getBoundingClientRect().left;
         var y = e.clientY - document.getElementById("canvas-main").getBoundingClientRect().top;
-        var selectedIndex = Math.floor(y / this.buttonSpacing);
+        var selectedIndex = Math.floor((y - this.buttonSpacing / 2) / this.buttonSpacing);
         if (selectedIndex < 0 || selectedIndex >= this.buttons.length) {
             this.buttons.forEach((b) => { b.selected = false; });
         } else {

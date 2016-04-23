@@ -17,6 +17,38 @@ var PathChecker = (function () {
         enumerable: true,
         configurable: true
     });
+    Object.defineProperty(PathChecker, "AirPathsVer", {
+        get: function () { return PathChecker._airPathsHor; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(PathChecker, "AirPathsHor", {
+        get: function () { return PathChecker._airPathsVer; },
+        enumerable: true,
+        configurable: true
+    });
+    PathChecker.calcAirPaths = function () {
+        PathChecker._airPathsVer = Array(PathChecker.sizeX);
+        for (var i = 0; i < PathChecker.sizeX; i++) {
+            var temp = [];
+            PathChecker._airPathsVer[i] = Array(PathChecker.sizeY);
+            for (var j = this.sizeY - 1; j >= 0; j--) {
+                temp.push(new ArCoord(i, j));
+                PathChecker._airPathsVer[i][j] = temp.slice().reverse();
+            }
+        }
+        PathChecker._airPathsHor = Array(PathChecker.sizeX);
+        for (var i = 0; i < PathChecker.sizeX; i++) {
+            PathChecker._airPathsHor[i] = Array(PathChecker.sizeY);
+        }
+        for (var j = 0; j < PathChecker.sizeY; j++) {
+            var temp = [];
+            for (var i = this.sizeX - 1; i >= 0; i--) {
+                temp.push(new ArCoord(i, j));
+                PathChecker._airPathsHor[i][j] = temp.slice().reverse();
+            }
+        }
+    };
     PathChecker.isValidMove = function (newX, newY, isHor) {
         if (newX >= PathChecker.sizeX || newY >= PathChecker.sizeY || newX < 0 || newY < 0)
             return false;

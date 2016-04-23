@@ -11,9 +11,40 @@ class PathChecker {
     private static _pathsHor: Array<Array<Array<ArCoord>>>; //stores path from some square to finish for the horizontal path (left->right) 
     public static get PathsVer() { return PathChecker._pathsVer; }
     public static get PathsHor() { return PathChecker._pathsHor; }
+
+    private static _airPathsHor: Array<Array<Array<ArCoord>>>; //stores path from some square to finish for the vertical path (top->bottom)
+    private static _airPathsVer: Array<Array<Array<ArCoord>>>; //stores path from some square to finish for the horizontal path (left->right) 
+    public static get AirPathsVer() { return PathChecker._airPathsHor; }
+    public static get AirPathsHor() { return PathChecker._airPathsVer; }
+
     private static sizeX = 25;
     private static sizeY = 16;
     private static stateArray: Array<Array<CellType>>;
+
+    public static calcAirPaths() {
+        PathChecker._airPathsVer = Array<Array<Array<ArCoord>>>(PathChecker.sizeX);
+        for (var i = 0; i < PathChecker.sizeX; i++) {
+            var temp = [];
+            PathChecker._airPathsVer[i] = Array<Array<ArCoord>>(PathChecker.sizeY);
+            for (var j = this.sizeY -1; j >= 0; j--) {
+                temp.push(new ArCoord(i, j));
+                PathChecker._airPathsVer[i][j] = temp.slice().reverse();
+            }
+        }
+
+        PathChecker._airPathsHor = Array<Array<Array<ArCoord>>>(PathChecker.sizeX);
+        for (var i = 0; i < PathChecker.sizeX; i++) {
+            PathChecker._airPathsHor[i] = Array<Array<ArCoord>>(PathChecker.sizeY);
+        }
+
+        for (var j = 0; j < PathChecker.sizeY; j++) {
+            var temp = [];
+            for (var i = this.sizeX -1; i >= 0; i--) {
+                temp.push(new ArCoord(i, j));
+                PathChecker._airPathsHor[i][j] = temp.slice().reverse();
+            }
+        }
+    }
 
     private static isValidMove(newX, newY, isHor) {
         if (newX >= PathChecker.sizeX || newY >= PathChecker.sizeY || newX < 0 || newY < 0) return false;
