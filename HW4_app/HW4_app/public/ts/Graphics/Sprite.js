@@ -9,9 +9,10 @@ var Sprite = (function () {
         this.currIter = 0;
         this.stepTimeCt = 0;
     }
-    Sprite.prototype.draw = function (ctx, x, y, dir, delta) {
+    Sprite.prototype.draw = function (ctx, x, y, dir, delta, isFrozen) {
         this.stepTimeCt += delta;
-        if (this.stepTimeCt > this.stepTime) {
+        var st = isFrozen ? this.stepTime * 2 : this.stepTime;
+        if (this.stepTimeCt > st) {
             this.currIter = this.currIter === 3 ? 0 : this.currIter + 1;
             this.stepTimeCt = 0;
         }

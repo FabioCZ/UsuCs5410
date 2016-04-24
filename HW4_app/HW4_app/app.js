@@ -20,6 +20,7 @@ router.get('/getScores', function(req, res){
 
 router.post('/addScore/:score', function(req, res){
   var score = parseInt(req.params.score);
+	console.log("received high score ", score);
   var highScores;
   if(fs.existsSync(highScoresDbFileName)){
     var f = fs.readFileSync(highScoresDbFileName,'utf8');

@@ -186,14 +186,11 @@ var PathChecker = (function () {
         queue.push({ x: fromI, y: fromJ, path: new Array() });
         while (queue.length > 0) {
             var c = queue.shift();
-            if (c.x == toI && c.y == toJ) {
+            if (c.x === toI && c.y === toJ) {
                 var temp = new Array();
-                for (var i = 0; i < c.path.length; i--) {
+                //temp.push(new ArCoord(fromI, fromJ));;
+                for (var i = 0; i < c.path.length; i++) {
                     temp.push(new ArCoord(c.path[i].x, c.path[i].y));
-                    if (i == 0) {
-                        temp.push(new ArCoord(fromI, fromJ));
-                        ;
-                    }
                 }
                 return temp;
             }

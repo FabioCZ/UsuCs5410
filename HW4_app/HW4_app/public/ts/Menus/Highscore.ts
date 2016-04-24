@@ -61,7 +61,7 @@ class HighScore {
 
     public updateScores = (data)=> {
         for (var i = 0; i < 5; i++) {
-            this.buttons[i + 1].title = (i + 1) + ": " + (data[i] > 0 ? data[i] : "N/A");
+            this.buttons[i + 1].title = (i + 1) + ": " + (data[i] >= 0 ? data[i] : "N/A");
         }
         this.draw();
     }
@@ -82,8 +82,8 @@ class HighScore {
             type: 'GET',
             error: function() { alert('GET scores failed'); },
             success: function(data) {
-                //var res = JSON.parse(data);
-                callBack(data);
+                var res = JSON.parse(data);
+                callBack(res);
             }
         });
     }

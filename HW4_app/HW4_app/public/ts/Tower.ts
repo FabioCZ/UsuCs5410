@@ -40,13 +40,13 @@ class Tower {
         this.upgradeLevel = 1;
         this.angleRad = 0;
         this.targetAngleRad = 0;
-        this.rotSpeed = 0.2;
+        this.rotSpeed = 0.02;
         this.lastAttackTime = -50000;
         switch (name) {
             case Tower.Ground1Name:
                 this.tFileBaseName = "img/tower/turret-2";
                 this.radius = Game.towerSize * 2.5;
-                this.cost = 10;
+                this.cost = 15;
                 this.coolDown = 500;
                 break;
             case Tower.Ground2Name:
@@ -58,12 +58,12 @@ class Tower {
             case Tower.MixedName:
                 this.tFileBaseName = "img/tower/turret-3";
                 this.radius = Game.baseTowerRadius;
-                this.coolDown = 500;
+                this.coolDown = 100;
                 this.cost = 20;
                 break;
             case Tower.AirName:
-                this.cost = 15;
-                this.radius = Game.baseTowerRadius * 2;
+                this.cost = 30;
+                this.radius = Game.baseTowerRadius * 3;
                 this.tFileBaseName = "img/tower/turret-7";
                 this.coolDown = 500;
                 break;
@@ -91,8 +91,8 @@ class Tower {
         gs._money -= ~~(this.cost / 3);
         Sound.Buy.play();
         this.upgradeLevel++;
-        this.radius *= 1.25;
-        this.coolDown *= 0.75;
+        this.radius *= 1.2;
+        this.coolDown *= 0.8;
         console.log("tower upgraded to level ", this.upgradeLevel);
         this.setTurretImage();
     }
@@ -132,6 +132,7 @@ class Tower {
             ctx.drawImage(this.baseImg, this.x, this.y, Game.towerSize, Game.towerSize);
             return;
         }
+        ctx.drawImage(this.baseImg, this.x - Game.towerSize * 0.2, this.y - Game.towerSize * 0.2, Game.towerSize*1.4, Game.towerSize*1.4);
         if (this.name === Tower.Ground2Name && !drawRadius) { //slow tower
             var old = ctx.globalAlpha;
             ctx.globalAlpha = 0.4;
@@ -154,14 +155,14 @@ class Tower {
         return new Tower(name, x, y);
     }
 
-    public update(gs: Game) {
+    public update(gs: Game,delta) {
         var turningMode = false;
-        if (Math.abs(this.angleRad - this.targetAngleRad) > 0.3) {
+        if (Math.abs(this.angleRad - this.targetAngleRad) > 0.5) {
             if (this.rotatingCw) {
-                this.angleRad += this.rotSpeed;
+                this.angleRad += this.rotSpeed * delta;
 
             } else {
-                this.angleRad -= this.rotSpeed;
+                this.angleRad -= this.rotSpeed * delta;
             }
 
             this.angleRad = this.angleRad % (2 * Math.PI);
@@ -171,11 +172,12 @@ class Tower {
 
             turningMode = true;
         }
+
         var closest = { index: -1, dist: 500000 };
         var tCX = this.x + Game.towerSize / 2;
         var tCY = this.y + Game.towerSize / 2;
 
-
+        var slowed = false;
         for (var i = 0; i < gs._creep.length; i++) {
             if (gs._creep[i].state !== CreepState.Active) continue;
             var cCX = gs._creep[i].x + Game.towerSize / 2;
@@ -184,12 +186,12 @@ class Tower {
             if (dist < closest.dist) {
                 closest = { index: i, dist: dist };
             }
-            if (this.name === Tower.Ground2Name && dist < this.radius) {
+            if (this.name === Tower.Ground2Name && dist < this.radius && gs._creep[i].type !== CType.Air) {
                 gs._creep[i].slow(this.upgradeLevel + 1, gs.ElapsedTime);
-                return;
+                slowed = true;
             }
         }
-
+        if (slowed) return;
         //commit rotation
         if (closest.index !== -1) {
             if (!turningMode && 
@@ -199,13 +201,15 @@ class Tower {
                 var x2 = gs._creep[closest.index].x + Game.towerSize / 2;
                 var y2 = gs._creep[closest.index].y + Game.towerSize / 2;
 
-                this.targetAngleRad = Math.atan2((y2 - tCY), (x2 - tCX));
-                this.targetAngleRad += Math.PI / 2;
-                if (this.targetAngleRad > 2 * Math.PI) {
-                    this.targetAngleRad -= (2 * Math.PI);
-                } else if (this.targetAngleRad < 0) {
-                    this.targetAngleRad += (2 * Math.PI);
-
+                var newTargetAngleRad = Math.atan2((y2 - tCY), (x2 - tCX));
+                newTargetAngleRad += Math.PI / 2;
+                if (newTargetAngleRad > 2 * Math.PI) {
+                    newTargetAngleRad -= (2 * Math.PI);
+                } else if (newTargetAngleRad < 0) {
+                    newTargetAngleRad += (2 * Math.PI);
+                }
+                if (Math.abs(this.angleRad - newTargetAngleRad) > 0.4) {
+                    this.targetAngleRad = newTargetAngleRad;
                 }
 
                 var cwDist;
@@ -226,15 +230,17 @@ class Tower {
 
             if (this.lastAttackTime + this.coolDown > gs.ElapsedTime) return;
 
-            if (Math.abs(this.angleRad - this.targetAngleRad) < 0.6) { //if angle is right
-                if (dist < this.radius) { //execute attack
+            if (Math.abs(this.angleRad - this.targetAngleRad) < 0.4) { //if angle is right
+                if (closest.dist < this.radius) { //execute attack
                     console.log("attack!");
                     var cX = gs._creep[closest.index].x;
                     var cY = gs._creep[closest.index].y;
                     switch (this.name) {
                         case Tower.Ground1Name:
-                            Sound.Fire.play();
-                            gs._projectiles.push(new Bomb(this.upgradeLevel, tCX, tCY, cX, cY));
+                            if (gs._creep[closest.index].type !== CType.Air) {
+                                Sound.Fire.play();
+                                gs._projectiles.push(new Bomb(this.upgradeLevel, tCX, tCY, cX, cY));
+                            }
                             break;
                         case Tower.Ground2Name:
                             //nothing here
@@ -244,13 +250,16 @@ class Tower {
                             gs._projectiles.push(new MixedProj(this.upgradeLevel, tCX, tCY, cX, cY));
                             break;
                         case Tower.AirName:
-                            Sound.Fire.play();
-                            var pr = new GuidedProj(this.upgradeLevel, tCX, tCY, cX, cY);
-                            pr.setCreepIndex(closest.index);
+                            if (gs._creep[closest.index].type == CType.Air) {
+                                Sound.Fire.play();
+                                var pr = new GuidedProj(this.upgradeLevel, tCX, tCY, cX, cY);
+                                gs._projectiles.push(pr);
+                                pr.setCreepIndex(closest.index);
+                            }
                             break;
                     }
+                    this.lastAttackTime = gs.ElapsedTime;
                 }
-               this.lastAttackTime = gs.ElapsedTime;
             }
 
         }

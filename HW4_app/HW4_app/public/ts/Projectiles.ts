@@ -18,16 +18,16 @@ class Bomb implements IProjectile {
 
     constructor(level, fromX, fromY, toX, toY) {
         if (level === 1) {
-            this.attack = 10;
+            this.attack = 8;
             this.speed = Game.towerSize / 200;
             this.explRadius = Game.towerSize * 1;
         } else if (level === 2) {
-            this.attack = 20;
+            this.attack = 12;
             this.speed = Game.towerSize / 100;
             this.explRadius = Game.towerSize * 1.5;
 
         } else { //==3
-            this.attack = 30;
+            this.attack = 16;
             this.speed = Game.towerSize / 50;
             this.explRadius = Game.towerSize * 2.5;
 
@@ -59,7 +59,7 @@ class Bomb implements IProjectile {
         this.elapsedDist += this.speed * delta;
         this.currX += dX;
         this.currY += dY;
-        Particles.addTrace(gs.ElapsedTime, this.currX, this.currY);
+        Particles.addTraceBomb(gs.ElapsedTime, this.currX, this.currY);
 
         if (this.elapsedDist >= this.targetDist) {
             Sound.Hit.play();
@@ -78,7 +78,9 @@ class Bomb implements IProjectile {
 
     draw(ctx: CanvasRenderingContext2D) {
         ctx.fillStyle = Colors.Black;
-        ctx.fillRect(this.currX, this.currY, 5, 5);
+        ctx.beginPath();
+        ctx.arc(this.currX, this.currY, Game.towerSize / 10, 0, 2 * Math.PI, false);
+        ctx.fill();
     }
 }
 
@@ -97,15 +99,15 @@ class MixedProj implements IProjectile {
 
     constructor(level, fromX, fromY, toX, toY) {
         if (level === 1) {
-            this.attack = 20;
-            this.speed = Game.towerSize / 200;
+            this.attack = 10;
+            this.speed = Game.towerSize / 300;
         } else if (level === 2) {
-            this.attack = 40;
-            this.speed = Game.towerSize / 100;
+            this.attack = 15;
+            this.speed = Game.towerSize / 200;
 
         } else { //==3
-            this.attack = 60;
-            this.speed = Game.towerSize / 50;
+            this.attack = 20;
+            this.speed = Game.towerSize / 100;
 
         }
         this.fromX = fromX;
@@ -135,7 +137,7 @@ class MixedProj implements IProjectile {
         this.elapsedDist += this.speed * delta;
         this.currX += dX;
         this.currY += dY;
-        Particles.addTrace(gs.ElapsedTime, this.currX, this.currY);
+        Particles.addTraceMissile(gs.ElapsedTime, this.currX, this.currY);
 
         if (this.elapsedDist > this.targetDist) {
             Particles.addProjExpl(gs.ElapsedTime,this.currX,this.currY);
@@ -154,7 +156,12 @@ class MixedProj implements IProjectile {
         return false;
     }
 
-    draw(ctx: CanvasRenderingContext2D) {}
+    draw(ctx: CanvasRenderingContext2D) {
+        ctx.fillStyle = Colors.Orage;
+        ctx.beginPath();
+        ctx.arc(this.currX, this.currY, Game.towerSize/10, 0, 2 * Math.PI, false);
+        ctx.fill();
+    }
 }
 
 class GuidedProj implements IProjectile {
@@ -167,26 +174,24 @@ class GuidedProj implements IProjectile {
     public targetCreepIndex: number;
     public path: Array<ArCoord>;
     public tCI: number;
-    public tCJ:number;
+    public tCJ: number;
     constructor(level, fromX, fromY, toX, toY) {
         if (level === 1) {
-            this.attack = 20;
+            this.attack = 15;
             this.speed = Game.towerSize / 200;
         } else if (level === 2) {
-            this.attack = 40;
-            this.speed = Game.towerSize / 100;
+            this.attack = 25;
+            this.speed = Game.towerSize / 150;
 
         } else { //==3
-            this.attack = 60;
-            this.speed = Game.towerSize / 50;
+            this.attack = 35;
+            this.speed = Game.towerSize / 100;
 
         }
         this.fromX = fromX;
         this.fromY = fromY;
         this.currX = fromX;
         this.currY = fromY;
-        this.tCI = -10;
-        this.tCJ = -10;
     }
 
     setCreepIndex(cI: number) {
@@ -195,14 +200,45 @@ class GuidedProj implements IProjectile {
 
     update(gs: Game, delta: number) {
         var c = gs._creep[this.targetCreepIndex];
-        var cCI = Game.xToI(c.x);
-        var cCJ = Game.yToJ(c.y);
-        if (this.tCI != cCI || this.tCJ != cCJ) {   //only recalc path if we need to
-            this.path = PathChecker.getGuidedProjPath(Game.xToI(this.currX), Game.yToJ(this.currY), cCI, cCJ);
+        if (this.path == undefined) {   //only recalc path if we need to
+            this.path = PathChecker.getGuidedProjPath(Game.xToI(this.currX), Game.yToJ(this.currY), Game.xToI(c.x), Game.yToJ(c.y));
+        }
+        var str = "";
+        for (var i = 0; i < this.path.length; i++) {
+            str += "(" + this.path[i].i + ", " + this.path[i].j + ") => ";
+        }
+        console.log(str);
+        console.log("currI", Game.xToI(this.currX), " currI", Game.yToJ(this.currY));
+        if (this.path.length > 0) {
+            var next = this.path[0];
+            if (next.i === Game.xToI(this.currX) + 1) { //next right
+                this.currX += this.speed * delta;
+            } else if (next.i === Game.xToI(this.currX)  - 1) { // next left
+                this.currX -= this.speed * delta;
+            } else if (next.j === Game.yToJ(this.currY) + 1) { //next down
+                this.currY += this.speed * delta;
+            } else if (next.j === Game.yToJ(this.currY) - 1) { // next up
+                this.currY -= this.speed * delta;
+            } else {
+                throw ("error in guided missile path");
+            }
+            this.path = PathChecker.getGuidedProjPath(Game.xToI(this.currX), Game.yToJ(this.currY), Game.xToI(c.x), Game.yToJ(c.y));
+            Particles.addTraceMissile(gs.ElapsedTime, this.currX, this.currY);
+            return false;
+        } else {
+            gs._creep[this.targetCreepIndex].hit(this.attack, gs);
+            Sound.Hit.play();
+            Particles.addProjExpl(gs.ElapsedTime, this.currX, this.currY);
+            return true;
         }
 
     }
 
-    draw(ctx: CanvasRenderingContext2D) {}
+    draw(ctx: CanvasRenderingContext2D) {
+        ctx.fillStyle = Colors.Blue;
+        ctx.beginPath();
+        ctx.arc(this.currX, this.currY, Game.towerSize / 8, 0, 2 * Math.PI, false);
+        ctx.fill();
+    }
 }
 

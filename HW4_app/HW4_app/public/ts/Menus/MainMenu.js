@@ -38,7 +38,7 @@ var MainMenu = (function () {
         document.addEventListener("mousemove", this.overListener);
         document.addEventListener("click", this.clickListener);
         this.buttons = new Array();
-        this.buttons.push(new MenuItem("New Game", function () { _this.removeListeners(); Application.CurrScreen = new Game(performance.now(), ctx, 1, { towers: null, money: 100, lives: 15, score: 0 }); }));
+        this.buttons.push(new MenuItem("New Game", function () { _this.removeListeners(); Application.CurrScreen = new Game(performance.now(), ctx, 1, { towers: null, money: 100, lives: 20, score: 0, elTime: 0 }); }));
         this.buttons.push(new MenuItem("High Scores", function () { _this.removeListeners(); Application.CurrScreen = new HighScore(ctx); }));
         this.buttons.push(new MenuItem("Controls", function () { _this.removeListeners(); Application.CurrScreen = new Controls(ctx); }));
         this.buttons.push(new MenuItem("Credits", function () { _this.removeListeners(); Application.CurrScreen = new Credits(ctx); }));

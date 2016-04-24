@@ -29,7 +29,7 @@ var HighScore = (function () {
         };
         this.updateScores = function (data) {
             for (var i = 0; i < 5; i++) {
-                _this.buttons[i + 1].title = (i + 1) + ": " + (data[i] > 0 ? data[i] : "N/A");
+                _this.buttons[i + 1].title = (i + 1) + ": " + (data[i] >= 0 ? data[i] : "N/A");
             }
             _this.draw();
         };
@@ -39,8 +39,8 @@ var HighScore = (function () {
                 type: 'GET',
                 error: function () { alert('GET scores failed'); },
                 success: function (data) {
-                    //var res = JSON.parse(data);
-                    callBack(data);
+                    var res = JSON.parse(data);
+                    callBack(res);
                 }
             });
         };

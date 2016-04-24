@@ -15,9 +15,10 @@
         this.stepTimeCt = 0;
     }
 
-    draw(ctx:CanvasRenderingContext2D,x:number,y:number,dir: Dir, delta: number) {
+    draw(ctx:CanvasRenderingContext2D,x:number,y:number,dir: Dir, delta: number, isFrozen: boolean) {
         this.stepTimeCt += delta;
-        if (this.stepTimeCt > this.stepTime) {
+        var st = isFrozen ? this.stepTime * 2 : this.stepTime;
+        if (this.stepTimeCt > st) {
             this.currIter = this.currIter === 3 ? 0 : this.currIter + 1;
             this.stepTimeCt = 0;
         }

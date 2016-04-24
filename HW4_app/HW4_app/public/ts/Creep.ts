@@ -64,15 +64,15 @@ class Creep {
                 break;
             case CType.Land1:
                 this.sprite = new Sprite("img/cow.png", 512);
-                this.hp = 50;
+                this.hp = 40;
                 break;
             case CType.Land2:
                 this.sprite = new Sprite("img/llama.png", 512);
-                this.hp = 90;
+                this.hp = 70;
                 break;
             case CType.Land3:
                 this.sprite = new Sprite("img/pig.png", 512);
-                this.hp = 125;
+                this.hp = 100;
                 break;
         }
         this.maxHp = this.hp;
@@ -86,7 +86,7 @@ class Creep {
             this.state = CreepState.Dead;
             gs._money += ~~(this.maxHp/10);
             gs._score += ~~(this.maxHp / 5);
-            FloatingScores.addScore(this.x, this.y, ~~(this.maxHp / 5), gs.ElapsedTime);
+            FloatingScores.addScore(this.x, this.y, ~~(this.maxHp / 5), gs.ElapsedTime,false);
             Particles.addCreepExpl(gs.ElapsedTime, this.x + Game.towerSize / 2, this.y + Game.towerSize / 2);
             Sound.Death.play();
             this.x = -2;
@@ -160,7 +160,7 @@ class Creep {
 
     public draw(ctx: CanvasRenderingContext2D, delta: number) {
         if (this.state !== CreepState.Active) return;
-        this.sprite.draw(ctx, this.x, this.y, this.lastDir, delta);
+        this.sprite.draw(ctx, this.x, this.y, this.lastDir, delta,this.slowedTime !== -1);
 
         if (Math.abs(this.speed - this.origSpeed) > 0.01) {
             ctx.fillStyle = Colors.LtBlue;

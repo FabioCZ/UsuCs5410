@@ -51,6 +51,26 @@ var Colors = (function () {
         enumerable: true,
         configurable: true
     });
+    Object.defineProperty(Colors, "Pink", {
+        get: function () { return "#F70AFF"; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Colors, "DarkRed", {
+        get: function () { return "#7D0000"; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Colors, "Purple", {
+        get: function () { return "#7D007D"; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Colors, "Blue", {
+        get: function () { return "#0D92FF"; },
+        enumerable: true,
+        configurable: true
+    });
     return Colors;
 }());
 var GameGraphics = (function () {
@@ -70,6 +90,8 @@ var GameGraphics = (function () {
         this.drawTowers();
         this.drawWalls();
         this.drawCreep();
+        Particles.drawAll(this.ctx);
+        FloatingScores.updateAndDraw(this.ctx, gameState.ElapsedTime);
         this.drawProjectiles();
     };
     GameGraphics.prototype.drawBackground = function () {

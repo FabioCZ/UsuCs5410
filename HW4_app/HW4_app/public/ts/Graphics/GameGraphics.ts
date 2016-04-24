@@ -9,7 +9,10 @@
     public static get LtBlue() { return "#8CC9FF"; }
     public static get DarkBlue() { return "#00315C"; }
     public static get Orage() { return "#FFA90A"; }
-
+    public static get Pink() { return "#F70AFF"; }
+    public static get DarkRed() { return "#7D0000"; }
+    public static get Purple() { return "#7D007D"; }
+    public static get Blue() { return "#0D92FF"; }
 
 }
 
@@ -37,6 +40,8 @@ class GameGraphics {
         this.drawTowers();
         this.drawWalls();
         this.drawCreep();
+        Particles.drawAll(this.ctx);
+        FloatingScores.updateAndDraw(this.ctx, gameState.ElapsedTime);
         this.drawProjectiles();
     }
 
