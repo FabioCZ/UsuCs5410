@@ -161,6 +161,7 @@ class Trace implements IParticleSys {
     public draw(ctx: CanvasRenderingContext2D) {
         for (var i = 0; i < this.particles.length; i++) {
             var size = this.particles[i].size;
+            if (this.color == Colors.Red) size *= 3;
             ctx.fillStyle = this.color;
             ctx.fillRect(this.particles[i].x - size / 2, this.particles[i].y - size / 2, size, size);
         }
@@ -182,7 +183,7 @@ class Particles {
         if (Particles.explosions == undefined) {
             Particles.explosions = new Array<IParticleSys>();
         }
-        Particles.explosions.push(new Explosion(time, x, y,Colors.Red,500));
+        Particles.explosions.push(new Explosion(time, x, y,Colors.Red,750));
     }
 
     public static addProjExpl(time, x, y) {
@@ -198,7 +199,7 @@ class Particles {
         if (Particles.explosions == undefined) {
             Particles.explosions = new Array<IParticleSys>();
         }
-        Particles.explosions.push(new Explosion(time, x, y, Colors.Pink, 500)); 
+        Particles.explosions.push(new Explosion(time, x, y, Colors.Pink, 750)); 
     }
 
     public static addTraceMissile(time, x, y) {

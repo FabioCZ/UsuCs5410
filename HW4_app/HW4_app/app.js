@@ -13,7 +13,7 @@ router.get('/getScores', function(req, res){
       res.send(f);
     } else {
         var highscores = [-1, -1, -1, -1, -1];
-        fs.writeFileSync(highScoresDbFileName,JSON.stringify(highScores));
+        fs.writeFileSync(highScoresDbFileName,JSON.stringify(highscores));
         res.send(JSON.stringify(highscores));
     }
   });

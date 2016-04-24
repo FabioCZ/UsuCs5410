@@ -5,7 +5,7 @@ Project structure:
 ----------------------------------
 I included the whole Visual Studio typescript project (this project builds its own server by default, but I don't use it).
 
-The project front end is written in TypeScript. The transpiled build js files are included for your convenience, so that you don't have to transpile it on your machine.
+The project front end is written in TypeScript. The transpiled js files are included for your convenience, so that you don't have to transpile it on your machine.
 
 |
 ├───HW4_app
@@ -31,6 +31,13 @@ $cd HW4_app
 $node app.js
 
 Point your browser to http://localhost:3000
+
+----------------------------------
+Controls:
+----------------------------------
+Mouse based
+right click to deselect tower/cancel placement
+ESC to return to main menu from game
 
 ----------------------------------
 Credits:

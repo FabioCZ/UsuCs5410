@@ -41,7 +41,7 @@ var Controls = (function () {
                 _this.bindings[_this.recording].ctrl = e.ctrlKey;
                 _this.bindings[_this.recording].alt = e.altKey;
                 _this.bindings[_this.recording].shift = e.shiftKey;
-                _this.bindings[_this.recording].key = String.fromCharCode(e.keyCode);
+                _this.bindings[_this.recording].key = String.fromCharCode(e.keyCode).toLowerCase();
                 console.log("setting to: ", _this.bindings[_this.recording].key);
                 localStorage.setItem("TD.keyBindings", JSON.stringify(_this.bindings));
                 _this.recording = null;
@@ -51,6 +51,7 @@ var Controls = (function () {
         this.removeListeners = function () {
             document.removeEventListener("mousemove", _this.overListener);
             document.removeEventListener("click", _this.clickListener);
+            document.removeEventListener("keydown", _this.keyListener);
         };
         this.ctx = ctx;
         document.addEventListener("mousemove", this.overListener);

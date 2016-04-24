@@ -31,7 +31,7 @@ var Credits = (function () {
         document.addEventListener("click", this.clickListener);
         this.buttons = new Array();
         this.buttons.push(new MenuItem("Created by:", null));
-        this.buttons.push(new MenuItem("Fabio Gottlicher:", null));
+        this.buttons.push(new MenuItem("Fabio Gottlicher", null));
         this.buttons.push(new MenuItem("CS 5410 - Spring 2016", null));
         this.buttons.push(new MenuItem("Back", function () { _this.removeListeners(); Application.CurrScreen = new MainMenu(ctx); }));
         this.buttonSpacing = this.ctx.canvas.clientHeight / (this.buttons.length + 1);

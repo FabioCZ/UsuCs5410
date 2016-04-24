@@ -20,7 +20,7 @@ var Tower = (function () {
         this.upgradeLevel = 1;
         this.angleRad = 0;
         this.targetAngleRad = 0;
-        this.rotSpeed = 0.02;
+        this.rotSpeed = 0.015;
         this.lastAttackTime = -50000;
         switch (name) {
             case Tower.Ground1Name:
@@ -37,8 +37,8 @@ var Tower = (function () {
                 break;
             case Tower.MixedName:
                 this.tFileBaseName = "img/tower/turret-3";
-                this.radius = Game.baseTowerRadius;
-                this.coolDown = 100;
+                this.radius = Game.towerSize * 3.5;
+                this.coolDown = 400;
                 this.cost = 20;
                 break;
             case Tower.AirName:
@@ -159,7 +159,7 @@ var Tower = (function () {
     };
     Tower.prototype.update = function (gs, delta) {
         var turningMode = false;
-        if (Math.abs(this.angleRad - this.targetAngleRad) > 0.5) {
+        if (Math.abs(this.angleRad - this.targetAngleRad) > 0.3) {
             if (this.rotatingCw) {
                 this.angleRad += this.rotSpeed * delta;
             }
@@ -207,7 +207,7 @@ var Tower = (function () {
                 else if (newTargetAngleRad < 0) {
                     newTargetAngleRad += (2 * Math.PI);
                 }
-                if (Math.abs(this.angleRad - newTargetAngleRad) > 0.4) {
+                if (Math.abs(this.angleRad - newTargetAngleRad) > 0.3) {
                     this.targetAngleRad = newTargetAngleRad;
                 }
                 var cwDist;
@@ -228,7 +228,7 @@ var Tower = (function () {
             }
             if (this.lastAttackTime + this.coolDown > gs.ElapsedTime)
                 return;
-            if (Math.abs(this.angleRad - this.targetAngleRad) < 0.4) {
+            if (Math.abs(this.angleRad - this.targetAngleRad) < 0.3) {
                 if (closest.dist < this.radius) {
                     console.log("attack!");
                     var cX = gs._creep[closest.index].x;

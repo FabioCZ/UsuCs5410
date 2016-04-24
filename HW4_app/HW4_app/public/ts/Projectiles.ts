@@ -203,12 +203,6 @@ class GuidedProj implements IProjectile {
         if (this.path == undefined) {   //only recalc path if we need to
             this.path = PathChecker.getGuidedProjPath(Game.xToI(this.currX), Game.yToJ(this.currY), Game.xToI(c.x), Game.yToJ(c.y));
         }
-        var str = "";
-        for (var i = 0; i < this.path.length; i++) {
-            str += "(" + this.path[i].i + ", " + this.path[i].j + ") => ";
-        }
-        console.log(str);
-        console.log("currI", Game.xToI(this.currX), " currI", Game.yToJ(this.currY));
         if (this.path.length > 0) {
             var next = this.path[0];
             if (next.i === Game.xToI(this.currX) + 1) { //next right

@@ -40,7 +40,7 @@ class Tower {
         this.upgradeLevel = 1;
         this.angleRad = 0;
         this.targetAngleRad = 0;
-        this.rotSpeed = 0.02;
+        this.rotSpeed = 0.015;
         this.lastAttackTime = -50000;
         switch (name) {
             case Tower.Ground1Name:
@@ -57,8 +57,8 @@ class Tower {
                 break;
             case Tower.MixedName:
                 this.tFileBaseName = "img/tower/turret-3";
-                this.radius = Game.baseTowerRadius;
-                this.coolDown = 100;
+                this.radius = Game.towerSize * 3.5;
+                this.coolDown = 400;
                 this.cost = 20;
                 break;
             case Tower.AirName:
@@ -157,7 +157,7 @@ class Tower {
 
     public update(gs: Game,delta) {
         var turningMode = false;
-        if (Math.abs(this.angleRad - this.targetAngleRad) > 0.5) {
+        if (Math.abs(this.angleRad - this.targetAngleRad) > 0.3) {
             if (this.rotatingCw) {
                 this.angleRad += this.rotSpeed * delta;
 
@@ -208,7 +208,7 @@ class Tower {
                 } else if (newTargetAngleRad < 0) {
                     newTargetAngleRad += (2 * Math.PI);
                 }
-                if (Math.abs(this.angleRad - newTargetAngleRad) > 0.4) {
+                if (Math.abs(this.angleRad - newTargetAngleRad) > 0.3) {
                     this.targetAngleRad = newTargetAngleRad;
                 }
 
@@ -230,7 +230,7 @@ class Tower {
 
             if (this.lastAttackTime + this.coolDown > gs.ElapsedTime) return;
 
-            if (Math.abs(this.angleRad - this.targetAngleRad) < 0.4) { //if angle is right
+            if (Math.abs(this.angleRad - this.targetAngleRad) < 0.3) { //if angle is right
                 if (closest.dist < this.radius) { //execute attack
                     console.log("attack!");
                     var cX = gs._creep[closest.index].x;

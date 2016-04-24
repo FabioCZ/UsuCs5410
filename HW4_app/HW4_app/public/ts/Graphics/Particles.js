@@ -111,6 +111,8 @@ var Trace = (function () {
     Trace.prototype.draw = function (ctx) {
         for (var i = 0; i < this.particles.length; i++) {
             var size = this.particles[i].size;
+            if (this.color == Colors.Red)
+                size *= 3;
             ctx.fillStyle = this.color;
             ctx.fillRect(this.particles[i].x - size / 2, this.particles[i].y - size / 2, size, size);
         }
@@ -130,7 +132,7 @@ var Particles = (function () {
         if (Particles.explosions == undefined) {
             Particles.explosions = new Array();
         }
-        Particles.explosions.push(new Explosion(time, x, y, Colors.Red, 500));
+        Particles.explosions.push(new Explosion(time, x, y, Colors.Red, 750));
     };
     Particles.addProjExpl = function (time, x, y) {
         if (Particles.explosions == undefined) {
@@ -143,7 +145,7 @@ var Particles = (function () {
         if (Particles.explosions == undefined) {
             Particles.explosions = new Array();
         }
-        Particles.explosions.push(new Explosion(time, x, y, Colors.Pink, 500));
+        Particles.explosions.push(new Explosion(time, x, y, Colors.Pink, 750));
     };
     Particles.addTraceMissile = function (time, x, y) {
         if (Particles.explosions == undefined) {

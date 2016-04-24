@@ -87,6 +87,7 @@ var Game = (function () {
             }
         };
         this.keyListener = function (e) {
+            console.log(e.keyCode);
             if (e.keyCode === 17 || e.keyCode === 18 || e.keyCode === 16)
                 return; //return if just ctrl or just alt
             //upgradeTower
@@ -261,7 +262,7 @@ var Game = (function () {
                 break;
             case 2:
                 FloatingScores.addScore(this._context.canvas.clientWidth / 2, this._context.canvas.clientHeight / 2, "Wave incoming, 1 of 2", this.elapsedTime + 500, true);
-                FloatingScores.addScore(this._context.canvas.clientWidth / 2, this._context.canvas.clientHeight / 2, "Wave incoming, 2 of 2", this.elapsedTime + 30000, true);
+                FloatingScores.addScore(this._context.canvas.clientWidth / 2, this._context.canvas.clientHeight / 2, "Wave incoming, 2 of 2", this.elapsedTime + 20000, true);
                 for (var i = 0; i < 5; i++) {
                     this._creep.push(new Creep(this, true, RandomBetween(this.elapsedTime + 1000, this.elapsedTime + 5000), CType.Land1));
                 }

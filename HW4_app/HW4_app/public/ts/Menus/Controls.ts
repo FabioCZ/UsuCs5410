@@ -73,7 +73,7 @@ class Controls {
             this.bindings[this.recording].ctrl = e.ctrlKey;
             this.bindings[this.recording].alt = e.altKey;
             this.bindings[this.recording].shift = e.shiftKey;
-            this.bindings[this.recording].key = String.fromCharCode(e.keyCode);
+            this.bindings[this.recording].key = String.fromCharCode(e.keyCode).toLowerCase();
             console.log("setting to: ", this.bindings[this.recording].key);
 
             localStorage.setItem("TD.keyBindings", JSON.stringify(this.bindings));
@@ -85,6 +85,7 @@ class Controls {
     public removeListeners = () => {
         document.removeEventListener("mousemove", this.overListener);
         document.removeEventListener("click", this.clickListener);
+        document.removeEventListener("keydown",this.keyListener);
     }
 
     public getCurrBindings() {
