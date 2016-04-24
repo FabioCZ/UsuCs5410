@@ -27,6 +27,23 @@ var HighScore = (function () {
             document.removeEventListener("mousemove", _this.overListener);
             document.removeEventListener("click", _this.clickListener);
         };
+        this.updateScores = function (data) {
+            for (var i = 0; i < 5; i++) {
+                _this.buttons[i + 1].title = (i + 1) + ": " + (data[i] > 0 ? data[i] : "N/A");
+            }
+            _this.draw();
+        };
+        this.GetScores = function (callBack) {
+            $.ajax({
+                url: 'http://localhost:3000/v1/getScores',
+                type: 'GET',
+                error: function () { alert('GET scores failed'); },
+                success: function (data) {
+                    //var res = JSON.parse(data);
+                    callBack(data);
+                }
+            });
+        };
         this.ctx = ctx;
         document.addEventListener("mousemove", this.overListener);
         document.addEventListener("click", this.clickListener);
@@ -39,7 +56,7 @@ var HighScore = (function () {
         this.buttons.push(new MenuItem("5 : N/A", null));
         this.buttons.push(new MenuItem("Back", function () { _this.removeListeners(); Application.CurrScreen = new MainMenu(ctx); }));
         this.buttonSpacing = this.ctx.canvas.clientHeight / (this.buttons.length + 1);
-        HighScore.GetScores(this.updateScores);
+        this.GetScores(this.updateScores);
     }
     HighScore.prototype.draw = function () {
         drawBk(this.ctx);
@@ -51,30 +68,13 @@ var HighScore = (function () {
             this.ctx.fillText(this.buttons[i].title, this.ctx.canvas.clientWidth / 2, this.buttonSpacing * (i + 1));
         }
     };
-    HighScore.prototype.updateScores = function (data) {
-        for (var i = 0; i < 5; i++) {
-            this.buttons[i + 1].title = (i + 1) + ": " + (data[i] > 0 ? data[i] : "N/A");
-        }
-        this.draw();
-    };
     HighScore.InsertScore = function (score) {
         $.ajax({
-            url: 'http://localhost:3000/v1/score/' + score,
+            url: 'http://localhost:3000/v1/addScore/' + score,
             type: 'POST',
             error: function () { alert('POST failed. Are you pointing to the right IP?'); },
             success: function () {
                 console.log("Score " + score + " successfully added");
-            }
-        });
-    };
-    HighScore.GetScores = function (callBack) {
-        $.ajax({
-            url: 'http://localhost:3000/v1/getScores',
-            type: 'GET',
-            error: function () { alert('GET scores failed'); },
-            success: function (data) {
-                var res = JSON.parse(data);
-                callBack(res);
             }
         });
     };

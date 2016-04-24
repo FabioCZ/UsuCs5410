@@ -27,7 +27,8 @@
     <Content Include="web.config" />
   </ItemGroup>
   <ItemGroup>
-    <TypeScriptCompile Include="public\ts\App.ts" />
+    <TypeScriptCompile Include="public\ts\Application.ts" />
+    <TypeScriptCompile Include="public\ts\Graphics\FloatingScores.ts" />
     <TypeScriptCompile Include="public\ts\Graphics\Particles.ts" />
     <TypeScriptCompile Include="public\ts\Menus\Controls.ts" />
     <TypeScriptCompile Include="public\ts\Menus\Credits.ts" />

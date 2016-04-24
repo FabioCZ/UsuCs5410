@@ -25,12 +25,13 @@
     public hasStarted: boolean;
     public continue: boolean;
     public levelNum: number;
-    private _money: number;
+    public _money: number;
     private _livesLeft: number;
-    private _score: number;
+    public _score: number;
     private _activeTowers: Tower[];
     private _wallTowers: Tower[];
     public _creep: Creep[];
+    public _projectiles: IProjectile[];
 
     static newTowerPlaced: boolean;
     static canvasWidth: number;
@@ -74,6 +75,7 @@
         this.initBorder();
         PathChecker.resetCreepPaths();
         this._creep = [];
+        this._projectiles = [];
         this.levelNum = levelNum;
         this.hasStarted = false;
         this.continue = true;
@@ -95,7 +97,7 @@
         switch (this.levelNum) {
             case 1:
                 for (var i = 0; i < 1; i++) {
-                    this._creep.push(new Creep(this, true, RandomBetween(this.elapsedTime + 1000, this.elapsedTime + 10000), CType.Land1));
+                    this._creep.push(new Creep(this, true, RandomBetween(this.elapsedTime + 500, this.elapsedTime + 1000), CType.Land1));
                 }
                 for (var i = 0; i < 5; i++) {
                     //this._creep.push(new Creep(this, true, RandomBetween(this.elapsedTime + 1000, this.elapsedTime + 10000), CType.Land2));
@@ -241,7 +243,8 @@
         if (e.ctrlKey === this.bindings[2].ctrl && e.altKey === this.bindings[2].alt && e.shiftKey === this.bindings[2].shift && String.fromCharCode(e.keyCode) === this.bindings[2].key) {
             this.startLevel();
         }
-        if (String.fromCharCode(e.keyCode) === "ESC") {
+        if (e.keyCode == 27) {
+            this.continue = false;
             this.removeListeners();
             Application.CurrScreen = new MainMenu(this._context);
         }
@@ -279,16 +282,16 @@
         this.elapsedTime = time - this.startTime - this.pausedTime;
         var delta = this.elapsedTime - prev;
         this.update(delta);
-        this.draw(delta);
-        if(this.continue)
+        if (this.continue) {
+            this.draw(delta);
             requestAnimationFrame(this.loop);
+        }
     }
 
     public update = (delta: number) => {
         //TODO shooting!
 
         //Update creep position
-        console.log('cs', this._creep.length);
         for (var i = 0; i < this._creep.length; i++) {
             this._livesLeft -= this._creep[i].update(this, delta); //creep update returns 1 if a _creep has made it
             if (this._livesLeft <= 0) {
@@ -298,14 +301,27 @@
         for (var i = 0; i < this._activeTowers.length; i++) {
             this._activeTowers[i].update(this);
         }
+        for (var i = 0; i < this._projectiles.length; i++) {
+            if (this._projectiles[i].update(this, delta)) {
+                this._projectiles.splice(i, 1);
+                i = i === this._projectiles.length ? i : i - 1;
+            }
+        }
         Game.newTowerPlaced = false;
         this.checkWinLose();
+        Particles.updateAll(this.elapsedTime);
     }
 
     public checkWinLose() {
         if (!this.hasStarted) return;
         if (this._livesLeft <= 0) {
-            //TODO game over
+            this.continue = false;
+            HighScore.InsertScore(this._score);
+            var fontSize = this._context.canvas.clientWidth / 30;
+            this._context.font = fontSize + "px GoodTimes";
+            this._context.textAlign = "center";
+            this._context.fillStyle = Colors.Black;
+            this._context.fillText("Game Over. Press ESC to return to main menu", this._context.canvas.clientWidth / 2, this._context.canvas.clientHeight / 2, this._context.canvas.clientWidth * 0.8);
         }
         var done = true;
         for (var i = 0; i < this.Creep.length; i++) {
@@ -316,6 +332,7 @@
         if (done) {
             this.continue = false;
             if (this.levelNum === 5) {
+                HighScore.InsertScore(this._score);
                 //TODO done
             } else {
                 this.removeListeners();
@@ -328,6 +345,8 @@
         this._context["clear"]();
         this.gameGraphics.draw(this, delta);
         this.gameHud.draw(this, this._context);
+        Particles.drawAll(this._context);
+        FloatingScores.updateAndDraw(this._context, this.elapsedTime);
     }
 }
 

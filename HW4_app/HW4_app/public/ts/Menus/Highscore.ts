@@ -18,7 +18,7 @@ class HighScore {
         this.buttons.push(new MenuItem("5 : N/A", null));
         this.buttons.push(new MenuItem("Back", () => { this.removeListeners(); Application.CurrScreen = new MainMenu(ctx);}));
         this.buttonSpacing = this.ctx.canvas.clientHeight / (this.buttons.length + 1);
-        HighScore.GetScores(this.updateScores);
+        this.GetScores(this.updateScores);
     }
 
     public overListener = (e: MouseEvent) => {
@@ -59,7 +59,7 @@ class HighScore {
         }
     }
 
-    public updateScores(data) {
+    public updateScores = (data)=> {
         for (var i = 0; i < 5; i++) {
             this.buttons[i + 1].title = (i + 1) + ": " + (data[i] > 0 ? data[i] : "N/A");
         }
@@ -67,7 +67,7 @@ class HighScore {
     }
     public static InsertScore = (score : number) =>{
         $.ajax({
-            url: 'http://localhost:3000/v1/score/' + score,
+            url: 'http://localhost:3000/v1/addScore/' + score,
             type: 'POST',
             error: function () { alert('POST failed. Are you pointing to the right IP?'); },
             success: function () {
@@ -76,14 +76,14 @@ class HighScore {
         });
     }
 
-    public static GetScores = (callBack: Function) => {
+    public GetScores = (callBack: Function) => {
         $.ajax({
             url: 'http://localhost:3000/v1/getScores',
             type: 'GET',
             error: function() { alert('GET scores failed'); },
             success: function(data) {
-                var res = JSON.parse(data);
-                callBack(res);
+                //var res = JSON.parse(data);
+                callBack(data);
             }
         });
     }

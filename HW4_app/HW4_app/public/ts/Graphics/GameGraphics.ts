@@ -35,6 +35,7 @@ class GameGraphics {
         this.drawTowers();
         this.drawWalls();
         this.drawCreep();
+        this.drawProjectiles();
     }
 
     drawBackground() {
@@ -73,8 +74,12 @@ class GameGraphics {
         }
     }
 
-    drawStartPrompt() {
-        
+
+
+    drawProjectiles() {
+        for (var i = 0; i < this.game._projectiles.length; i++) {
+            this.game._projectiles[i].draw(this.ctx);
+        }
     }
 
 

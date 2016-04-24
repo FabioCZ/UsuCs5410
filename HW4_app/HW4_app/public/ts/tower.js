@@ -20,33 +20,32 @@ var Tower = (function () {
         this.upgradeLevel = 1;
         this.angleRad = 0;
         this.targetAngleRad = 0;
-        this.rotSpeed = 0.1; //TODO
+        this.rotSpeed = 0.2;
         this.lastAttackTime = -50000;
         switch (name) {
             case Tower.Ground1Name:
                 this.tFileBaseName = "img/tower/turret-2";
-                this.radius = Game.baseTowerRadius;
+                this.radius = Game.towerSize * 2.5;
                 this.cost = 10;
-                this.coolDown = 1500;
+                this.coolDown = 500;
                 break;
             case Tower.Ground2Name:
                 this.tFileBaseName = "img/tower/turret-1";
                 this.radius = Game.towerSize * 1.5;
                 this.coolDown = 0;
                 this.cost = 15;
-                this.attack = 2;
                 break;
             case Tower.MixedName:
                 this.tFileBaseName = "img/tower/turret-3";
                 this.radius = Game.baseTowerRadius;
-                this.coolDown = 1500;
+                this.coolDown = 500;
                 this.cost = 20;
                 break;
             case Tower.AirName:
                 this.cost = 15;
                 this.radius = Game.baseTowerRadius * 2;
                 this.tFileBaseName = "img/tower/turret-7";
-                this.coolDown = 1500;
+                this.coolDown = 500;
                 break;
             case Tower.WallName:
                 this.radius = 0;
@@ -96,9 +95,10 @@ var Tower = (function () {
         if (this.upgradeLevel === 3)
             return;
         this.upgradeLevel++;
+        this.radius *= 1.5;
+        this.coolDown *= 0.75;
         console.log("tower upgraded to level ", this.upgradeLevel);
         this.setTurretImage();
-        this.attack *= 4 / 3;
     };
     Tower.prototype.setCoords = function (x, y) {
         this.x = x;
@@ -151,10 +151,20 @@ var Tower = (function () {
         return new Tower(name, x, y);
     };
     Tower.prototype.update = function (gs) {
-        if (Math.abs(this.angleRad - this.targetAngleRad) > 0.05) {
+        var turningMode = false;
+        if (Math.abs(this.angleRad - this.targetAngleRad) > 0.3) {
+            if (this.rotatingCw) {
+                this.angleRad += this.rotSpeed;
+            }
+            else {
+                this.angleRad -= this.rotSpeed;
+            }
+            this.angleRad = this.angleRad % (2 * Math.PI);
+            if (this.angleRad < 0) {
+                this.angleRad += Math.PI * 2;
+            }
+            turningMode = true;
         }
-        if (this.lastAttackTime + this.coolDown > gs.ElapsedTime)
-            return;
         var closest = { index: -1, dist: 500000 };
         var tCX = this.x + Game.towerSize / 2;
         var tCY = this.y + Game.towerSize / 2;
@@ -168,20 +178,49 @@ var Tower = (function () {
                 closest = { index: i, dist: dist };
             }
             if (this.name === Tower.Ground2Name && dist < this.radius) {
-                gs._creep[i].slow(this.attack, gs.ElapsedTime);
+                gs._creep[i].slow(this.upgradeLevel + 1, gs.ElapsedTime);
                 return;
             }
         }
         //commit rotation
         if (closest.index !== -1) {
-            var x2 = gs._creep[closest.index].x + Game.towerSize / 2;
-            var y2 = gs._creep[closest.index].y + Game.towerSize / 2;
-            this.targetAngleRad = Math.acos((y2 - tCY) / (Math.sqrt((x2 - tCX) * (x2 - tCX) + (y2 - tCY) * (y2 - tCY))));
-            //console.log("target", this.targetAngleRad);
-            if (Math.abs(this.angleRad - this.targetAngleRad) < 0.05) {
+            if (!turningMode) {
+                var x2 = gs._creep[closest.index].x + Game.towerSize / 2;
+                var y2 = gs._creep[closest.index].y + Game.towerSize / 2;
+                this.targetAngleRad = Math.atan2((y2 - tCY), (x2 - tCX));
+                this.targetAngleRad += Math.PI / 2;
+                if (this.targetAngleRad > 2 * Math.PI) {
+                    this.targetAngleRad -= (2 * Math.PI);
+                }
+                else if (this.targetAngleRad < 0) {
+                    this.targetAngleRad += (2 * Math.PI);
+                }
+                var cwDist;
+                if (this.targetAngleRad < this.angleRad) {
+                    cwDist = 2 * Math.PI - this.targetAngleRad + this.angleRad;
+                }
+                else {
+                    cwDist = this.angleRad - this.targetAngleRad;
+                }
+                var ccwDist;
+                if (this.targetAngleRad > this.angleRad) {
+                    ccwDist = 2 * Math.PI - this.targetAngleRad + this.angleRad;
+                }
+                else {
+                    ccwDist = this.angleRad = this.targetAngleRad;
+                }
+                this.rotatingCw = cwDist < ccwDist;
+            }
+            if (this.lastAttackTime + this.coolDown > gs.ElapsedTime)
+                return;
+            if (Math.abs(this.angleRad - this.targetAngleRad) < 0.5) {
                 if (dist < this.radius) {
+                    console.log("attack!");
+                    var cX = gs._creep[closest.index].x;
+                    var cY = gs._creep[closest.index].y;
                     switch (this.name) {
                         case Tower.Ground1Name:
+                            gs._projectiles.push(new Bomb(this.upgradeLevel, tCX, tCY, cX, cY));
                             break;
                         case Tower.Ground2Name:
                             //nothing here

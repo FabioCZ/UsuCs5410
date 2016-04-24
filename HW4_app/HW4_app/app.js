@@ -10,11 +10,11 @@ var highScoresDbFileName = "data/highscores.txt";
 router.get('/getScores', function(req, res){  
     if(fs.existsSync(highScoresDbFileName)){
       var f = fs.readFileSync(highScoresDbFileName,'utf8');
-      res.json(JSON.parse(f));
+      res.send(f);
     } else {
         var highscores = [-1, -1, -1, -1, -1];
         fs.writeFileSync(highScoresDbFileName,JSON.stringify(highScores));
-        res.json(JSON.stringify(highscores));
+        res.send(JSON.stringify(highscores));
     }
   });
 
@@ -43,7 +43,7 @@ router.post('/addScore/:score', function(req, res){
       return b - a;
   });
   fs.writeFileSync(highScoresDbFileName,JSON.stringify(highScores));
-  res.json("success");
+  res.send("success");
 })
 
 app.use(express.static('public'));

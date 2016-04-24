@@ -102,7 +102,8 @@ var Game = (function () {
             if (e.ctrlKey === _this.bindings[2].ctrl && e.altKey === _this.bindings[2].alt && e.shiftKey === _this.bindings[2].shift && String.fromCharCode(e.keyCode) === _this.bindings[2].key) {
                 _this.startLevel();
             }
-            if (String.fromCharCode(e.keyCode) === "ESC") {
+            if (e.keyCode == 27) {
+                _this.continue = false;
                 _this.removeListeners();
                 Application.CurrScreen = new MainMenu(_this._context);
             }
@@ -112,14 +113,14 @@ var Game = (function () {
             _this.elapsedTime = time - _this.startTime - _this.pausedTime;
             var delta = _this.elapsedTime - prev;
             _this.update(delta);
-            _this.draw(delta);
-            if (_this.continue)
+            if (_this.continue) {
+                _this.draw(delta);
                 requestAnimationFrame(_this.loop);
+            }
         };
         this.update = function (delta) {
             //TODO shooting!
             //Update creep position
-            console.log('cs', _this._creep.length);
             for (var i = 0; i < _this._creep.length; i++) {
                 _this._livesLeft -= _this._creep[i].update(_this, delta); //creep update returns 1 if a _creep has made it
                 if (_this._livesLeft <= 0) {
@@ -129,13 +130,22 @@ var Game = (function () {
             for (var i = 0; i < _this._activeTowers.length; i++) {
                 _this._activeTowers[i].update(_this);
             }
+            for (var i = 0; i < _this._projectiles.length; i++) {
+                if (_this._projectiles[i].update(_this, delta)) {
+                    _this._projectiles.splice(i, 1);
+                    i = i === _this._projectiles.length ? i : i - 1;
+                }
+            }
             Game.newTowerPlaced = false;
             _this.checkWinLose();
+            Particles.updateAll(_this.elapsedTime);
         };
         this.draw = function (delta) {
             _this._context["clear"]();
             _this.gameGraphics.draw(_this, delta);
             _this.gameHud.draw(_this, _this._context);
+            Particles.drawAll(_this._context);
+            FloatingScores.updateAndDraw(_this._context, _this.elapsedTime);
         };
         this.startTime = startTime;
         this.pausedTime = 0;
@@ -163,6 +173,7 @@ var Game = (function () {
         this.initBorder();
         PathChecker.resetCreepPaths();
         this._creep = [];
+        this._projectiles = [];
         this.levelNum = levelNum;
         this.hasStarted = false;
         this.continue = true;
@@ -227,7 +238,7 @@ var Game = (function () {
         switch (this.levelNum) {
             case 1:
                 for (var i = 0; i < 1; i++) {
-                    this._creep.push(new Creep(this, true, RandomBetween(this.elapsedTime + 1000, this.elapsedTime + 10000), CType.Land1));
+                    this._creep.push(new Creep(this, true, RandomBetween(this.elapsedTime + 500, this.elapsedTime + 1000), CType.Land1));
                 }
                 for (var i = 0; i < 5; i++) {
                 }
@@ -299,6 +310,13 @@ var Game = (function () {
         if (!this.hasStarted)
             return;
         if (this._livesLeft <= 0) {
+            this.continue = false;
+            HighScore.InsertScore(this._score);
+            var fontSize = this._context.canvas.clientWidth / 30;
+            this._context.font = fontSize + "px GoodTimes";
+            this._context.textAlign = "center";
+            this._context.fillStyle = Colors.Black;
+            this._context.fillText("Game Over. Press ESC to return to main menu", this._context.canvas.clientWidth / 2, this._context.canvas.clientHeight / 2, this._context.canvas.clientWidth * 0.8);
         }
         var done = true;
         for (var i = 0; i < this.Creep.length; i++) {
@@ -309,6 +327,7 @@ var Game = (function () {
         if (done) {
             this.continue = false;
             if (this.levelNum === 5) {
+                HighScore.InsertScore(this._score);
             }
             else {
                 this.removeListeners();

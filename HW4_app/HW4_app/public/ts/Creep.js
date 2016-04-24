@@ -44,7 +44,7 @@ var Creep = (function () {
                 this.sprite = new Sprite("img/bat.png", 128);
                 var i = Game.xToI(this.x);
                 var j = Game.yToJ(this.y);
-                this.path = isHorizontalPath ? PathChecker.AirPathsHor[i][j] : PathChecker.AirPathsVer[i][j];
+                this.path = !isHorizontalPath ? PathChecker.AirPathsHor[i][j] : PathChecker.AirPathsVer[i][j];
                 this.hp = 40;
                 break;
             case CType.Land1:
@@ -69,10 +69,16 @@ var Creep = (function () {
         configurable: true
     });
     ;
-    Creep.prototype.hit = function (damage) {
+    Creep.prototype.hit = function (damage, gs) {
+        if (this.hp < 0)
+            return;
         this.hp -= damage;
         if (this.hp < 0) {
             this.state = CreepState.Dead;
+            gs._money += ~~(this.maxHp / 10);
+            gs._score += ~~(this.maxHp / 5);
+            this.x = -2;
+            this.y = -2;
         }
     };
     Creep.prototype.slow = function (ratio, currTime) {
@@ -156,7 +162,7 @@ var Creep = (function () {
             ctx.fillStyle = Colors.LtGreen;
             ctx.fillRect(this.x, this.y - Game.towerSize / 10, this.RatioHpLeft * Game.towerSize, Game.towerSize / 10);
             ctx.fillStyle = Colors.Red;
-            ctx.fillRect(this.RatioHpLeft, this.y - Game.towerSize / 10, (1 - this.RatioHpLeft) * Game.towerSize, Game.towerSize / 10);
+            ctx.fillRect(this.x + Game.towerSize - +(1 - this.RatioHpLeft) * Game.towerSize, this.y - Game.towerSize / 10, (1 - this.RatioHpLeft) * Game.towerSize, Game.towerSize / 10);
         }
     };
     return Creep;

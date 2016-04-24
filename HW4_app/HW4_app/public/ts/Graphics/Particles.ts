@@ -87,7 +87,7 @@ class Particles {
     }
 
     public static updateAll(time) {
-
+        if (Particles.explosions == undefined) return;
         for (var i = 0; i < Particles.explosions.length; i++) {
             if (Particles.explosions[i].endTime < time) {
                 Particles.explosions.splice(i, 1);
@@ -98,7 +98,8 @@ class Particles {
         }
     }
 
-    public static draw(ctx: CanvasRenderingContext2D) {
+    public static drawAll(ctx: CanvasRenderingContext2D) {
+        if (Particles.explosions == undefined) return;
         for (var i = 0; i < Particles.explosions.length; i++) {
             Particles.explosions[i].draw(ctx);
         }

@@ -68,6 +68,8 @@ var Particles = (function () {
         Particles.explosions.push(new Explosion(time, x, y));
     };
     Particles.updateAll = function (time) {
+        if (Particles.explosions == undefined)
+            return;
         for (var i = 0; i < Particles.explosions.length; i++) {
             if (Particles.explosions[i].endTime < time) {
                 Particles.explosions.splice(i, 1);
@@ -78,7 +80,9 @@ var Particles = (function () {
             }
         }
     };
-    Particles.draw = function (ctx) {
+    Particles.drawAll = function (ctx) {
+        if (Particles.explosions == undefined)
+            return;
         for (var i = 0; i < Particles.explosions.length; i++) {
             Particles.explosions[i].draw(ctx);
         }

@@ -65,6 +65,7 @@ var GameGraphics = (function () {
         this.drawTowers();
         this.drawWalls();
         this.drawCreep();
+        this.drawProjectiles();
     };
     GameGraphics.prototype.drawBackground = function () {
         this.ctx.save();
@@ -98,7 +99,10 @@ var GameGraphics = (function () {
             this.game.Creep[i].draw(this.ctx, this.delta);
         }
     };
-    GameGraphics.prototype.drawStartPrompt = function () {
+    GameGraphics.prototype.drawProjectiles = function () {
+        for (var i = 0; i < this.game._projectiles.length; i++) {
+            this.game._projectiles[i].draw(this.ctx);
+        }
     };
     return GameGraphics;
 }());
