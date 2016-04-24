@@ -85,6 +85,7 @@
         this._money = gameData['money'];
         this._livesLeft = gameData['lives'];
         this._score = gameData['score'];
+        this.elapsedTime = gameData['elTime'];
         if(gameData['towers'] != null)
             this._activeTowers = gameData['towers'];
 
@@ -99,8 +100,8 @@
                 for (var i = 0; i < 1; i++) {
                     this._creep.push(new Creep(this, true, RandomBetween(this.elapsedTime + 500, this.elapsedTime + 1000), CType.Land1));
                 }
-                for (var i = 0; i < 5; i++) {
-                    //this._creep.push(new Creep(this, true, RandomBetween(this.elapsedTime + 1000, this.elapsedTime + 10000), CType.Land2));
+                for (var i = 0; i < 1; i++) {
+                    this._creep.push(new Creep(this, true, RandomBetween(this.elapsedTime + 1000, this.elapsedTime + 10000), CType.Land2));
                 }
                 break;
             case 2:
@@ -151,7 +152,7 @@
         var y = e.clientY - document.getElementById("canvas-main").getBoundingClientRect().top;
         if (y < Game.hudHeight) { //HUD click
             //console.log("hud click");
-            var r = this.gameHud.handleClick(x, y);
+            var r = this.gameHud.handleClick(x, y,this);
             if (r == null) return;
             if (r['start']) {
                 this.startLevel();
@@ -229,7 +230,7 @@
         //upgradeTower
         if (e.ctrlKey === this.bindings[0].ctrl && e.altKey === this.bindings[0].alt && e.shiftKey === this.bindings[0].shift && String.fromCharCode(e.keyCode) === this.bindings[0].key) {
             if (this.selectedTowerIndex > -1) {
-                this._activeTowers[this.selectedTowerIndex].upgrade();
+                this._activeTowers[this.selectedTowerIndex].upgrade(this);
             }
         }
         //sellTower
@@ -336,7 +337,7 @@
                 //TODO done
             } else {
                 this.removeListeners();
-                Application.CurrScreen = new Game(performance.now(), this._context, ++this.levelNum, { towers: this._activeTowers, money: this._money, lives: this._livesLeft, score: this._score});
+                Application.CurrScreen = new Game(this.startTime, this._context, ++this.levelNum, { towers: this._activeTowers, money: this._money, lives: this._livesLeft, score: this._score, elTime:this.elapsedTime});
             }
         }
     }
@@ -346,7 +347,7 @@
         this.gameGraphics.draw(this, delta);
         this.gameHud.draw(this, this._context);
         Particles.drawAll(this._context);
-        FloatingScores.updateAndDraw(this._context, this.elapsedTime);
+        FloatingScores.updateAndDraw(this._context, this.ElapsedTime);
     }
 }
 

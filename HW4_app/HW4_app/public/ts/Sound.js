@@ -8,6 +8,7 @@ var Sound = (function () {
         Sound.Buy = new Audio('sound/buy.wav');
         Sound.No = new Audio('sound/no.mp3');
         Sound.Death = new Audio('sound/death.ogg');
+        Sound.Death.volume = 0.5;
         Sound.Music = new Audio('sound/music.mp3');
         Sound.Music.addEventListener('ended', function () {
             this.currentTime = 0;

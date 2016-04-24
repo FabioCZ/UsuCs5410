@@ -82,10 +82,16 @@ class Tower {
         this.turretImg.src = name;
     }
 
-    public upgrade() {
+    public upgrade(gs:Game) {
         if (this.upgradeLevel === 3) return;
+        if (gs._money < ~~(this.cost / 3)) {
+            Sound.No.play();
+            return;
+        }
+        gs._money -= ~~(this.cost / 3);
+        Sound.Buy.play();
         this.upgradeLevel++;
-        this.radius *= 1.5;
+        this.radius *= 1.25;
         this.coolDown *= 0.75;
         console.log("tower upgraded to level ", this.upgradeLevel);
         this.setTurretImage();
@@ -186,7 +192,10 @@ class Tower {
 
         //commit rotation
         if (closest.index !== -1) {
-            if (!turningMode) {
+            if (!turningMode && 
+                (((this.name == Tower.MixedName || this.name == Tower.AirName) && gs._creep[closest.index].type === CType.Air) ||
+                ((this.name == Tower.MixedName || this.name == Tower.Ground1Name) && (gs._creep[closest.index].type === CType.Land1 || gs._creep[closest.index].type === CType.Land2 || gs._creep[closest.index].type === CType.Land3)))) {
+                
                 var x2 = gs._creep[closest.index].x + Game.towerSize / 2;
                 var y2 = gs._creep[closest.index].y + Game.towerSize / 2;
 
@@ -212,31 +221,38 @@ class Tower {
                     ccwDist = this.angleRad = this.targetAngleRad;
                 }
                 this.rotatingCw = cwDist < ccwDist;
+                
             }
 
             if (this.lastAttackTime + this.coolDown > gs.ElapsedTime) return;
 
-            if (Math.abs(this.angleRad - this.targetAngleRad) < 0.5) { //if angle is right
+            if (Math.abs(this.angleRad - this.targetAngleRad) < 0.6) { //if angle is right
                 if (dist < this.radius) { //execute attack
                     console.log("attack!");
                     var cX = gs._creep[closest.index].x;
                     var cY = gs._creep[closest.index].y;
                     switch (this.name) {
                         case Tower.Ground1Name:
+                            Sound.Fire.play();
                             gs._projectiles.push(new Bomb(this.upgradeLevel, tCX, tCY, cX, cY));
                             break;
                         case Tower.Ground2Name:
                             //nothing here
                             break;
                         case Tower.MixedName:
+                            Sound.Fire.play();
+                            gs._projectiles.push(new MixedProj(this.upgradeLevel, tCX, tCY, cX, cY));
                             break;
                         case Tower.AirName:
+                            Sound.Fire.play();
+                            var pr = new GuidedProj(this.upgradeLevel, tCX, tCY, cX, cY);
+                            pr.setCreepIndex(closest.index);
                             break;
                     }
                 }
+               this.lastAttackTime = gs.ElapsedTime;
             }
 
-            this.lastAttackTime = gs.ElapsedTime;
         }
 
     }

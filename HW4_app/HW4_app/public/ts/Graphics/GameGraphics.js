@@ -46,6 +46,11 @@ var Colors = (function () {
         enumerable: true,
         configurable: true
     });
+    Object.defineProperty(Colors, "Orage", {
+        get: function () { return "#FFA90A"; },
+        enumerable: true,
+        configurable: true
+    });
     return Colors;
 }());
 var GameGraphics = (function () {

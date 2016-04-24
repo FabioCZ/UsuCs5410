@@ -7,7 +7,7 @@ var Game = (function () {
             var y = e.clientY - document.getElementById("canvas-main").getBoundingClientRect().top;
             if (y < Game.hudHeight) {
                 //console.log("hud click");
-                var r = _this.gameHud.handleClick(x, y);
+                var r = _this.gameHud.handleClick(x, y, _this);
                 if (r == null)
                     return;
                 if (r['start']) {
@@ -88,7 +88,7 @@ var Game = (function () {
             //upgradeTower
             if (e.ctrlKey === _this.bindings[0].ctrl && e.altKey === _this.bindings[0].alt && e.shiftKey === _this.bindings[0].shift && String.fromCharCode(e.keyCode) === _this.bindings[0].key) {
                 if (_this.selectedTowerIndex > -1) {
-                    _this._activeTowers[_this.selectedTowerIndex].upgrade();
+                    _this._activeTowers[_this.selectedTowerIndex].upgrade(_this);
                 }
             }
             //sellTower
@@ -145,7 +145,7 @@ var Game = (function () {
             _this.gameGraphics.draw(_this, delta);
             _this.gameHud.draw(_this, _this._context);
             Particles.drawAll(_this._context);
-            FloatingScores.updateAndDraw(_this._context, _this.elapsedTime);
+            FloatingScores.updateAndDraw(_this._context, _this.ElapsedTime);
         };
         this.startTime = startTime;
         this.pausedTime = 0;
@@ -182,6 +182,7 @@ var Game = (function () {
         this._money = gameData['money'];
         this._livesLeft = gameData['lives'];
         this._score = gameData['score'];
+        this.elapsedTime = gameData['elTime'];
         if (gameData['towers'] != null)
             this._activeTowers = gameData['towers'];
         this.loop(performance.now());
@@ -240,7 +241,8 @@ var Game = (function () {
                 for (var i = 0; i < 1; i++) {
                     this._creep.push(new Creep(this, true, RandomBetween(this.elapsedTime + 500, this.elapsedTime + 1000), CType.Land1));
                 }
-                for (var i = 0; i < 5; i++) {
+                for (var i = 0; i < 1; i++) {
+                    this._creep.push(new Creep(this, true, RandomBetween(this.elapsedTime + 1000, this.elapsedTime + 10000), CType.Land2));
                 }
                 break;
             case 2:
@@ -331,7 +333,7 @@ var Game = (function () {
             }
             else {
                 this.removeListeners();
-                Application.CurrScreen = new Game(performance.now(), this._context, ++this.levelNum, { towers: this._activeTowers, money: this._money, lives: this._livesLeft, score: this._score });
+                Application.CurrScreen = new Game(this.startTime, this._context, ++this.levelNum, { towers: this._activeTowers, money: this._money, lives: this._livesLeft, score: this._score, elTime: this.elapsedTime });
             }
         }
     };

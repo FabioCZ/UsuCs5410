@@ -8,9 +8,10 @@
     particles: any;
     lastStamp: number;
     duration: number;
-
-    constructor(time, x, y) {
-        this.duration = 1500;
+    color;
+    constructor(time, x, y, color,duration) {
+        this.color = color;
+        this.duration = duration;
         this.centerX = x;
         this.centerY = y;
         this.startTime = time;
@@ -29,11 +30,11 @@
 
     private createParticle (t) {
         var that2 = {
-            size: gaussianWithMidPoint(this.h / 20),
+            size: gaussianWithMidPoint(Game.towerSize / 35),
             x: this.centerX,
             y: this.centerY,
             direction: direction(),
-            speed: gaussianWithMidPoint(2.0),
+            speed: gaussianWithMidPoint(1),
             rotation: 0,
             start: t,
             duration: gaussianWithMidPoint(this.endTime - t)
@@ -71,6 +72,7 @@
     public draw(ctx: CanvasRenderingContext2D) {
         for (var i = 0; i < this.particles.length; i++) {
             var size = this.particles[i].size;
+            ctx.fillStyle = this.color;
             ctx.fillRect(this.particles[i].x - size / 2, this.particles[i].y - size / 2, size, size);
         }
     }
@@ -78,12 +80,40 @@
 
 }
 class Particles {
-    static explosions : Array<Explosion>;
+    static explosions: Array<Explosion>;
+
     public static addExplosion(time, x, y) {
         if (Particles.explosions == undefined) {
             Particles.explosions = new Array<Explosion>();
         }
-        Particles.explosions.push(new Explosion(time, x, y));
+        Particles.explosions.push(new Explosion(time, x, y,Colors.Black,500));
+    }
+
+    public static addCreepExpl(time, x, y) {
+        if (Particles.explosions == undefined) {
+            Particles.explosions = new Array<Explosion>();
+        }
+        Particles.explosions.push(new Explosion(time, x, y,Colors.Red,500));
+    }
+
+    public static addProjExpl(time, x, y) {
+        if (Particles.explosions == undefined) {
+            Particles.explosions = new Array<Explosion>();
+        }
+        Particles.explosions.push(new Explosion(time, x, y, Colors.Yellow, 750));
+        Particles.explosions.push(new Explosion(time, x, y, Colors.Orage, 750));
+
+    }
+
+    public static addTowerSold(time, x, y) {
+        
+    }
+
+    public static addTrace(time, x, y) {
+        if (Particles.explosions == undefined) {
+            Particles.explosions = new Array<Explosion>();
+        }
+        Particles.explosions.push(new Explosion(time, x, y, Colors.Grey, 150)); 
     }
 
     public static updateAll(time) {

@@ -1,6 +1,7 @@
 var Explosion = (function () {
-    function Explosion(time, x, y) {
-        this.duration = 1500;
+    function Explosion(time, x, y, color, duration) {
+        this.color = color;
+        this.duration = duration;
         this.centerX = x;
         this.centerY = y;
         this.startTime = time;
@@ -17,11 +18,11 @@ var Explosion = (function () {
     }
     Explosion.prototype.createParticle = function (t) {
         var that2 = {
-            size: gaussianWithMidPoint(this.h / 20),
+            size: gaussianWithMidPoint(Game.towerSize / 35),
             x: this.centerX,
             y: this.centerY,
             direction: direction(),
-            speed: gaussianWithMidPoint(2.0),
+            speed: gaussianWithMidPoint(1),
             rotation: 0,
             start: t,
             duration: gaussianWithMidPoint(this.endTime - t)
@@ -53,6 +54,7 @@ var Explosion = (function () {
     Explosion.prototype.draw = function (ctx) {
         for (var i = 0; i < this.particles.length; i++) {
             var size = this.particles[i].size;
+            ctx.fillStyle = this.color;
             ctx.fillRect(this.particles[i].x - size / 2, this.particles[i].y - size / 2, size, size);
         }
     };
@@ -65,7 +67,28 @@ var Particles = (function () {
         if (Particles.explosions == undefined) {
             Particles.explosions = new Array();
         }
-        Particles.explosions.push(new Explosion(time, x, y));
+        Particles.explosions.push(new Explosion(time, x, y, Colors.Black, 500));
+    };
+    Particles.addCreepExpl = function (time, x, y) {
+        if (Particles.explosions == undefined) {
+            Particles.explosions = new Array();
+        }
+        Particles.explosions.push(new Explosion(time, x, y, Colors.Red, 500));
+    };
+    Particles.addProjExpl = function (time, x, y) {
+        if (Particles.explosions == undefined) {
+            Particles.explosions = new Array();
+        }
+        Particles.explosions.push(new Explosion(time, x, y, Colors.Yellow, 750));
+        Particles.explosions.push(new Explosion(time, x, y, Colors.Orage, 750));
+    };
+    Particles.addTowerSold = function (time, x, y) {
+    };
+    Particles.addTrace = function (time, x, y) {
+        if (Particles.explosions == undefined) {
+            Particles.explosions = new Array();
+        }
+        Particles.explosions.push(new Explosion(time, x, y, Colors.Grey, 150));
     };
     Particles.updateAll = function (time) {
         if (Particles.explosions == undefined)

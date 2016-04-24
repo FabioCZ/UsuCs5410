@@ -12,6 +12,7 @@ var FloatingScores = (function () {
     function FloatingScores() {
     }
     FloatingScores.addScore = function (x, y, value, currTime) {
+        console.log("adding floating score");
         if (FloatingScores.scores == undefined) {
             FloatingScores.scores = new Array();
         }
@@ -23,6 +24,7 @@ var FloatingScores = (function () {
         for (var i = 0; i < FloatingScores.scores.length; i++) {
             var s = FloatingScores.scores[i];
             var elapsed = currTime - s.startTime;
+            //console.log("fsEl", elapsed);
             if (elapsed > 1000) {
                 FloatingScores.scores.splice(i, 1); //remove if more than a sec
                 i = i === FloatingScores.scores.length ? i : i - 1;

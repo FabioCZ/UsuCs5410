@@ -92,11 +92,9 @@ var PathChecker = (function () {
         }
     };
     PathChecker.setCreepPath = function (game, initI, initJ, isHorizontal) {
-        var mazeVisited = new Array(this.sizeX);
         PathChecker.stateArray = new Array(this.sizeX);
         for (var i = 0; i < this.sizeX; i++) {
             PathChecker.stateArray[i] = new Array(this.sizeY);
-            mazeVisited[i] = new Array(this.sizeY);
             for (var j = 0; j < this.sizeY; j++) {
                 PathChecker.stateArray[i][j] = CellType.Empty;
             }
@@ -160,6 +158,7 @@ var PathChecker = (function () {
         console.log('no path, delete last tower', queue.length);
         game.deleteLatestTower();
         this.setCreepPath(game, initI, initJ, isHorizontal);
+        Sound.No.play();
     };
     PathChecker.getValidMoves = function (x, y, isHor) {
         var validMoves = [];
@@ -172,6 +171,51 @@ var PathChecker = (function () {
         if (PathChecker.isValidMove(x + 1, y, isHor))
             validMoves.push({ x: x + 1, y: y });
         return validMoves;
+    };
+    PathChecker.getGuidedProjPath = function (fromI, fromJ, toI, toJ) {
+        if (toI < 0 || toJ < 0)
+            return null;
+        var state = new Array(this.sizeX);
+        for (var i = 0; i < this.sizeX; i++) {
+            state[i] = new Array(this.sizeY);
+            for (var j = 0; j < this.sizeY; j++) {
+                state[i][j] = CellType.Empty;
+            }
+        }
+        var queue = new Array();
+        queue.push({ x: fromI, y: fromJ, path: new Array() });
+        while (queue.length > 0) {
+            var c = queue.shift();
+            if (c.x == toI && c.y == toJ) {
+                var temp = new Array();
+                for (var i = 0; i < c.path.length; i--) {
+                    temp.push(new ArCoord(c.path[i].x, c.path[i].y));
+                    if (i == 0) {
+                        temp.push(new ArCoord(fromI, fromJ));
+                        ;
+                    }
+                }
+                return temp;
+            }
+            if (state[c.x][c.y] === CellType.Visited) {
+                continue;
+            }
+            state[c.x][c.y] = CellType.Visited;
+            var validMoves = [];
+            if (c.x - 1 >= 0)
+                validMoves.push({ x: c.x - 1, y: c.y });
+            if (c.x + 1 < this.sizeX)
+                validMoves.push({ x: c.x + 1, y: c.y });
+            if (c.y - 1 >= 0)
+                validMoves.push({ x: c.x, y: c.y - 1 });
+            if (c.y + 1 < this.sizeY)
+                validMoves.push({ x: c.x, y: c.y + 1 });
+            for (var i = 0; i < validMoves.length; i++) {
+                var newPath = c.path.slice();
+                newPath.push({ x: validMoves[i].x, y: validMoves[i].y });
+                queue.push({ x: validMoves[i].x, y: validMoves[i].y, path: newPath });
+            }
+        }
     };
     PathChecker.sizeX = 25;
     PathChecker.sizeY = 16;

@@ -77,6 +77,9 @@ var Creep = (function () {
             this.state = CreepState.Dead;
             gs._money += ~~(this.maxHp / 10);
             gs._score += ~~(this.maxHp / 5);
+            FloatingScores.addScore(this.x, this.y, ~~(this.maxHp / 5), gs.ElapsedTime);
+            Particles.addCreepExpl(gs.ElapsedTime, this.x + Game.towerSize / 2, this.y + Game.towerSize / 2);
+            Sound.Death.play();
             this.x = -2;
             this.y = -2;
         }
@@ -155,7 +158,7 @@ var Creep = (function () {
             ctx.fillStyle = Colors.LtBlue;
             ctx.fillRect(this.x, this.y - Game.towerSize / 10, this.RatioHpLeft * Game.towerSize, Game.towerSize / 10);
             ctx.fillStyle = Colors.DarkBlue;
-            ctx.fillRect(this.RatioHpLeft, this.y - Game.towerSize / 10, (1 - this.RatioHpLeft) * Game.towerSize, Game.towerSize / 10);
+            ctx.fillRect(this.x + Game.towerSize - +(1 - this.RatioHpLeft) * Game.towerSize, this.y - Game.towerSize / 10, (1 - this.RatioHpLeft) * Game.towerSize, Game.towerSize / 10);
         }
         else {
             //health bar

@@ -52,8 +52,9 @@ class TowerDetails {
 
             ctx.textAlign = "center";
             ctx.fillStyle = Colors.Black;
-            ctx.fillText("Sell: " + ~~(this.tower.cost / 2) + "€", centerX, this.buttonRectSell.y+this.buttonRectSell.h*0.8, this.buttonRectSell.w);
-            ctx.fillText("Upgrade: " + ~~(this.tower.cost / 3) + "€", centerX, this.buttonRectUpg.y + this.buttonRectUpg.h*0.8, this.buttonRectUpg.w);
+            ctx.fillText("Sell: " + ~~(this.tower.cost / 2) + "€", centerX, this.buttonRectSell.y + this.buttonRectSell.h * 0.8, this.buttonRectSell.w);
+            var upgradeText = this.tower.upgradeLevel == 3 ? "Maxed upgrades" : "Upgrade: " + ~~(this.tower.cost / 3) + "€";
+            ctx.fillText(upgradeText, centerX, this.buttonRectUpg.y + this.buttonRectUpg.h*0.8, this.buttonRectUpg.w);
 
 
         } else {
@@ -138,7 +139,7 @@ class GameHud {
         GameHud.Button.src = "img/buttonLong_brown.png";
     }
 
-    public handleClick(x: number, y: number): Object {
+    public handleClick(x: number, y: number,gs:Game): Object {
         for (var i = 0; i < this.towerButtons.length; i++) {
             if (IsCoordInRect(this.towerButtons[i].rect, x, y)) {
                 this.towerDetails.tower = null;
@@ -148,11 +149,13 @@ class GameHud {
         }
         if (this.towerDetails.tower != null) {
             //details pane
-            if (IsCoordInRect(this.towerDetails.buttonRectSell, x, y)) {
+            if (IsCoordInRect(this.towerDetails.buttonRectSell, x, y)) {    //sell
+                this.setSelected(null);
                 return { new: false, t: null, start: false };
+                
             }
             if (IsCoordInRect(this.towerDetails.buttonRectUpg, x, y)) {
-                this.towerDetails.tower.upgrade();
+                this.towerDetails.tower.upgrade(gs);
                 return { new: false, t: this.towerDetails.tower, start: false };
             }
         }

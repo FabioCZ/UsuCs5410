@@ -44,7 +44,7 @@ class Application {
 
         //var game = new Game(performance.now(), this._context,l);
         //Application.CurrScreen = new MainMenu(this._context);
-        Application.CurrScreen = new Game(performance.now(), this._context, 1, { towers: null, money: 100, lives: 15, score: 0 });
+        Application.CurrScreen = new Game(performance.now(), this._context, 2, { towers: null, money: 100, lives: 15, score: 0, elTime:0 });
 
     }
 

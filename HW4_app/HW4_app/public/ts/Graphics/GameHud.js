@@ -40,7 +40,8 @@ var TowerDetails = (function () {
             ctx.textAlign = "center";
             ctx.fillStyle = Colors.Black;
             ctx.fillText("Sell: " + ~~(this.tower.cost / 2) + "€", centerX, this.buttonRectSell.y + this.buttonRectSell.h * 0.8, this.buttonRectSell.w);
-            ctx.fillText("Upgrade: " + ~~(this.tower.cost / 3) + "€", centerX, this.buttonRectUpg.y + this.buttonRectUpg.h * 0.8, this.buttonRectUpg.w);
+            var upgradeText = this.tower.upgradeLevel == 3 ? "Maxed upgrades" : "Upgrade: " + ~~(this.tower.cost / 3) + "€";
+            ctx.fillText(upgradeText, centerX, this.buttonRectUpg.y + this.buttonRectUpg.h * 0.8, this.buttonRectUpg.w);
         }
         else {
             ctx.textAlign = "center";
@@ -99,7 +100,7 @@ var GameHud = (function () {
         GameHud.Button = new Image();
         GameHud.Button.src = "img/buttonLong_brown.png";
     }
-    GameHud.prototype.handleClick = function (x, y) {
+    GameHud.prototype.handleClick = function (x, y, gs) {
         for (var i = 0; i < this.towerButtons.length; i++) {
             if (IsCoordInRect(this.towerButtons[i].rect, x, y)) {
                 this.towerDetails.tower = null;
@@ -110,10 +111,11 @@ var GameHud = (function () {
         if (this.towerDetails.tower != null) {
             //details pane
             if (IsCoordInRect(this.towerDetails.buttonRectSell, x, y)) {
+                this.setSelected(null);
                 return { new: false, t: null, start: false };
             }
             if (IsCoordInRect(this.towerDetails.buttonRectUpg, x, y)) {
-                this.towerDetails.tower.upgrade();
+                this.towerDetails.tower.upgrade(gs);
                 return { new: false, t: this.towerDetails.tower, start: false };
             }
         }

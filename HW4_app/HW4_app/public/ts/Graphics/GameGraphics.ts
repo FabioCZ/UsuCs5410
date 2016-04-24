@@ -8,6 +8,8 @@
     public static get Black() { return "#000000"; }
     public static get LtBlue() { return "#8CC9FF"; }
     public static get DarkBlue() { return "#00315C"; }
+    public static get Orage() { return "#FFA90A"; }
+
 
 }
 
