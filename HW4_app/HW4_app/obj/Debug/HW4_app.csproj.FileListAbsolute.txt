@@ -1,6 +1,0 @@
-C:\Users\KeanoFabricio\Desktop\UsuCs5410\HW4_app\HW4_app\bin\HW4_app.dll.config
-C:\Users\KeanoFabricio\Desktop\UsuCs5410\HW4_app\HW4_app\bin\HW4_app.dll
-C:\Users\KeanoFabricio\Desktop\UsuCs5410\HW4_app\HW4_app\bin\HW4_app.pdb
-C:\Users\KeanoFabricio\Desktop\UsuCs5410\HW4_app\HW4_app\obj\Debug\HW4_app.csprojResolveAssemblyReference.cache
-C:\Users\KeanoFabricio\Desktop\UsuCs5410\HW4_app\HW4_app\obj\Debug\HW4_app.dll
-C:\Users\KeanoFabricio\Desktop\UsuCs5410\HW4_app\HW4_app\obj\Debug\HW4_app.pdb
