@@ -99,10 +99,10 @@
         switch (this.levelNum) {
             case 1:
                 FloatingScores.addScore(this._context.canvas.clientWidth / 2, this._context.canvas.clientHeight / 2, "Wave incoming, 1 of 1", this.elapsedTime + 500, true);
-                for (var i = 0; i < 5; i++) {
-                    this._creep.push(new Creep(this, true, RandomBetween(this.elapsedTime + 1000, this.elapsedTime + 10000), CType.Land1));
+                for (var i = 0; i < 4; i++) {
+                    this._creep.push(new Creep(this, true, RandomBetween(this.elapsedTime + 1000, this.elapsedTime + 10000), CType.Air));
                 }
-                for (var i = 0; i < 1; i++) {
+                for (var i = 0; i < 3; i++) {
                     this._creep.push(new Creep(this, true, RandomBetween(this.elapsedTime + 1000, this.elapsedTime + 10000), CType.Land2));
                 }
                 break;

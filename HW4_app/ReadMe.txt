@@ -40,6 +40,25 @@ right click to deselect tower/cancel placement
 ESC to return to main menu from game
 
 ----------------------------------
+Gameplay:
+----------------------------------
+There are 4 types of creep:
+-Cow 60hp, land
+-Llama 90hp, land
+-Pig 120hp, land
+-Bat 60hp, air
+
+There are 4 kinds of towers:
+bomb - can attack land units, shoots a bomb with an explosion radius
+slow - any land unit in its vicinity gets slowed
+mixed - can attack both land and air units, shoots a projectile that only damages the creep it hits (if any)
+air - shoots a guided projectile at air units
+
+Towers have 3 upgrade levels.
+
+There are 5 levels, with increasing amount of enemy waves
+
+----------------------------------
 Credits:
 ----------------------------------
 

@@ -154,7 +154,7 @@ var GuidedProj = (function () {
         if (this.path == undefined) {
             this.path = PathChecker.getGuidedProjPath(Game.xToI(this.currX), Game.yToJ(this.currY), Game.xToI(c.x), Game.yToJ(c.y));
         }
-        if (this.path.length > 0) {
+        if (this.path !== null && this.path.length > 0) {
             var next = this.path[0];
             if (next.i === Game.xToI(this.currX) + 1) {
                 this.currX += this.speed * delta;

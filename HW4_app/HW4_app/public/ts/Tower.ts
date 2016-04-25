@@ -184,7 +184,13 @@ class Tower {
             var cCY = gs._creep[i].y + Game.towerSize / 2;
             var dist = Math.sqrt((cCX - tCX) * (cCX - tCX) + (cCY - tCY) * (cCY - tCY));
             if (dist < closest.dist) {
-                closest = { index: i, dist: dist };
+                if (this.name === Tower.AirName && gs._creep[i].type == CType.Air) {
+                    closest = { index: i, dist: dist };
+                } else if (this.name === Tower.Ground1Name && gs._creep[i].type !== CType.Air) {
+                    closest = { index: i, dist: dist };
+                } else if (this.name === Tower.MixedName) {
+                    closest = { index: i, dist: dist };
+                }
             }
             if (this.name === Tower.Ground2Name && dist < this.radius && gs._creep[i].type !== CType.Air) {
                 gs._creep[i].slow(this.upgradeLevel + 1, gs.ElapsedTime);

@@ -60,19 +60,19 @@ class Creep {
                 var i = Game.xToI(this.x);
                 var j = Game.yToJ(this.y);
                 this.path = !isHorizontalPath ? PathChecker.AirPathsHor[i][j] : PathChecker.AirPathsVer[i][j];  
-                this.hp = 40;
+                this.hp = 60;
                 break;
             case CType.Land1:
                 this.sprite = new Sprite("img/cow.png", 512);
-                this.hp = 40;
+                this.hp = 60;
                 break;
             case CType.Land2:
                 this.sprite = new Sprite("img/llama.png", 512);
-                this.hp = 70;
+                this.hp = 90;
                 break;
             case CType.Land3:
                 this.sprite = new Sprite("img/pig.png", 512);
-                this.hp = 100;
+                this.hp = 120;
                 break;
         }
         this.maxHp = this.hp;
