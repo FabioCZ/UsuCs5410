@@ -254,7 +254,7 @@ var Game = (function () {
             case 1:
                 FloatingScores.addScore(this._context.canvas.clientWidth / 2, this._context.canvas.clientHeight / 2, "Wave incoming, 1 of 1", this.elapsedTime + 500, true);
                 for (var i = 0; i < 4; i++) {
-                    this._creep.push(new Creep(this, true, RandomBetween(this.elapsedTime + 1000, this.elapsedTime + 10000), CType.Air));
+                    this._creep.push(new Creep(this, true, RandomBetween(this.elapsedTime + 1000, this.elapsedTime + 10000), CType.Land1));
                 }
                 for (var i = 0; i < 3; i++) {
                     this._creep.push(new Creep(this, true, RandomBetween(this.elapsedTime + 1000, this.elapsedTime + 10000), CType.Land2));
@@ -270,7 +270,7 @@ var Game = (function () {
                     this._creep.push(new Creep(this, true, RandomBetween(this.elapsedTime + 1000, this.elapsedTime + 5000), CType.Land2));
                     this._creep.push(new Creep(this, true, RandomBetween(this.elapsedTime + 1000, this.elapsedTime + 5000), CType.Air));
                 }
-                for (var i = 0; i < 10; i++) {
+                for (var i = 0; i < 5; i++) {
                     this._creep.push(new Creep(this, true, RandomBetween(this.elapsedTime + 20000, this.elapsedTime + 30000), CType.Land1));
                     this._creep.push(new Creep(this, true, RandomBetween(this.elapsedTime + 20000, this.elapsedTime + 30000), CType.Land2));
                     this._creep.push(new Creep(this, false, RandomBetween(this.elapsedTime + 20000, this.elapsedTime + 30000), CType.Land1));
@@ -366,12 +366,12 @@ var Game = (function () {
                 FloatingScores.addScore(this._context.canvas.clientWidth / 2, this._context.canvas.clientHeight / 2, "Wave incoming, 3 of 5", this.elapsedTime + 45000, true);
                 FloatingScores.addScore(this._context.canvas.clientWidth / 2, this._context.canvas.clientHeight / 2, "Wave incoming, 4 of 5", this.elapsedTime + 70000, true);
                 FloatingScores.addScore(this._context.canvas.clientWidth / 2, this._context.canvas.clientHeight / 2, "Final Wave of the Game!", this.elapsedTime + 90000, true);
-                for (var i = 0; i < 14; i++) {
-                    this._creep.push(new Creep(this, true, RandomBetween(this.elapsedTime + 500, this.elapsedTime + 5000), CType.Land3));
-                    this._creep.push(new Creep(this, true, RandomBetween(this.elapsedTime + 1000, this.elapsedTime + 5000), CType.Land2));
-                    this._creep.push(new Creep(this, false, RandomBetween(this.elapsedTime + 500, this.elapsedTime + 5000), CType.Land1));
-                    this._creep.push(new Creep(this, false, RandomBetween(this.elapsedTime + 1000, this.elapsedTime + 5000), CType.Land2));
-                    this._creep.push(new Creep(this, false, RandomBetween(this.elapsedTime + 1000, this.elapsedTime + 5000), CType.Air));
+                for (var i = 0; i < 25; i++) {
+                    this._creep.push(new Creep(this, true, RandomBetween(this.elapsedTime + 500, this.elapsedTime + 10000), CType.Land3));
+                    this._creep.push(new Creep(this, true, RandomBetween(this.elapsedTime + 1000, this.elapsedTime + 10000), CType.Land2));
+                    this._creep.push(new Creep(this, false, RandomBetween(this.elapsedTime + 500, this.elapsedTime + 10000), CType.Land1));
+                    this._creep.push(new Creep(this, false, RandomBetween(this.elapsedTime + 1000, this.elapsedTime + 10000), CType.Land2));
+                    this._creep.push(new Creep(this, false, RandomBetween(this.elapsedTime + 1000, this.elapsedTime + 10000), CType.Air));
                 }
                 for (var i = 0; i < 20; i++) {
                     this._creep.push(new Creep(this, true, RandomBetween(this.elapsedTime + 20000, this.elapsedTime + 30000), CType.Land1));

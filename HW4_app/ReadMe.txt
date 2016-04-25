@@ -36,6 +36,7 @@ Point your browser to http://localhost:3000
 Controls:
 ----------------------------------
 Mouse based
+left click to select menu items, place towers...
 right click to deselect tower/cancel placement
 ESC to return to main menu from game
 
@@ -54,9 +55,9 @@ slow - any land unit in its vicinity gets slowed
 mixed - can attack both land and air units, shoots a projectile that only damages the creep it hits (if any)
 air - shoots a guided projectile at air units
 
-Towers have 3 upgrade levels.
+Towers have 3 upgrade levels, where the radius, attack, projectile speed and cool down time get improved.
 
-There are 5 levels, with increasing amount of enemy waves
+There are 5 levels, with increasing amount of enemy waves.
 
 ----------------------------------
 Credits:

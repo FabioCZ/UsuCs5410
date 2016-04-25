@@ -53,4 +53,6 @@ app.use('/v1', router);
 var server = app.listen(3000, function () {
   var port = server.address().port;
   console.log('The tower defense game server listening at: http://localhost:%s', port);
+  console.log('If you haven\'t already, make sure to check out the included Readme for gameplay info');
+
 });
