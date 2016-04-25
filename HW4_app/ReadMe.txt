@@ -28,6 +28,7 @@ To run:
 ----------------------------------
 
 $cd HW4_app
+$npm install #this might not be necessary
 $node app.js
 
 Point your browser to http://localhost:3000
